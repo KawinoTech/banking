@@ -1,0 +1,33 @@
+{
+	"currencies":[{
+			"currency-code" : "021",
+			"curr": "TZS",
+			"prev": 10.45,
+			"current": 10.47,
+			"variance": 0.02},
+	 		{
+			"currency-code":"024",
+			"curr": "UGS",
+			"prev": 52.43,
+			"current": 52.47,
+			"variance": 0.04},
+	 {
+			"currency-code" : "004",
+			"curr": "EUR",
+			"prev": 144.68,
+			"current": 142.47,
+			"variance": -2.21},
+	 {
+			"currency-code" : "002",
+			"curr": "POUND",
+			"prev": 175.45,
+			"current": 177.47,
+			"variance": 2.56},
+			{
+				"currency-code" : "001",
+				"curr": "USD",
+				"prev": 138.45,
+				"current": 138.45,
+				"variance": 0.00}
+		]
+}

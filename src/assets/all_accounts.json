@@ -1,0 +1,39 @@
+{
+	"accounts":[{
+            "account_number": "20406010",
+			"account_type" : "Pay As You Go",
+			"curr": "KES",
+			"account_balance": "50,000.45",
+			"signatories": [],
+			"restrictions": false,
+            "account_status": "open",
+            "overdraft_limit": "100,000.00"},
+	 		{
+                "account_number": "22594578",
+                "account_type" : "Savings Account",
+                "curr": "KES",
+                "account_balance": "1,304,050.45",
+                "signatories": [],
+                "restrictions": false,
+                "account_status": "dormant",
+                "overdraft_limit": "0.00"},
+            {
+                "account_number": "28749357",
+                "account_type" : "Forex_Plus",
+                "curr": "USD",
+                "account_balance": "97,060.45",
+                "signatories": [],
+                "restrictions": true,
+                "account_status": "open",
+                "overdraft_limit": "5,000.00"},
+                {
+                    "account_number": "26428348",
+                    "account_type" : "Term Deposit",
+                    "curr": "KES",
+                    "account_balance": "1,060.45",
+                    "signatories": [],
+                    "restrictions": false,
+                    "account_status": "open",
+                    "overdraft_limit": "0.00"}
+		]
+}
