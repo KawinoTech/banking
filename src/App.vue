@@ -7,34 +7,40 @@
       </a>
     </div>
   </nav>
-  <Currencies_Trend></Currencies_Trend>
   <router-view></router-view>
       <footer>
         <p style="font-size: 10px;">Copyright &copy; All rights reserved</p>
-        <p style="font-size: 10px;">Application built by Okoth Kawino</p>
+        <p v-bind:class="status" style="font-size: 10px;">Application built by Okoth Kawino</p>
     </footer>
 </template>
 
 <script>
-import Currencies_Trend from './components/exchange_r.vue'
-
 
 export default {
   name: 'App',
-  components: {
-    Currencies_Trend
-  },
-
+  data(){
+    return {
+      status: 'danger',
+      movie: '',
+      showpop: false
+    }
+  }
 }
 </script>
 <style scoped>
 
-        footer {
-            display: block;
-            color: aqua;
-            text-align: center;
-            padding: 20px 0;
-            bottom: 0;
-            width: 100%;
-        }
+footer {
+    display: block;
+    color: aqua;
+    text-align: center;
+    padding: 20px 0;
+    bottom: 0;
+    width: 100%;
+}
+.danger {
+  color: red;
+}
+.inp {
+  color: white;
+}
 </style>

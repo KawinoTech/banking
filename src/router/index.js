@@ -55,7 +55,7 @@ const routes = [
     {
         name: 'Login_Page',
         component: Login_Page,
-        path: '/login'
+        path: '/'
     },
     {
         name: 'My_Cards',
