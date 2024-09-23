@@ -1,13 +1,11 @@
-import Buy_goods from '../components/buygoods.vue'
-import Home_Page from '../components/home.vue'
-import Pay_Bill from '../components/paybill.vue'
-import New_Account from '../components/new_account.vue'
-import Transfer_Funds from '../components/transfer_funds.vue'
-import Transaction_History from '../components/transaction_history.vue'
-import Success_Pg from '../components/success.vue'
-import Error_Pg from '../components/error.vue'
-import Login_Page from '../components/login.vue'
-import My_Cards from '../components/mycards.vue'
+import Buy_goods from '../routes/buygoods.vue'
+import Home_Page from '../routes/home.vue'
+import Pay_Bill from '../routes/paybill.vue'
+import New_Account from '../routes/new_account.vue'
+import Transfer_Funds from '../routes/transfer_funds.vue'
+import Transaction_History from '../routes/transaction_history.vue'
+import Login_Page from '../routes/login.vue'
+import My_Cards from '../routes/mycards.vue'
 import Login_Error_pg from '../components/loginerror.vue'
 import {createRouter, createWebHistory} from 'vue-router'
 
@@ -41,16 +39,6 @@ const routes = [
         name: 'Trans',
         component: Transaction_History,
         path: '/transaction_history'
-    },
-    {
-        name: 'Success_Pg',
-        component: Success_Pg,
-        path: '/success'
-    },
-    {
-        name: 'Error_Pg',
-        component: Error_Pg,
-        path: '/error'
     },
     {
         name: 'Login_Page',

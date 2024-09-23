@@ -101,26 +101,3 @@ body {
   .transaction-details .transaction-type {
     color: #28a745;
   }
-  span {
-    color: white;
-  }
-
-
-  ul {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-    width: 50%;
-}
-
-li {
-    margin-bottom: 5px;
-    padding: 10px;
-    background-color: #f0f0f0;
-    border-radius: 5px;
-}
-
-/* Styles for list items when hovered */
-li:hover {
-    background-color: #ddd;
-}

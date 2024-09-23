@@ -1,6 +1,6 @@
 <template>
     <div class="message_area">
-    <p>Invalid Credentials</p>
+    <p>Oops! Something Went Wrong</p>
     </div>
 <section>
   <div class="container">
@@ -14,7 +14,7 @@
   </div>
 </section>
 <div class="button_area" style="margin: 30px;">
-<router-link to="/login"><button type="button" class="btn btn-success">Try Again</button></router-link>
+<router-link to="/"><button type="button" class="btn btn-success">Try Again</button></router-link>
 </div>
 </template>
 <script>

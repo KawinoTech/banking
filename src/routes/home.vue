@@ -1,5 +1,6 @@
 <template>
 <div>
+  <Exchange_Rate style="margin-top: 80px;"></Exchange_Rate>
     <h1 style="color: aqua; margin: 10px;">My Accounts</h1>
     <User_Accounts></User_Accounts>
     <div class="container px-4 text-center">
@@ -66,7 +67,8 @@
 </template>
 
 <script>
-import User_Accounts from './user_accounts.vue'
+import User_Accounts from '../components/user_accounts.vue'
+import Exchange_Rate from '../components/exchange_r.vue'
 export default {
   name: 'Home_Page',
 
@@ -77,6 +79,7 @@ export default {
      },
      components: {
       User_Accounts,
+      Exchange_Rate
      },
 
   methods: {
