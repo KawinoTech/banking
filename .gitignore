@@ -23,3 +23,12 @@ pnpm-debug.log*
 *.sln
 *.sw?
 .gitignore
+.env
+__pycache__/
+.vscode/
+.env
+__pycache__/
+.vscode/
+.env
+__pycache__/
+.vscode/

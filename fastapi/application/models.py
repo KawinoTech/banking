@@ -1,5 +1,5 @@
 from .database import Base
-from sqlalchemy import Column, String, Integer, ForeignKey, Boolean, Text, DateTime
+from sqlalchemy import Column, String, Integer, ForeignKey, Boolean, Text, DateTime, Float
 from datetime import datetime
 from sqlalchemy.orm import relationship
 from flask_bcrypt import Bcrypt
@@ -18,10 +18,6 @@ class User(Base):
     email = Column(String(60), nullable=False, unique=True)
     pin = Column(String(60), nullable=False, unique=True)
     customer_no = Column(Integer, nullable=False, unique=True)
-
-
-    #collaborating = relationship('Idea', secondary=user_idea, backref='collaborator')
-    #pending_collaborating = relationship('Idea', secondary=pending_request, backref='requster')
 
     @property
     def password(self):
@@ -77,7 +73,7 @@ class BuyGoods(Base):
 class Account(Base):
     __tablename__ = "accounts"
     account_no = Column(String(100), primary_key=True)
-    date_posted = Column(DateTime, nullable=False, default=datetime.utcnow())
+    date_posted = Column(DateTime, nullable=False, default=datetime.now())
     id_no = Column(String(10), nullable=False)
     kra_pin = Column(String(10), nullable=False)
     nationality = Column(String(10), nullable=False)
@@ -89,3 +85,26 @@ class Account(Base):
     next_of_kin = Column(String(100), nullable=False)
     account_balance = Column(Integer, nullable=False, default=50000)
     owner_customer_no = Column(Integer, ForeignKey('user.customer_no'))
+    overdraft = Column(Boolean, nullable=False, default=False)
+
+class Loan(Base):
+    __tablename__ = "loans"
+    account_no = Column(String(100), primary_key=True)
+    date_posted = Column(DateTime, nullable=False, default=datetime.now())
+    owner_customer_no = Column(Integer, ForeignKey('user.customer_no'))
+    payback_period = Column(Integer, nullable=False)
+    rate = Column(Float, nullable=False)
+    account_balance = Column(Integer, nullable=False)
+    account_type = Column(String(100), nullable=False)
+    currency = Column(String(10), nullable=False)
+
+class TermDeposit(Base):
+    __tablename__ = "term_deposits"
+    account_no = Column(String(100), primary_key=True)
+    date_posted = Column(DateTime, nullable=False, default=datetime.now())
+    owner_customer_no = Column(Integer, ForeignKey('user.customer_no'))
+    maturity_period = Column(Integer, nullable=False)
+    rate = Column(Float, nullable=False)
+    account_balance = Column(Integer, nullable=False)
+    account_type = Column(String(100), nullable=False)
+    currency = Column(String(10), nullable=False)
