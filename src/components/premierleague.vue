@@ -1,7 +1,7 @@
 <template>
     <div class="container">
         <div class="video-container">
-            <video autoplay muted loop>
+            <video controls>
                 <source src="../assets/videos/epl.mp4" type="video/mp4">
                 Your browser does not support the video tag.
             </video>
@@ -22,7 +22,7 @@
                     reduce gap to six points at the top
                     
                     </p>
-                    <button type="button" class="btn btn-success">Stream</button>
+                    <button type="button" class="btn btn-success">Stream<i class="fa-regular fa-circle-play fa-beat"></i></button>
                 </div>
             </div>
             
@@ -109,5 +109,9 @@ img {
     background: gold;
     color: white;
     border: 0;
+}
+
+i {
+    margin-left: 20px;
 }
 </style>

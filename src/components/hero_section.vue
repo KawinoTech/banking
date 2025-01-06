@@ -14,19 +14,19 @@
             <div class="accounts">
                 <div>
                     <i class="fa-solid fa-piggy-bank"></i><br>
-                    <button type="button" class="btn btn-primary">Savings</button>
+                    <router-link to="/savings_account"><button type="button" class="btn btn-primary">Savings</button></router-link>
                 </div>
                 <div>
                     <i class="fa-solid fa-person"></i><br>
-                    <button type="button" class="btn btn-success">Personal</button>
+                    <router-link to="/transactional_account"><button type="button" class="btn btn-success">Personal</button></router-link>
                 </div>
                 <div>
                     <i class="fa-regular fa-building"></i><br>
-                    <button type="button" class="btn btn-warning">Corporate</button>
+                    <router-link to="/corporate_account"><button type="button" class="btn btn-warning">Corporate</button></router-link>
                 </div>
                 <div>
                     <i class="fa-solid fa-dollar-sign"></i><br>
-                    <button type="button" class="btn btn-info">Forex</button>
+                    <router-link to="/investment_banking"><button type="button" class="btn btn-info">Investment Banking</button></router-link>
                 </div>
             </div>
         </div>

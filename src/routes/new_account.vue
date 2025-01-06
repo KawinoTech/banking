@@ -1,5 +1,5 @@
 <template>
-        <Image_Slider></Image_Slider>
+        <Nav_Bar></Nav_Bar>
         <div class="head">
             <p style="color: rgb(196, 186, 186);">Open New Account</p>
         </div>
@@ -69,13 +69,13 @@
 </template>
 <script>
 import json from '../assets/types.json'
-import Image_Slider from '../components/slider.vue'
+import Nav_Bar from '../components/navbar.vue'
 import check from '../utils/utils'
 const url = 'https://sys-audit.tech/post/open_new_account'
 export default {
     name: "New_Account",
     components: {
-    Image_Slider
+      Nav_Bar
 },
     data() {
 return {

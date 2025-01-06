@@ -5,7 +5,7 @@ module.exports = defineConfig({
 module.exports = {
   devServer: {
     host: '0.0.0.0',
-    port: 8000, // Change this to your desired port if needed
+    port: 8080, // Change this to your desired port if needed
     open: true, // Opens the browser automatically on start
   },
 };

@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from datetime import datetime
+from typing import Optional
 class User(BaseModel):
     pin : str
     password_hash : str 
@@ -12,9 +12,12 @@ class ResponseUser(User):
     id : str
 
 class Transaction(BaseModel):
-    account : str
-    amount : int
-    remarks : str
+    payload: dict
+    signature: str
+class HelpDesk(BaseModel):
+    text : str
+class Report(BaseModel):
+    text : str
 
 
 class Transfer(Transaction):
@@ -37,8 +40,8 @@ class Account(BaseModel):
     telephone : str
     next_of_kin : str
 
-class ResponseTransfer(Transfer):
-    id : str
+class ResponseTransact(BaseModel):
+    ref_no: str
 
 class ResponseAccount(BaseModel):
     account_name : str
@@ -50,3 +53,8 @@ class TokenData(BaseModel):
 class ResponseAccount1(Account):
     account_no : str
     account_balance: int
+
+class ResponseHelp(BaseModel):
+    id : str
+class ReportResponse(BaseModel):
+    id : str

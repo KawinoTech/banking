@@ -40,7 +40,7 @@
 </div>
 </template>
 <script>
-const url = 'https://sys-audit.tech/post/login'
+const url = 'http://127.0.0.1:8000/post/login'
 export default ({
     name: "Login_Page",
     data() {

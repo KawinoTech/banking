@@ -4,9 +4,12 @@ from . import schemas
 from fastapi import  Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from .config import settings
+import hmac
+import hashlib
+import base64
+import json
 
 oauth_scheme = OAuth2PasswordBearer(tokenUrl='login') #Ties an endpoint to function get_current user
-
 SECRET_KEY = settings.secret_key
 ALGORITHM = settings.algorithm
 EXPIRATION = settings.access_token_expiration
@@ -34,3 +37,13 @@ def get_current_user(token: str = Depends(oauth_scheme)):
                                           detail="Unable to Validate Credentials",
                                           headers={"WWW-Authenticate": "Bearer"})
     return verify_token(token, credentials_exception)
+
+def verify_signature(payload: dict, signature: str) -> bool:
+    # Convert payload to string
+    payload_string = json.dumps(payload, separators=(',', ':'))
+
+    # Calculate HMAC using the same hashing method (SHA256) as in the frontend
+    computed_hmac = hmac.new(SECRET_KEY, payload_string.encode(), hashlib.sha256)
+    computed_signature = base64.b64encode(computed_hmac.digest()).decode()
+
+    return computed_signature == signature

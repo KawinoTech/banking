@@ -23,12 +23,12 @@
                             </ul>
                             <ul class="navbar-nav">
                                 <li class="nav-item active m-2">
-                                    <a href="#" class="nav-link"><i class="fa-solid fa-circle-info"></i>Customer Care</a>
+                                    <router-link to="/customer_service" style="text-decoration: none;"><i class="fa-solid fa-circle-info"></i>Customer Care</router-link>
                                 </li>
                             </ul>
                             <ul class="navbar-nav m-2">
                                 <li class="nav-item active">
-                                    <a href="#" class="nav-link"><i style="color: red" class="fa-solid fa-circle-exclamation fa-beat"></i>Report Problem</a>
+                                    <router-link to="/report_problem" style="text-decoration: none;"><i style="color: red" class="fa-solid fa-circle-exclamation fa-beat"></i>Report Problem</router-link>
                                 </li>
                             </ul>
                         </div>
@@ -53,5 +53,6 @@
 i {
     margin-right: 5px;
     font-size: large;
+    text-decoration: none;
 }
 </style>

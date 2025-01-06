@@ -18,6 +18,14 @@ class User(Base):
     email = Column(String(60), nullable=False, unique=True)
     pin = Column(String(60), nullable=False, unique=True)
     customer_no = Column(Integer, nullable=False, unique=True)
+    bills = relationship("PayBill", backref="owner")
+    goods_payed = relationship("BuyGoods", backref="owner")
+    c2b_transfers = relationship("Transfer", backref="owner")
+    accounts = relationship("Account", backref="owner")
+    loans = relationship("Loan", backref="owner")
+    deposits = relationship("TermDeposit", backref="owner")
+    help_requests = relationship("ClientHelpRequest", backref="owner")
+    client_reports = relationship("ClientReports", backref="owner")
 
     @property
     def password(self):
@@ -42,6 +50,7 @@ class Transfer(Base):
     beneficiary = Column(Text, nullable=False)
     date_posted = Column(DateTime, nullable=False, default=datetime.utcnow())
     ref_no = Column(String(100), primary_key=True)
+    owner_customer_no = Column(Integer, ForeignKey('user.customer_no'))
 
     
 
@@ -86,6 +95,7 @@ class Account(Base):
     account_balance = Column(Integer, nullable=False, default=50000)
     owner_customer_no = Column(Integer, ForeignKey('user.customer_no'))
     overdraft = Column(Boolean, nullable=False, default=False)
+    account_status = Column(String(8), nullable=False, default="open")
 
 class Loan(Base):
     __tablename__ = "loans"
@@ -97,6 +107,7 @@ class Loan(Base):
     account_balance = Column(Integer, nullable=False)
     account_type = Column(String(100), nullable=False)
     currency = Column(String(10), nullable=False)
+    account_status = Column(String(8), nullable=False, default="open")
 
 class TermDeposit(Base):
     __tablename__ = "term_deposits"
@@ -108,3 +119,22 @@ class TermDeposit(Base):
     account_balance = Column(Integer, nullable=False)
     account_type = Column(String(100), nullable=False)
     currency = Column(String(10), nullable=False)
+
+class ClientHelpRequest(Base):
+    __tablename__ = "client_help"
+    id = Column(String(100), primary_key=True)
+    date_posted = Column(DateTime, nullable=False)
+    owner_customer_no = Column(Integer, ForeignKey('user.customer_no'))
+    text = Column(Text, nullable=False)
+    status_resolved = Column(Boolean, nullable=False, default=False)
+
+class ClientReports(Base):
+    __tablename__ = "client_reports"
+    id = Column(String(100), primary_key=True)
+    date_posted = Column(DateTime, nullable=False)
+    owner_customer_no = Column(Integer, ForeignKey('user.customer_no'))
+    text = Column(Text, nullable=False)
+    status_resolved = Column(Boolean, nullable=False, default=False)
+
+    def __repr__(self):
+        return f"{self.id}"
