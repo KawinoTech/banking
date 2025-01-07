@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from .routes import users, transactions, new_account, help_desk
+from .routes import users, transactions, new_account, help_desk, cards
 from fastapi.middleware.cors import CORSMiddleware
 from . import models
 from .database import engine
@@ -16,6 +16,7 @@ async def startup():
     redis = await aioredis.from_url("redis://localhost", encoding="utf-8", decode_responses=True)
     await FastAPILimiter.init(redis)
 app.include_router(transactions.router)
+app.include_router(cards.router)
 app.include_router(help_desk.router)
 app.include_router(users.router)
 app.include_router(new_account.router)

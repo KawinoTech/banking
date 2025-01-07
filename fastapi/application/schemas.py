@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional
+from datetime import datetime
 class User(BaseModel):
     pin : str
     password_hash : str 
@@ -58,3 +58,30 @@ class ResponseHelp(BaseModel):
     id : str
 class ReportResponse(BaseModel):
     id : str
+
+class CardApplication(BaseModel):
+    payload: dict
+    signature: str
+
+class CardApplicationResponse(BaseModel):
+    full_name: str
+    email_address: str
+    phone: str
+    card_type: str
+    delivery_option: str
+    card_classification: str
+    card_no: str
+    account_attached_no: str
+    status: str
+    date_issued: datetime
+    expiry_date: datetime
+
+class GetDebitCards(BaseModel):
+    full_name: str
+    card_type: str
+    card_classification: str
+    card_no: str
+    account_attached_no: str
+    status: str
+    date_issued: str
+    expiry_date: str

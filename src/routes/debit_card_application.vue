@@ -4,38 +4,33 @@
     <h1>Debit Card Application</h1>
     <form action="/submit-debit-card-application" method="POST">
       <!-- Personal Information -->
-      <label for="full-name">Full Name</label>
-      <input type="text" id="full-name" name="full_name" placeholder="Enter your full name" required>
-
-      <label for="dob">Date of Birth</label>
-      <input type="date" id="dob" name="date_of_birth" required>
+      <label for="full_name">Full Name</label>
+      <input v-model="formData.full_name" type="text" id="full_name" name="full_name" placeholder="Enter your full name" required>
 
       <label for="email">Email Address</label>
-      <input type="email" id="email" name="email" placeholder="Enter your email address" required>
+      <input v-model="formData.email" type="email" id="email" name="email" placeholder="Enter your email address" required>
 
       <label for="phone">Phone Number</label>
-      <input type="tel" id="phone" name="phone" placeholder="Enter your phone number" required>
+      <input v-model="formData.phone" type="tel" id="phone" name="phone" placeholder="Enter your phone number" required>
 
       <!-- Account Details -->
-      <label for="account-number">Account Number</label>
-      <input type="text" id="account-number" name="account_number" placeholder="Enter your account number" required>
-
-      <label for="account-type">Account Type</label>
-      <select id="account-type" name="account_type" required>
-        <option value="savings">Savings Account</option>
-        <option value="current">Current Account</option>
+      <label for="account_number">Attach to Account</label>
+      <select v-model="formData.account_number" id="account_number" name="account_number" required>
+        <option v-for="account in all_accounts" :key="account">
+            {{account.account_type}} {{account.currency}}:{{account.account_no}}
+          </option>
       </select>
 
       <!-- Card Preferences -->
-      <label for="card-type">Card Type</label>
-      <select id="card-type" name="card_type" required>
-        <option value="classic">Classic Debit Card</option>
-        <option value="platinum">Platinum Debit Card</option>
-        <option value="premium">Premium Debit Card</option>
+      <label for="card_classification">Card Type</label>
+      <select v-model="formData.card_classification" id="card_classification" name="card_classification" required>
+        <option value="Classic Debit Card">Classic Debit Card</option>
+        <option value="Platinum Debit Card">Platinum Debit Card</option>
+        <option value="Premium Debit Card">Premium Debit Card</option>
       </select>
 
-      <label for="delivery-option">Delivery Option</label>
-      <select id="delivery-option" name="delivery_option" required>
+      <label for="delivery_option">Delivery Option</label>
+      <select v-model="formData.delivery_option" id="delivery_option" name="delivery_option" required>
         <option value="branch">Pick up at branch</option>
         <option value="mail">Mail to address</option>
       </select>
@@ -47,18 +42,99 @@
       </label>
 
       <!-- Submit Button -->
-      <button type="submit">Apply Now</button>
+      <button type="button" class="btn btn-success" @click="applyCard">Apply Now</button>
     </form>
   </div>
 </template>
 <script>
 import Nav_Bar from '../components/navbar.vue'
+import utils from '../utils/utils'
+const url2 = "http://127.0.0.1:8000/post/get_user_current&savings_accounts";
     export default {
         name: "Debit_App",
         components: {
           Nav_Bar
-        }
-    }
+        },
+        data() {
+    return {
+      formData: {
+        full_name: "",
+        email: "",
+        phone: "",
+        account_number: "",
+        delivery_option: "",
+        card_classification: "",
+      },
+      all_accounts: [],
+      isConfirmationVisible: false,
+      isProcessing: false,
+    };
+  },
+  mounted() {
+        this.fetchData();
+      },
+  methods: {
+    async fetchData() {
+      try {
+        const response = await fetch(url2, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        });
+        const data = await response.json();
+        this.all_accounts.push(...data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    },
+    findAndReturnSubsequent(str, char) {
+      const index = str.indexOf(char);
+      return index !== -1 && index < str.length - 1
+        ? str.substring(index + 1)
+        : "";
+    },
+    async applyCard() {
+      try{
+          if (utils.checkEmptyValues(this.formData)){
+            throw new Error('Empty Fields');
+      }
+      const requestBody = utils.generateHmacSignature( {"delivery_option": this.formData.delivery_option,
+                          "account_attached_no": this.findAndReturnSubsequent(this.formData.account_number, ':'),
+                          "phone": this.formData.phone,
+                          "email_address": this.formData.email,
+                          "full_name": this.formData.full_name,
+                        "card_classification": this.formData.card_classification})
+      const response = await fetch('http://127.0.0.1:8000/post/debit_card_application', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+                        },
+                        body: JSON.stringify(requestBody)
+                        }
+                       );
+      if (!response.ok) {
+      throw new Error('Failed to post data');
+      }
+      setTimeout(() => {
+            this.isConfirmationVisible = false;
+            this.isProcessing = false;
+            this.$router.push('/success');
+          }, 3000);
+         }
+         catch (error) {
+            console.error('Error posting data:', error);
+            setTimeout(() => {
+              this.isConfirmationVisible = false;
+              this.isProcessing = false;
+              this.$router.push('/error');
+            }, 1000);
+            // Handle error if necessary
+         }
+      }
+  }
+}
 </script>
 <style scoped>
     .form-container {

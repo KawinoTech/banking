@@ -25,7 +25,7 @@ def get_ideas(db: Session = Depends(get_db),
 '''
 
 @router.post("/open_new_account", status_code=status.HTTP_201_CREATED, response_model=schemas.ResponseAccount)
-#Post automatically saves users post in the form of pydantic model
+#Post auttomatically saves users post in the form of pydantic model
 #It is then stored in new_post. Every pydantic model has a .dict(converts to a python dict)
 def create_account(new_account: schemas.Account, db: Session = Depends(get_db), current_user: str = Depends(oauth.get_current_user)):
     account = models.Account(owner_customer_no = current_user.customer_no, account_no = uuid4(), **new_account.dict())
@@ -34,12 +34,24 @@ def create_account(new_account: schemas.Account, db: Session = Depends(get_db), 
         db.commit()
         db.refresh(account)
 
-    except:
+    except Exception as e:
+        print(e)
         raise HTTPException(status_code=status.HTTP_501_NOT_IMPLEMENTED, detail="Failed")
     return account
 
 @router.get("/get_user_accounts", status_code=status.HTTP_200_OK, response_model=List[schemas.ResponseAccount1])
 def get_user_accounts(db: Session = Depends(get_db), current_user: str = Depends(oauth.get_current_user)):
     accounts = db.query(models.Account).filter(models.Account.owner_customer_no == current_user.customer_no).all()
+    return accounts
+
+@router.get("/get_user_current&savings_accounts", status_code=status.HTTP_200_OK, response_model=List[schemas.ResponseAccount1])
+def get_user_accounts(db: Session = Depends(get_db), current_user: str = Depends(oauth.get_current_user)):
+    accounts = (
+    db.query(models.Account)
+    .filter(
+        models.Account.owner_customer_no == current_user.customer_no,
+        models.Account.account_type.in_(["Pay As You Go", "Savings Account"])
+    )
+    .all())
     return accounts
 
