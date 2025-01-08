@@ -5,41 +5,41 @@
     <form action="/submit-credit-card-application" method="POST">
       <!-- Personal Information -->
       <label for="full-name">Full Name</label>
-      <input type="text" id="full-name" name="full_name" placeholder="Enter your full name" required>
-
-      <label for="dob">Date of Birth</label>
-      <input type="date" id="dob" name="date_of_birth" required>
+      <input v-model="formData.full_name" type="text" id="full_name" name="full_name" placeholder="Enter your full name" required>
 
       <label for="email">Email Address</label>
-      <input type="email" id="email" name="email" placeholder="Enter your email address" required>
+      <input v-model="formData.email" type="email" id="email" name="email" placeholder="Enter your email address" required>
 
       <label for="phone">Phone Number</label>
-      <input type="tel" id="phone" name="phone" placeholder="Enter your phone number" required>
+      <input v-model="formData.phone" type="tel" id="phone" name="phone" placeholder="Enter your phone number" required>
 
       <!-- Employment Details -->
-      <label for="employment-status">Employment Status</label>
-      <select id="employment-status" name="employment_status" required>
+      <label for="employment_status">Employment Status</label>
+      <select v-model="formData.employment_status" id="employment_status" name="employment_status" required>
         <option value="employed">Employed</option>
         <option value="self-employed">Self-Employed</option>
         <option value="student">Student</option>
         <option value="unemployed">Unemployed</option>
+        <option value="business">Business</option>
       </select>
 
-      <label for="annual-income">Annual Income (USD)</label>
-      <input type="number" id="annual-income" name="annual_income" placeholder="Enter your annual income" required>
+      <label for="annual_income">Annual Income (USD)</label>
+      <input v-model="formData.annual_income" type="number" id="annual_income" name="annual_income" placeholder="Enter your annual income" required>
 
       <!-- Card Preferences -->
-      <label for="card-type">Preferred Card Type</label>
-      <select id="card-type" name="card_type" required>
-        <option value="standard">Standard Credit Card</option>
-        <option value="gold">Gold Credit Card</option>
-        <option value="platinum">Platinum Credit Card</option>
-        <option value="business">Business Credit Card</option>
+      <label for="card_classification">Preferred Card Type</label>
+      <select v-model="formData.card_classification" id="card_classification" name="card_classification" required>
+        <option value="Standard Credit Card">Standard Credit Card</option>
+        <option value="Gold Credit Card">Gold Credit Card</option>
+        <option value="Platinum Credit Card">Platinum Credit Card</option>
+        <option value="Business Credit Card">Business Credit Card</option>
       </select>
 
-      <!-- Address -->
-      <label for="address">Address</label>
-      <input type="text" id="address" name="address" placeholder="Enter your residential address" required>
+      <label for="delivery_option">Delivery Option</label>
+      <select v-model="formData.delivery_option" id="delivery_option" name="delivery_option" required>
+        <option value="branch">Pick up at branch</option>
+        <option value="mail">Mail to address</option>
+      </select>
 
       <!-- Terms and Conditions -->
       <label class="terms">
@@ -48,19 +48,78 @@
       </label>
 
       <!-- Submit Button -->
-      <button type="submit">Apply Now</button>
+      <button type="button" class="btn btn-success" @click="applyCard">Apply Now</button>
     </form>
   </div>
 </template>
 
 <script>
 import Nav_Bar from '../components/navbar.vue'
+import utils from '../utils/utils'
     export default {
-        name: "Debit_App",
+        name: "Credit_App",
         components: {
           Nav_Bar
-        }
-    }
+        },
+        data() {
+    return {
+      formData: {
+        full_name: "",
+        email: "",
+        phone: "",
+        delivery_option: "",
+        card_classification: "",
+        annual_income: "",
+        employment_status: ""
+      },
+      all_accounts: [],
+      isConfirmationVisible: false,
+      isProcessing: false,
+    };
+  },
+  methods: {
+    async applyCard() {
+      try{
+          if (utils.checkEmptyValues(this.formData)){
+            throw new Error('Empty Fields');
+      }
+      const requestBody = utils.generateHmacSignature( {"delivery_option": this.formData.delivery_option,
+                          "annual_income": this.formData.annual_income,
+                          "employment_status": this.formData.employment_status,
+                          "phone": this.formData.phone,
+                          "email_address": this.formData.email,
+                          "full_name": this.formData.full_name,
+                        "card_classification": this.formData.card_classification})
+      const response = await fetch('http://127.0.0.1:8000/post/credit_card_application', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+                        },
+                        body: JSON.stringify(requestBody)
+                        }
+                       );
+      if (!response.ok) {
+      throw new Error('Failed to post data');
+      }
+      setTimeout(() => {
+            this.isConfirmationVisible = false;
+            this.isProcessing = false;
+            this.$router.push('/success');
+          }, 3000);
+         }
+         catch (error) {
+            console.error('Error posting data:', error);
+            setTimeout(() => {
+              this.isConfirmationVisible = false;
+              this.isProcessing = false;
+              this.$router.push('/error');
+            }, 1000);
+            // Handle error if necessary
+         }
+      }
+  }
+}
 </script>
 <style scoped>
     .form-container {

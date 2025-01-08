@@ -1,11 +1,13 @@
 from .database import Base
 from sqlalchemy import Column, String, Integer, ForeignKey, Boolean, Text, DateTime, Float
 from datetime import datetime
-from sqlalchemy.orm import relationship
+from fastapi import  Depends
+from sqlalchemy.orm import relationship, Session
 from flask_bcrypt import Bcrypt
 from uuid import uuid4
 import random
 import string
+from babel.numbers import format_currency
 
 bycrypt = Bcrypt()
 
@@ -46,45 +48,64 @@ class User(Base):
     def check_password(self, attempted_pasword):
         #Returns Boolean
         return self.password_hash == attempted_pasword
+    
+    def get_c2b_transactions(self, db):
+        return db.query(Transfer).filter_by(owner_customer_no=self.customer_no).all()
 
-class Transfer(Base):
+    def get_bills(self, db):
+        return db.query(PayBill).filter_by(owner_customer_no=self.customer_no).all()
+    def get_amount(self, db):
+        return db.query(BuyGoods).filter_by(owner_customer_no=self.customer_no).all()
 
-    __tablename__ = "transfer"
-    id = Column(String(100), nullable=False)
+class Transaction():
+    id = Column(String(100), nullable=False, primary_key=True)
     account = Column(String(50), nullable=False)
-    amount = Column(Integer, nullable=False)
+    amount = Column(Float, nullable=False)
     remarks = Column(String(100), nullable=False)
     beneficiary = Column(Text, nullable=False)
-    date_posted = Column(DateTime, nullable=False, default=datetime.utcnow())
+    date_posted = Column(DateTime, nullable=False, default=datetime.now())
+
+    def truncate_uuid(self):
+        uuid = self.account
+        parts = uuid.split('-')
+    
+        # Check if the UUID has the correct structure
+        
+        # Construct the truncated string
+        truncated = f"{parts[0]}-***-{parts[-1][-2:]}"
+        self.account = truncated
+    
+    def format_cash(self):
+        self.amount = format_currency(self.amount, 'USD', locale='en_US')
+
+class Transfer(Transaction, Base):
+
+    __tablename__ = "transfer"
     ref_no = Column(String(100), primary_key=True)
     owner_customer_no = Column(Integer, ForeignKey('user.customer_no'))
+    transaction_type = Column(String(20), nullable=False, default="c2b_transfer") 
 
     
 
-class PayBill(Base):
+class PayBill(Transaction, Base):
 
     __tablename__ = "bill_payments"
-    id = Column(String(100), primary_key=True, nullable=False)
-    account = Column(String(100), nullable=False)
-    amount = Column(Integer, nullable=False)
-    remarks = Column(Text, nullable=False)
-    bus_no = Column(String(100), nullable=False)
+
     account_no = Column(String(100), nullable=False)
-    date_posted = Column(DateTime, nullable=False, default=datetime.utcnow())
     ref_no = Column(String(100), nullable=False)
     owner_customer_no = Column(Integer, ForeignKey('user.customer_no'))
+    transaction_type = Column(String(20), nullable=False, default="paybill")
 
-class BuyGoods(Base):
+
+class BuyGoods(Transaction, Base):
 
     __tablename__ = "buy_goods_and_services"
-    id = Column(String(100), primary_key=True)
-    account = Column(String(100), nullable=False)
-    amount = Column(Integer, nullable=False)
-    remarks = Column(Text, nullable=False)
-    store_no = Column(String(100), nullable=False)
-    date_posted = Column(DateTime, nullable=False, default=datetime.utcnow())
+
     ref_no = Column(String(100), nullable=False)
     owner_customer_no = Column(Integer, ForeignKey('user.customer_no'))
+    transaction_type = Column(String(20), nullable=False, default="buy_goods_and_services")
+
+
 
 class Loan(Base):
     __tablename__ = "loans"
@@ -140,7 +161,8 @@ class BaseCards():
     currency = Column(String(4), nullable=False, default='KES')
     delivery_option = Column(String(20), nullable=False)
     loyalty_point = Column(Float, nullable=False, default=1.0)
-    card_no = Column(String(11), primary_key=True)
+    card_no = Column(String(17), primary_key=True)
+    
 
     @staticmethod
     def generate_card_no():
@@ -169,29 +191,34 @@ class BaseCards():
 
 class PrepaidCards(BaseCards, Base):
     __tablename__ = "prepaid_cards"
-    card_type = Column(String(5), nullable=False, default="prepaid")
+    card_type = Column(String(8), nullable=False, default="prepaid")
     balance = Column(Integer, nullable=False, default=50000)
-    due_date = Column(DateTime, nullable=False)
+    intended_usage = Column(Text, nullable=False)
     owner_customer_no = Column(Integer, ForeignKey('user.customer_no'))
 
 class CreditCards(BaseCards, Base):
     __tablename__ = "credit_cards"
-    card_type = Column(String(5), nullable=False, default="credit")
-    balance = Column(Integer, nullable=False, default=-50000)
+    card_type = Column(String(7), nullable=False, default="credit")
+    balance = Column(Integer, nullable=False, default=0)
     due_date = Column(DateTime, nullable=False)
+    annual_income = Column(Integer, nullable=True)
+    employment_status = Column(String(10), nullable=True)
     rate = Column(Float, nullable=False, default=3.2)
     owner_customer_no = Column(Integer, ForeignKey('user.customer_no'))
+    limit = Column(String(20), nullable=False, default="Not Assigned")
+    card_classification = Column(String(20), nullable=False)
+
 class DebitCards(BaseCards, Base):
     __tablename__ = "debit_cards"
     
     # Add card_no as primary key or unique constraint to ensure one-to-one
     card_no = Column(String(17), primary_key=True)  # Assuming card_no is the primary key
     card_type = Column(String(5), nullable=False, default="debit")
-    card_classification = Column(String(20), nullable=False)
     
     # Define relationship with Account, ensuring it's one-to-one
     account_attached_no = Column(String(37), ForeignKey('accounts.account_no'), nullable=False)
     owner_customer_no = Column(Integer, ForeignKey('user.customer_no'))
+    card_classification = Column(String(20), nullable=False)
 
 class Account(Base):
     __tablename__ = "accounts"

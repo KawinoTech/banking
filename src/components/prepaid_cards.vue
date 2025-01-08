@@ -1,53 +1,94 @@
 <template>
-  <h style="color: aqua; margin: 0px 10px 0px 10px;" class="heading">Prepaid Cards</h>
+  <h style="color: aqua; margin: 0px 10px;" class="heading">Prepaid Cards</h>
+  <div style="margin: 10px;"><h v-if="all_cards.length === 0" style="color: white">Sorry! No card available</h></div>
   <div class="users_cards">
-    <div class="card_container">
+    <div v-for="card in all_cards" :key="card" class="card_container">
       <div class="card">
-        <div class="chip"></div>
-        <div class="card-number">1234 5678 9012 3456</div>
+        <div class="card_head">
+          <div class="chip"></div>
+          <div style="margin-left: 200px;" class="card_type">Prepaid Card</div>
+        </div>
+        <div class="card-number">{{ card.card_no }}</div>
         <div class="card-details">
-          <div class="name">John Doe</div>
+          <div class="name">{{ card.full_name }}</div>
         </div>
         <div class="logo">VISA</div>
       </div>
       <div class="card_details">
         <div class="card_general_details">
           <div class="card_dates">
-            <p>Issued: 26-4-2024</p>
-            <p>Expiry: 26-4-2024</p>
+            <p>Issued: <span>{{ card.date_issued }}</span></p>
+            <p>Expiry: <span>{{ card.expiry_date }}</span></p>
           </div>
           <div class="card_status">
-            <p>Status: Active</p>
-            <p>Balance: Ksh 3,458.45</p>
+            <p>Status: <span>{{ card.status }}</span></p>
+            <p>Balance: <span>{{ card.balance }}</span></p>
           </div>
         </div>
       </div>
+      <div class="card_buttons">
+        <button type="button" class="btn btn-success">Block</button>
+        <button type="button" class="btn btn-success">Reset PIN</button>
+        <button type="button" class="btn btn-success">Replace</button>
+        <button type="button" class="btn btn-success">Top Up</button>
+      </div>
     </div>
   </div>
-  <div class="card_buttons">
-    <button type="button" class="btn btn-success">Block</button>
-    <button type="button" class="btn btn-success">Reset PIN</button>
-    <button type="button" class="btn btn-success">Replace</button>
-    <button type="button" class="btn btn-success">Top Up</button>
-  </div>
+  <router-link to="/prepaid_card_application"><button style="margin-left: 30px; margin-bottom: 20px;" type="button" class="btn btn-success">Apply Prepaid</button></router-link>
 </template>
 
 <script>
+const url2 = "http://127.0.0.1:8000/post/get_user_prepaid_cards";
+
 export default {
   name: "Prepaid_Cards",
+  data() {
+    return {
+      all_cards: [],
+    };
+  },
+  mounted() {
+    this.fetchData();
+  },
+  methods: {
+    async fetchData() {
+      try {
+        const response = await fetch(url2, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        });
+        const data = await response.json();
+        this.all_cards.push(...data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    },
+  },
 };
 </script>
 
 <style scoped>
 .users_cards {
   display: flex;
-  flex-wrap: wrap; /* Allow elements to wrap to the next row */
+  flex-wrap: wrap;
   justify-content: start;
   padding: 20px;
 }
 
 .card_container {
   margin-bottom: 20px;
+  margin-right: 25px;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+  padding-left: 20px;
+}
+
+.card_container:hover {
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  border-color: aqua;
 }
 
 .card {
@@ -80,6 +121,13 @@ export default {
   position: absolute;
   top: 20px;
   left: 20px;
+}
+
+.card_head {
+  display: flex;
+  justify-content: space-around;
+  margin: 0;
+  padding: 0;
 }
 
 .card-number {
@@ -140,5 +188,16 @@ p {
 
 .card_details {
   margin-top: 10px;
+}
+
+p {
+  color: gold;
+  font-size: small;
+  font-style: italic;
+  margin-top: 5px;
+}
+
+span {
+  color: aqua;
 }
 </style>

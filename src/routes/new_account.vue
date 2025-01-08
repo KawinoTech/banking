@@ -1,221 +1,243 @@
 <template>
-        <Nav_Bar></Nav_Bar>
-        <div class="head">
-            <p style="color: rgb(196, 186, 186);">Open New Account</p>
+  <Nav_Bar></Nav_Bar>
+  <h1>Open New Account</h1>
+  <form action="#">
+    <div class="form-group">
+      <!-- Account Name -->
+      <div class="form-group">
+        <div v-if="!isValidaccount_name && formData.account_name != ''" class="account_name_checker">
+          <p style="color: red; font-size: 10px; margin-left: 20px;">
+            Account Name MUST contain at least 3 separate unique names
+          </p>
         </div>
-        <form action="#">
-            <div class="form-group">
-                <div class="form-group">
-                <div class="account_name_checker" v-if="!isValidaccount_name && formData.account_name != ''">
-                  <p style="color: red; font-size: 10px; margin-left: 20px;">Account Name MUST lontain at least 3 seperate unique Names</p>
-                </div>
-                <input v-model="formData.account_name" type="text" id="account_name" name="account_name" placeholder="Account Name" @input="checkAccNameInpu">
-                </div>
-                <div class="form-group">
-                    <div class="account_name_checker" v-if="!isValidaddress && formData.address != ''">
-                      <p style="color: red; font-size: 10px; margin-left: 20px;">The Address you have entered is invalid</p>
-                    </div>
-                <input v-model="formData.address" type="text" id="address" name="address" placeholder="Address" @input="checkAddressInput">
-                </div>
-                <div class="form-group">
-                <input v-model="formData.telephone" type="text" id="telephone" name="telephone" placeholder="Telephone">
-                </div>
-                <div class="form-group">
-                    <div class="account_name_checker" v-if="!isValididnumber && formData.id_no != ''">
-                      <p style="color: red; font-size: 10px; margin-left: 20px;">The ID Number invalid</p>
-                    </div>
-                <input v-model="formData.id_no" type="text" id="id_no" name="id_no" placeholder="ID Number" @input="checkIdnumberInput">
-                </div>
-                  <div class="form-group">
-                    <div class="account_name_checker" v-if="!isValidkrapin && formData.kra_pin != ''">
-                      <p style="color: red; font-size: 10px; margin-left: 20px;">The KRA PIN is invalid</p>
-                    </div>
-                <input v-model="formData.kra_pin" type="text" id="kra_pin" name="kra_pin" placeholder="KRA PIN" @input="checkKRApinInput">
-                </div>
-                <div class="form-group">
-                <input v-model="formData.next_of_kin" type="text" id="next_of_kin" name="next_of_kin" placeholder="Next of Kin">
-                </div>
-                <label for="account_type" class="form-label">Choose Type of Account</label>
-                <select v-model="formData.account_type" id="account_type" name="account_type" class="form-select" style="background-color: rgb(0, 19, 31);
-                color: white;width: 50%;">
-                <option selected>Select Account to Open</option>
-                <option >Pay As You Go</option>
-                <option >Savings Account</option>
-                <option >Forex Plus</option>
-                <option >SME Banking</option>
-                <option >Vue Vantage</option>
-                </select>
-                <label for="currency" class="form-label">Choose Type of Cuurency</label>
-                <select v-model="formData.currency" id="currency" name="currency" class="form-select" style="background-color: rgb(0, 19, 31);
-                color: white;width: 50%;">
-                <option selected>Select Currency</option>
-                <option>KES</option>
-                <option>EUR</option>
-                <option>POUND</option>
-                <option>USD</option>
-                </select>
-                <label for="currency" class="form-label">Nationality</label>
-                <select v-model="formData.nationality" id="nationality" name="nationality" class="form-select" style="background-color: rgb(0, 19, 31);
-                color: white;width: 50%;">
-                <option selected>Select Nationality</option>
-                <option>Kenyan</option>
-                <option>British</option>
-                <option>American</option>
-                <option>French</option>
-                </select>
-            </div>
-            <button type="button" class="btn btn-success" @click.prevent="createAccount">Open Account</button>
-        </form>
+        <input v-model="formData.account_name" 
+               type="text" 
+               id="account_name" 
+               name="account_name" 
+               placeholder="Account Name" 
+               @input="checkAccNameInput" />
+      </div>
+
+      <!-- Address -->
+      <div class="form-group">
+        <div v-if="!isValidaddress && formData.address != ''" class="account_name_checker">
+          <p style="color: red; font-size: 10px; margin-left: 20px;">
+            The Address you have entered is invalid
+          </p>
+        </div>
+        <input v-model="formData.address" 
+               type="text" 
+               id="address" 
+               name="address" 
+               placeholder="Address" 
+               @input="checkAddressInput" />
+      </div>
+
+      <!-- Telephone -->
+      <div class="form-group">
+        <input v-model="formData.telephone" 
+               type="text" 
+               id="telephone" 
+               name="telephone" 
+               placeholder="Telephone" />
+      </div>
+
+      <!-- ID Number -->
+      <div class="form-group">
+        <div v-if="!isValididnumber && formData.id_no != ''" class="account_name_checker">
+          <p style="color: red; font-size: 10px; margin-left: 20px;">
+            The ID Number is invalid
+          </p>
+        </div>
+        <input v-model="formData.id_no" 
+               type="text" 
+               id="id_no" 
+               name="id_no" 
+               placeholder="ID Number" 
+               @input="checkIdnumberInput" />
+      </div>
+
+      <!-- KRA PIN -->
+      <div class="form-group">
+        <div v-if="!isValidkrapin && formData.kra_pin != ''" class="account_name_checker">
+          <p style="color: red; font-size: 10px; margin-left: 20px;">
+            The KRA PIN is invalid
+          </p>
+        </div>
+        <input v-model="formData.kra_pin" 
+               type="text" 
+               id="kra_pin" 
+               name="kra_pin" 
+               placeholder="KRA PIN" 
+               @input="checkKRApinInput" />
+      </div>
+
+      <!-- Next of Kin -->
+      <div class="form-group">
+        <input v-model="formData.next_of_kin" 
+               type="text" 
+               id="next_of_kin" 
+               name="next_of_kin" 
+               placeholder="Next of Kin" />
+      </div>
+
+      <!-- Account Type -->
+      <label for="account_type" class="form-label">Choose Type of Account</label>
+      <select v-model="formData.account_type" 
+              id="account_type" 
+              name="account_type" 
+              class="form-select" 
+              style="background-color: rgb(0, 19, 31); color: white; width: 50%;">
+        <option selected>Select Account to Open</option>
+        <option>Pay As You Go</option>
+        <option>Savings Account</option>
+        <option>Forex Plus</option>
+        <option>SME Banking</option>
+        <option>Vue Vantage</option>
+      </select>
+
+      <!-- Currency -->
+      <label for="currency" class="form-label">Choose Type of Currency</label>
+      <select v-model="formData.currency" 
+              id="currency" 
+              name="currency" 
+              class="form-select" 
+              style="background-color: rgb(0, 19, 31); color: white; width: 50%;">
+        <option selected>Select Currency</option>
+        <option>KES</option>
+        <option>EUR</option>
+        <option>POUND</option>
+        <option>USD</option>
+      </select>
+
+      <!-- Nationality -->
+      <label for="nationality" class="form-label">Nationality</label>
+      <select v-model="formData.nationality" 
+              id="nationality" 
+              name="nationality" 
+              class="form-select" 
+              style="background-color: rgb(0, 19, 31); color: white; width: 50%;">
+        <option selected>Select Nationality</option>
+        <option>Kenyan</option>
+        <option>British</option>
+        <option>American</option>
+        <option>French</option>
+      </select>
+    </div>
+
+    <button type="button" class="btn btn-success" @click.prevent="createAccount">Open Account</button>
+  </form>
 </template>
+
 <script>
-import json from '../assets/types.json'
-import Nav_Bar from '../components/navbar.vue'
-import check from '../utils/utils'
-const url = 'https://sys-audit.tech/post/open_new_account'
+import json from '../assets/types.json';
+import Nav_Bar from '../components/navbar.vue';
+import check from '../utils/utils';
+
+const url = 'http://127.0.0.1:8000/post/open_new_account';
+
 export default {
-    name: "New_Account",
-    components: {
-      Nav_Bar
-},
-    data() {
-return {
-formData: {
-            account_type: '',
-            account_name: '',
-            currency: '',
-            address: '',
-            id_no: '',
-            nationality: '',
-            kra_pin: '',
-            telephone: '',
-            next_of_kin: ''
-        },
-loading: true,
-isValidaccount_name: true,
-isValidaddress: true,
-isValididnumber: true,
-isValidkrapin: true,
-all_accounts: []
-    }
-},
-
-mounted() {
+  name: 'New_Account',
+  components: { Nav_Bar },
+  data() {
+    return {
+      formData: {
+        account_type: '',
+        account_name: '',
+        currency: '',
+        address: '',
+        id_no: '',
+        nationality: '',
+        kra_pin: '',
+        telephone: '',
+        next_of_kin: ''
+      },
+      loading: true,
+      isValidaccount_name: true,
+      isValidaddress: true,
+      isValididnumber: true,
+      isValidkrapin: true,
+      all_accounts: []
+    };
+  },
+  mounted() {
     this.fetchJson();
-},
-
-methods: {
-   fetchJson() {
-try {
-        for (let i = 0; i < json.accounts.length; i++)
-        {
-            this.all_accounts.push(json.accounts[i]);
-        }
-        this.loading = false;
-    } 
-    catch (error) 
-    {
-    console.error('Error fetching data:', error);
-    }
-            },
-async createAccount() {
+  },
+  methods: {
+    fetchJson() {
       try {
-        if (check.checkEmptyValues(this.formData)){
+        json.accounts.forEach(account => {
+          this.all_accounts.push(account);
+        });
+        this.loading = false;
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    },
+    async createAccount() {
+      try {
+        if (check.checkEmptyValues(this.formData)) {
           throw new Error('Empty Fields');
         }
         const response = await fetch(url, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+            Authorization: `Bearer ${localStorage.getItem('accessToken')}`
           },
           body: JSON.stringify(this.formData)
         });
         if (!response.ok) {
           throw new Error('Failed to post data');
         }
-
-        // Set success to true after successful post
         this.success = true;
-        // Redirect to homepage after 2 seconds
-        setTimeout(() => {
-          this.$router.push('/success');
-        }, 2000);
+        setTimeout(() => this.$router.push('/success'), 2000);
       } catch (error) {
         console.error('Error posting data:', error);
-        setTimeout(() => {
-          this.$router.push('/error');
-        }, 2000);
-        // Handle error if necessary
+        setTimeout(() => this.$router.push('/error'), 2000);
       }
     },
-
     checkAccNameInput() {
-
-      if (this.formData.account_name != "Hello")
-      {
-        this.isValidaccount_name = false;
-      }
-      else{
-        this.isValidaccount_name = true;
-      }
+      this.isValidaccount_name = this.formData.account_name === 'Hello';
     },
-
-        checkAddressInput() {
-      if (this.formData.address != "Hello")
-      {
-        this.isValidaddress = false;
-      }
-      else{
-        this.isValidaddress = true;
-      }
+    checkAddressInput() {
+      this.isValidaddress = this.formData.address === 'Hello';
     },
-
-            checkIdnumberInput() {
-      if (this.formData.id_no != "Hello")
-      {
-        this.isValididnumber = false;
-      }
-      else{
-        this.isValididnumber = true;
-      }
+    checkIdnumberInput() {
+      this.isValididnumber = this.formData.id_no === 'Hello';
     },
-
-            checkKRApinInput() {
-      if (this.formData.kra_pin != "Hello")
-      {
-        this.isValidkrapin = false;
-      }
-      else{
-        this.isValidkrapin = true;
-      }
+    checkKRApinInput() {
+      this.isValidkrapin = this.formData.kra_pin === 'Hello';
     }
-
   }
-}
+};
 </script>
 
 <style scoped>
+h1 {
+  color: gold;
+  margin-left: 5px;
+  margin-top: 80px;
+}
 .success-message {
   color: green;
 }
-
-head {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+.head {
+  margin-top: 80px;
 }
-p, label {
-    color: rgb(196, 186, 186);
-    font-size: 30px;
+p,
+label {
+  color: rgb(196, 186, 186);
+  font-size: 30px;
 }
-
-input, select, .head{
+input,
+select,
+.head {
   margin: 20px;
 }
-
 label {
-    color: rgb(118, 106, 106);
-    font-size: 15px;
-    margin: 20px;
+  color: white;
+  font-size: 15px;
+  margin: 20px;
 }
 </style>

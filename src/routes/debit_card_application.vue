@@ -35,7 +35,7 @@
         <option value="mail">Mail to address</option>
       </select>
 
-      <!-- Terms and Conditions -->
+      <!-- Terms and Clonditions -->
       <label>
         <input type="checkbox" name="terms" required>
         I agree to the terms and conditions.

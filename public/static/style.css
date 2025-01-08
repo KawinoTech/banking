@@ -157,3 +157,38 @@ body {
 .overdraft {
   margin: 10px;
 }
+
+.radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-family: Arial, sans-serif;
+  margin: 20px;
+}
+.radio-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+.radio-option input[type="radio"] {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #007bff;
+  border-radius: 50%;
+  background-color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.radio-option input[type="radio"]:checked {
+  background-color: green;
+  border: 2px solid #0056b3;
+}
+.radio-option input[type="radio"]:hover {
+  border-color: #0056b3;
+}
+.radio-option:hover {
+  color: #0056b3;
+}

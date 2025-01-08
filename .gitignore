@@ -3,7 +3,7 @@ node_modules
 /dist
 __pycache__
 /fastapi/fast_api/*
-
+fastapi/env/
 # local env files
 .env.local
 .env.*.local

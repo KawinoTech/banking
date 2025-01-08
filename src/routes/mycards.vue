@@ -2,9 +2,12 @@
 <Nav_Bar></Nav_Bar>
 <Exchange_Rate style="margin-top: 80px;"></Exchange_Rate>
 <h1>My Cards</h1>
-<Debit_Cards></Debit_Cards>
-<Credit_Cards></Credit_Cards>
-<Prepaid_Cards></Prepaid_Cards>
+<div><Debit_Cards></Debit_Cards></div>
+<div><Credit_Cards></Credit_Cards></div>
+<div><Prepaid_Cards></Prepaid_Cards></div>
+
+
+
 </template>
 
 <script>

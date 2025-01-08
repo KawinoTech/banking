@@ -19,10 +19,10 @@
       </div>
       <div class="form-group">
         <input
-          v-model="formData.store_no"
+          v-model="formData.beneficiary"
           type="text"
-          id="store_no"
-          name="store_no"
+          id="beneficiary"
+          name="beneficiary"
           placeholder="Store Number"
         />
       </div>
@@ -136,7 +136,7 @@ export default {
       formData: {
         amount: "",
         remarks: "",
-        store_no: "",
+        beneficiary: "",
         account: "",
         password: "",
       },
@@ -207,7 +207,7 @@ export default {
           amount: Number(this.formData.amount),
           account: this.findAndReturnSubsequent(this.formData.account, ":"),
           remarks: this.formData.remarks,
-          store_no: this.formData.store_no,
+          beneficiary: this.formData.beneficiary,
         });
         const response = await fetch("http://127.0.0.1:8000/post/buygoods", {
           method: "POST",
@@ -246,40 +246,6 @@ form {
 }
 label {
   color: white;
-}
-.radio-group {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  font-family: Arial, sans-serif;
-  margin: 20px;
-}
-.radio-option {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 1rem;
-  cursor: pointer;
-}
-.radio-option input[type="radio"] {
-  appearance: none;
-  width: 20px;
-  height: 20px;
-  border: 2px solid #007bff;
-  border-radius: 50%;
-  background-color: white;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-.radio-option input[type="radio"]:checked {
-  background-color: green;
-  border: 2px solid #0056b3;
-}
-.radio-option input[type="radio"]:hover {
-  border-color: #0056b3;
-}
-.radio-option:hover {
-  color: #0056b3;
 }
 span {
   color: green;

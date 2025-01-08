@@ -69,9 +69,7 @@ class CardApplicationResponse(BaseModel):
     phone: str
     card_type: str
     delivery_option: str
-    card_classification: str
     card_no: str
-    account_attached_no: str
     status: str
     date_issued: datetime
     expiry_date: datetime
@@ -85,3 +83,28 @@ class GetDebitCards(BaseModel):
     status: str
     date_issued: str
     expiry_date: str
+
+class GetCreditCards(BaseModel):
+    full_name: str
+    balance: int
+    due_date: datetime
+    card_classification: str
+    card_no: str
+    status: str
+    date_issued: str
+    expiry_date: str
+    limit: str
+
+class GetPrepaidCards(BaseModel):
+    full_name: str
+    balance: int
+    card_no: str
+    status: str
+    date_issued: str
+    expiry_date: str
+
+class AllTransactions(BaseModel):
+    account: str
+    amount: str
+    beneficiary: str
+    date_posted: datetime

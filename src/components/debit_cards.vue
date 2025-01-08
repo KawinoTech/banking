@@ -1,11 +1,12 @@
 <template>
   <h style="color: aqua; margin: 0px 10px 0px 10px;" class="heading">Debit Cards</h>
+  <div style="margin: 10px;"><h v-if="all_cards.length === 0" style="color: white">Sorry! No card available</h></div>
   <div class="users_cards">
     <div v-for="card in all_cards" :key="card" class="card_container">
       <div class="card">
         <div class="card_head">
           <div class="chip"></div>
-          <div class="card_type">{{card.card_classification }}</div>
+          <div class="card_type">{{ card.card_classification }}</div>
         </div>
         <div class="card-number">{{ card.card_no }}</div>
         <div class="card-details">
@@ -21,31 +22,33 @@
           </div>
           <div class="card_status">
             <p>Status: <span>{{ card.status }}</span></p>
-            <p>Account:<span>{{ card.account_attached_no }}</span></p>
+            <p>Account: <span>{{ card.account_attached_no }}</span></p>
           </div>
         </div>
       </div>
+      <div class="card_buttons">
+        <button type="button" class="btn btn-success">Block</button>
+        <button type="button" class="btn btn-success">Reset PIN</button>
+        <button type="button" class="btn btn-success">Replace</button>
+      </div>
     </div>
   </div>
-  <div class="card_buttons">
-    <button type="button" class="btn btn-success">Block</button>
-    <button type="button" class="btn btn-success">Reset PIN</button>
-    <button type="button" class="btn btn-success">Replace</button>
-  </div>
+  <router-link to="/debit_card_application"><button style="margin-left: 30px; margin-bottom: 20px;" type="button" class="btn btn-success">Apply Debit Card</button></router-link>
 </template>
 
 <script>
 const url2 = "http://127.0.0.1:8000/post/get_user_debit_cards";
+
 export default {
   name: "Debit_Cards",
   data() {
     return {
-      all_cards: []
-    }
+      all_cards: [],
+    };
   },
   mounted() {
-        this.fetchData();
-      },
+    this.fetchData();
+  },
   methods: {
     async fetchData() {
       try {
@@ -60,21 +63,30 @@ export default {
       } catch (error) {
         console.error("Error fetching data:", error);
       }
-    }
-  }
+    },
+  },
 };
 </script>
 
 <style scoped>
 .users_cards {
   display: flex;
-  flex-wrap: wrap; /* Allow elements to wrap to the next row */
+  flex-wrap: wrap;
   justify-content: start;
-  padding: 20px;
+  padding: 15px;
 }
 
 .card_container {
   margin-bottom: 20px;
+  margin-right: 25px;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.card_container:hover {
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  border-color: aqua;
 }
 
 .card {
@@ -89,8 +101,9 @@ export default {
   justify-content: space-between;
   padding: 20px;
   position: relative;
-  margin-right: 40px;
+  margin-right: 50px;
   margin-top: 20px;
+  margin-left: 10px;
   transition: transform 1s ease, box-shadow 1s ease;
 }
 
@@ -104,6 +117,13 @@ export default {
   height: 35px;
   border-radius: 5px;
   background: #e0e0e0;
+}
+
+.card_head {
+  display: flex;
+  justify-content: space-around;
+  margin: 0;
+  padding: 0;
 }
 
 .card-number {
@@ -141,6 +161,7 @@ export default {
   flex-wrap: wrap;
   justify-content: start;
   margin-bottom: 10px;
+  margin-left: 10px;
 }
 
 .card_dates {
@@ -151,7 +172,6 @@ export default {
   display: flex;
   flex-wrap: wrap;
   justify-content: start;
-  margin-left: 20px;
   margin-bottom: 20px;
 }
 
@@ -161,7 +181,7 @@ export default {
 
 .card_head {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around;
   margin: 0;
   padding: 0;
 }
@@ -175,5 +195,9 @@ p {
 
 span {
   color: aqua;
+}
+
+.btn {
+  margin-right: 30px;
 }
 </style>
