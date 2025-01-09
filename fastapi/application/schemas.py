@@ -107,4 +107,4 @@ class AllTransactions(BaseModel):
     account: str
     amount: str
     beneficiary: str
-    date_posted: datetime
+    date_posted: str

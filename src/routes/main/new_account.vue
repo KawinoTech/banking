@@ -1,6 +1,11 @@
 <template>
   <Nav_Bar></Nav_Bar>
-  <h1>Open New Account</h1>
+  <h1>
+    Open New Account
+    <i class="fa-solid fa-circle-question">
+      <div class="details"><router-link to="/instructions_on_opening_transactional_account"><p class="info">Click to find details on account opening</p></router-link></div>
+    </i>
+  </h1>
   <form action="#">
     <div class="form-group">
       <!-- Account Name -->
@@ -125,14 +130,19 @@
       </select>
     </div>
 
+    <label class="terms">
+        <input type="checkbox" name="terms" required>
+        I agree to the terms and conditions.
+      </label>
+
     <button type="button" class="btn btn-success" @click.prevent="createAccount">Open Account</button>
   </form>
 </template>
 
 <script>
-import json from '../assets/types.json';
-import Nav_Bar from '../components/navbar.vue';
-import check from '../utils/utils';
+import json from '../../assets/types.json';
+import Nav_Bar from '../../components/navbar.vue';
+import check from '../../utils/utils';
 
 const url = 'http://127.0.0.1:8000/post/open_new_account';
 
@@ -157,7 +167,8 @@ export default {
       isValidaddress: true,
       isValididnumber: true,
       isValidkrapin: true,
-      all_accounts: []
+      all_accounts: [],
+      isTandCsclicked: false,
     };
   },
   mounted() {
@@ -239,5 +250,46 @@ label {
   color: white;
   font-size: 15px;
   margin: 20px;
+}
+
+h1 i {
+      margin-left: 10px;
+      cursor: pointer;
+      color: gold;
+      position: relative;
+}
+
+/* Style the details area */
+.details {
+  position: absolute;
+  top: 120%; /* Position below the icon */
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: gold;
+  border: 1px solid;
+  border-radius: 5px;
+  padding: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  z-index: 1000;
+}
+
+/* Show details when hovering over the icon or details */
+h1 i:hover .details,
+.details:hover {
+  opacity: 1;
+  visibility: visible;
+}
+
+.info {
+  font-size: small;
+  color:black;
+}
+
+.btn {
+  margin-left: 20px;
 }
 </style>

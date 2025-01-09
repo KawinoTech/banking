@@ -27,8 +27,8 @@
 </section>
 </template>
 <script>
-import Nav_Bar from '../components/navbar.vue'
-import check from '../utils/utils'
+import Nav_Bar from '../../components/navbar.vue'
+import check from '../../utils/utils'
 export default {
   name: 'Customer_Service',
 
@@ -86,7 +86,7 @@ export default {
 </script>
 <style scoped>
     .background-container {
-      background-image: url('../assets/images/support.jpg'); /* Replace with your image path */
+      background-image: url('../../assets/images/support.jpg'); /* Replace with your image path */
       background-size: cover; /* Scales image to cover the entire area */
       background-repeat: no-repeat; /* Prevents the image from repeating */
       background-position: center; /* Center aligns the image */

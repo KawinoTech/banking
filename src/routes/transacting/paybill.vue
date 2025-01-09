@@ -135,8 +135,8 @@
 
 <script>
 const url2 = "http://127.0.0.1:8000/post/get_user_accounts";
-import utils from "../utils/utils";
-import Nav_Bar from "../components/navbar.vue";
+import utils from "../../utils/utils";
+import Nav_Bar from "../../components/navbar.vue";
 
 export default {
   name: "Pay_Bill",

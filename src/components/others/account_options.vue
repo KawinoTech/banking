@@ -35,7 +35,7 @@
 <script>
 import ImageCarousel from './ImageCarousel.vue';
 export default {
-    name: 'Hero_Section',
+    name: 'Accounts_Options',
     components: {
       ImageCarousel,
     },

@@ -4,7 +4,7 @@
   <div style="background-color: aqua; height: 2px; width: 85%; margin: 10px 0px 20px 20px;">.</div>
   <div class="video-section">
     <video autoplay muted loop playsinline>
-      <source src="../assets/videos/savings.mp4" type="video/mp4">
+      <source src="../../assets/videos/savings.mp4" type="video/mp4">
       Your browser does not support the video tag.
     </video>
   </div>
@@ -32,7 +32,7 @@
   </div>
 </template>
 <script>
-import Nav_Bar from '../components/navbar.vue'
+import Nav_Bar from '../../components/navbar.vue'
     export default {
         name: 'Savings_Account',
         emits: ['close'],

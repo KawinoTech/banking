@@ -2,7 +2,7 @@
     <div class="container">
         <div class="video-container">
             <video controls>
-                <source src="../assets/videos/epl.mp4" type="video/mp4">
+                <source src="../../assets/videos/epl.mp4" type="video/mp4">
                 Your browser does not support the video tag.
             </video>
         </div>
@@ -13,7 +13,7 @@
             <h1>News</h1>
             <div class="news_container">
                 <div>
-                    <img src="../assets/images/bre-v-ars.webp" class="card-img-top" alt="...">
+                    <img src="../../assets/images/bre-v-ars.webp" class="card-img-top" alt="...">
                 </div>
                 <div class="text-container">
                     <p>

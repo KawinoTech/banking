@@ -1,23 +1,25 @@
-import Buy_goods from '../routes/buygoods.vue'
-import Home_Page from '../routes/home.vue'
-import Pay_Bill from '../routes/paybill.vue'
-import Debit_App from '../routes/debit_card_application.vue'
-import Credit_App from '../routes/credit_card_application.vue'
-import Prepaid_App from '../routes/prepaid_card_application.vue'
-import Savings_Account from '../routes/savings.vue'
-import Investment_Banking from '../routes/investment_banking.vue'
-import Transactional_Account from '../routes/transactional_account.vue'
-import Corporate_Account from '../routes/corporate_banking.vue'
-import New_Account from '../routes/new_account.vue'
-import Transfer_Funds from '../routes/transfer_funds.vue'
-import Transaction_History from '../routes/transaction_history.vue'
-import Login_Page from '../routes/login.vue'
-import My_Cards from '../routes/mycards.vue'
-import Login_Error_pg from '../components/loginerror.vue'
-import Error_pg from '../routes/error.vue'
+import Buy_goods from '../routes/transacting/buygoods.vue'
+import Pay_Bill from '../routes/transacting/paybill.vue'
+import Transfer_Funds from '../routes/transacting/transfer_funds.vue'
+import Debit_App from '../routes/card_applications/debit_card_application.vue'
+import Credit_App from '../routes/card_applications/credit_card_application.vue'
+import Prepaid_App from '../routes/card_applications/prepaid_card_application.vue'
+import Savings_Account from '../routes/account_products/savings.vue'
+import Investment_Banking from '../routes/account_products/investment_banking.vue'
+import Transactional_Account from '../routes/account_products/transactional_account.vue'
+import Corporate_Account from '../routes/account_products/corporate_banking.vue'
+import Customer_Service from '../routes/customer_service/customer_service.vue'
+import Report_Problem from '../routes/customer_service/report_problem.vue'
+import Home_Page from '../routes/main/home.vue'
+import My_Cards from '../routes/main/mycards.vue'
+import New_Account from '../routes/main/new_account.vue'
+import Transaction_History from '../routes/main/transaction_history.vue'
+import Login_Error_pg from '../routes/error_pages/loginerror.vue'
+import Error_pg from '../routes/error_pages/error.vue'
+import Not_Found from '../routes/error_pages/404_notfound.vue'
+import Login_Page from '../routes/main/login.vue'
+import Manual_Open_Account from '../routes/manuals/open_account.vue'
 import Success_Pg from '../routes/success.vue'
-import Customer_Service from '../routes/customer_service.vue'
-import Report_Problem from '../routes/report_problem.vue'
 import {createRouter, createWebHistory} from 'vue-router'
 
 const routes = [
@@ -64,12 +66,13 @@ const routes = [
     {
         name: 'Login_Page',
         component: Login_Page,
+        alias: '/login',
         path: '/'
     },
     {
         name: 'My_Cards',
         component: My_Cards,
-        path: '/my_cards'
+        path: '/my_cards',
     },
     {
         name: 'Login_Error_pg',
@@ -120,6 +123,17 @@ const routes = [
         name: 'Prepaid_App',
         component: Prepaid_App,
         path: '/prepaid_card_application'
+    },
+    {
+        name: 'Manual_Open_Account',
+        component: Manual_Open_Account,
+        path: '/instructions_on_opening_transactional_account'
+    },
+    {
+        /*Routes any unmatching route*/
+        path: '/:pathMatch(.*)*', 
+        name: 'Not_Found',
+        component: Not_Found
     }
 ];
 

@@ -1,7 +1,7 @@
 <template>
     <div class="container">
         <div class="card" style="width: 16rem;">
-            <img src="../assets/images/ufc.jpg" class="card-img-top" alt="...">
+            <img src="../../assets/images/ufc.jpg" class="card-img-top" alt="...">
             <div class="card-body">
                 <h5 class="card-title">UFC</h5>
                 <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
@@ -9,7 +9,7 @@
             </div>
         </div>
         <div class="card" style="width: 16rem;">
-            <img src="../assets/images/avengers.jpg" class="card-img-top" alt="...">
+            <img src="../../assets/images/avengers.jpg" class="card-img-top" alt="...">
             <div class="card-body">
                 <h5 class="card-title">Movies & TV Shows</h5>
                 <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
@@ -17,7 +17,7 @@
             </div>
         </div>
         <div class="card" style="width: 16rem;">
-            <img src="../assets/images/matchday.jpg" class="card-img-top" alt="...">
+            <img src="../../assets/images/matchday.jpg" class="card-img-top" alt="...">
             <div class="card-body">
                 <h5 class="card-title">NFL</h5>
                 <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
@@ -28,7 +28,7 @@
     <Premier_League></Premier_League>
 </template>
 <script>
-import Premier_League from '../components/premierleague.vue'
+import Premier_League from './premierleague.vue'
 export default {
     name: 'Enter_tainment',
     components: {

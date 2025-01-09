@@ -1,39 +1,41 @@
 <template>
     <Nav_Bar></Nav_Bar>
-    <Currencies_Trend style="margin-top: 100px"></Currencies_Trend>
-    <h1 style="color: gold; padding-left: 20px;">Investment Banking</h1>
+    <h1 style="color: gold; margin-top: 100px; padding-left: 20px;">Transactional Account</h1>
     <div style="background-color: aqua; height: 2px; width: 85%; margin: 10px 0px 20px 20px;">.</div>
     <div class="video-section">
       <video autoplay muted loop playsinline>
-        <source src="../assets/videos/investment.mp4" type="video/mp4">
+        <source src="../../assets/videos/transactional.mp4" type="video/mp4">
         Your browser does not support the video tag.
       </video>
     </div>
     <div class="content-section">
-        <h1>Why Open an Investment Banking Account?</h1>
+      <h1>Why Open a Transactional Account?</h1>
 <p>
-  An investment banking account provides access to specialized financial services for businesses and individuals looking to manage assets, raise capital, and pursue strategic growth opportunities. It is a crucial tool for complex financial transactions, tailored investment strategies, and achieving long-term goals.
+  A transactional account, commonly known as a current account, is an essential tool for managing 
+  day-to-day finances and facilitating smooth financial transactions. It offers quick access to funds 
+  and supports high levels of financial activity for both individuals and businesses.
 </p>
-<h2>Benefits of an Investment Banking Account</h2>
+<h2>Benefits of a Transactional Account</h2>
 <ul>
-  <li>Access to advisory services for mergers, acquisitions, and restructuring.</li>
-  <li>Customized investment solutions to optimize portfolio performance.</li>
-  <li>Support in raising capital through equity, debt, or hybrid instruments.</li>
-  <li>Management of large-scale financial transactions with precision and expertise.</li>
-  <li>Comprehensive market research and strategic guidance.</li>
+  <li>Seamless deposits and withdrawals, including ATM access.</li>
+  <li>Unlimited transactions with no minimum holding period.</li>
+  <li>Access to overdraft facilities for additional financial flexibility.</li>
+  <li>Integration with digital banking platforms for online payments and transfers.</li>
 </ul>
-<h2>Driving Strategic Growth</h2>
+<h2>Enhancing Financial Management</h2>
 <p>
-  An investment banking account offers unparalleled resources for capital market access, financial advisory, and tailored solutions to meet unique investment goals. By partnering with investment banking services, businesses and individuals can unlock new growth opportunities, mitigate risks, and achieve financial success on a global scale.
+  A transactional account ensures that you can efficiently manage cash flow, settle bills, and meet 
+  daily financial obligations. It's a cornerstone for organizing your finances and achieving 
+  both personal and business goals with ease.
 </p>
-      <router-link to="/new_account"><button>Invest</button></router-link>
+
+      <router-link to="/new_account"><button>Open Account</button></router-link>
     </div>
   </template>
   <script>
-  import Nav_Bar from '../components/navbar.vue'
-  import Currencies_Trend from '../components/exchange_r.vue'
+  import Nav_Bar from '../../components/navbar.vue'
       export default {
-          name: 'Investment_Banking',
+          name: 'Transactional_Account',
           emits: ['close'],
           data() {
               return {
@@ -41,8 +43,7 @@
               }
           },
           components: {
-            Nav_Bar,
-            Currencies_Trend
+            Nav_Bar
   }
       }
   </script>
@@ -104,4 +105,4 @@
   button:hover {
     background-color: #218838;
   }
-</style>
+  </style>

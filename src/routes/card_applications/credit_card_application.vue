@@ -54,8 +54,8 @@
 </template>
 
 <script>
-import Nav_Bar from '../components/navbar.vue'
-import utils from '../utils/utils'
+import Nav_Bar from '../../components/navbar.vue'
+import utils from '../../utils/utils'
     export default {
         name: "Credit_App",
         components: {

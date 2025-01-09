@@ -181,8 +181,6 @@ def buygoods(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"An unexpected error occurred: {str(e)}"
         )
-    finally:
-        db.close()
 
 
 
@@ -273,8 +271,6 @@ def paybill(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"An unexpected error occurred: {str(e)}"
         )
-    finally:
-        db.close()
 
 
 @router.get(
@@ -333,6 +329,7 @@ def all_user_transactions(
         for transaction in all_transactions:
             transaction.truncate_uuid()
             transaction.format_cash()
+            transaction.truncate_datetime()
 
         return all_transactions
 
@@ -341,5 +338,3 @@ def all_user_transactions(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error fetching transactions: {str(e)}"
         )
-    finally:
-        db.close()

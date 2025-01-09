@@ -1,19 +1,19 @@
 <template>
     <div class="container">
         <div class="card" style="width: 18rem;">
-            <img src="../assets/images/uber.png" class="card-img-top" alt="...">
+            <img src="../../assets/images/uber.png" class="card-img-top" alt="...">
             <div class="card-body">
                 <button type="button" class="btn btn-success">Request ride</button>
             </div>
         </div>
         <div class="card" style="width: 18rem;">
-            <img src="../assets/images/bolt1.jpg" class="card-img-top" alt="...">
+            <img src="../../assets/images/bolt1.jpg" class="card-img-top" alt="...">
             <div class="card-body">
                 <button type="button" class="btn btn-success">Request ride</button>
             </div>
         </div>
         <div class="card" style="width: 18rem;">
-            <img src="../assets/images/little.png" class="card-img-top" alt="...">
+            <img src="../../assets/images/little.png" class="card-img-top" alt="...">
             <div class="card-body">
                 <button type="button" class="btn btn-success">Request ride</button>
             </div>

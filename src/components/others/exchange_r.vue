@@ -19,7 +19,7 @@
 </div>
 </template>
 <script>
-import json from '../assets/exchange-rates.json'
+import json from '../../assets/exchange-rates.json'
 
 export default {
   name: 'Currencies_Trend',

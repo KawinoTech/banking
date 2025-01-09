@@ -11,11 +11,11 @@
 </template>
 
 <script>
-import Nav_Bar from '../components/navbar.vue'
-import Exchange_Rate from '../components/exchange_r.vue'
-import Debit_Cards from '../components/debit_cards.vue'
-import Credit_Cards from '../components/credit_cards.vue'
-import Prepaid_Cards from '../components/prepaid_cards.vue'
+import Nav_Bar from '../../components/navbar.vue'
+import Exchange_Rate from '../../components/others/exchange_r.vue'
+import Debit_Cards from '../../components/cards/debit_cards.vue'
+import Credit_Cards from '../../components/cards/credit_cards.vue'
+import Prepaid_Cards from '../../components/cards/prepaid_cards.vue'
 export default {
     name: "My_Cards",
     components: {

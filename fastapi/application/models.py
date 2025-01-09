@@ -78,6 +78,10 @@ class Transaction():
     def format_cash(self):
         self.amount = format_currency(self.amount, 'USD', locale='en_US')
 
+    def truncate_datetime(self, format: str = "%Y-%m-%d %H:%M:%S"):
+        date_posted = self.date_posted.strftime(format)
+        self.date_posted = date_posted
+
 class Transfer(Transaction, Base):
 
     __tablename__ = "transfer"

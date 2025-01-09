@@ -42,7 +42,7 @@
 </template>
 
 <script>
-import Nav_Bar from '../components/navbar.vue';
+import Nav_Bar from '../../components/navbar.vue';
 
 export default {
   name: "Transaction_History",

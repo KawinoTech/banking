@@ -1,7 +1,7 @@
 <template>
     <Nav_Bar></Nav_Bar>
     <Exchange_Rate style="margin-top: 80px;"></Exchange_Rate>
-    <Hero_Section></Hero_Section>
+    <Accounts_Options></Accounts_Options>
     
     <div style="background-color: aqua; height: 2px; width: 85%; margin-top: 80px; margin-left: 40px;">.</div>
     <h1 style="color: gold; margin-top: 30px;padding-left: 40px;">Financial Services</h1>
@@ -31,17 +31,17 @@
 </template>
 
 <script>
-import Exchange_Rate from '../components/exchange_r.vue'
-import Nav_Bar from '../components/navbar.vue'
-import Hero_Section from '../components/hero_section.vue'
-import Financial_Services from '../components/financial_services.vue'
-import Enter_tainment from '../components/entertainment.vue'
-import Trans_port from '../components/transport.vue'
-import Customer_Savings from '../components/customer_savings.vue'
-import Term_Deposits from '../components/term_deposit.vue'
-import Current_Accounts from '../components/current_acs.vue'
-import Customer_Liability from '../components/customer_liability.vue'
-import ThirdP_Wallets from '../components/thirdp_wallets.vue'
+import Exchange_Rate from '../../components/others/exchange_r.vue'
+import Nav_Bar from '../../components/navbar.vue'
+import Accounts_Options from '../../components/others/account_options.vue'
+import Financial_Services from '../../components/services/financial_services.vue'
+import Enter_tainment from '../../components/services/entertainment.vue'
+import Trans_port from '../../components/services/transport.vue'
+import Customer_Savings from '../../components/assets&_liabilities/customer_savings.vue'
+import Term_Deposits from '../../components/assets&_liabilities/term_deposit.vue'
+import Current_Accounts from '../../components/assets&_liabilities/current_acs.vue'
+import Customer_Liability from '../../components/assets&_liabilities/customer_liability.vue'
+import ThirdP_Wallets from '../../components/services/thirdp_wallets.vue'
 export default {
   name: 'Home_Page',
 
@@ -53,7 +53,7 @@ export default {
      components: {
       Exchange_Rate,
       Nav_Bar,
-      Hero_Section,
+      Accounts_Options,
       Financial_Services,
       Enter_tainment,
       Trans_port,

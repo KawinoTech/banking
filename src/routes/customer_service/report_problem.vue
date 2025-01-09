@@ -22,8 +22,8 @@
 
 </template>
 <script>
-import Nav_Bar from '../components/navbar.vue'
-import check from '../utils/utils'
+import Nav_Bar from '../../components/navbar.vue'
+import check from '../../utils/utils'
 export default {
   name: 'Report_Problem',
 
