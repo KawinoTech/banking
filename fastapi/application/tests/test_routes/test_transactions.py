@@ -4,8 +4,7 @@ from unittest.mock import MagicMock, patch
 from uuid import uuid4
 from sqlalchemy.exc import IntegrityError
 from application.main import app
-from application.models import Account, Transfer
-from application.schemas import Transaction
+from application.models.accounts import Account
 from ...database import  get_db
 from ... import oauth
 class TestTransferEndpoint(unittest.TestCase):

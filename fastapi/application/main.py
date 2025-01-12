@@ -1,15 +1,16 @@
 from fastapi import FastAPI
 from .routes import users, transactions, new_account, help_desk, cards
 from fastapi.middleware.cors import CORSMiddleware
-from . import models
 from .database import engine
 from fastapi_limiter import FastAPILimiter
 import redis.asyncio as aioredis
 
 
-#creates all our models/ Though Alembic is an alternative
-models.Base.metadata.create_all(bind=engine)
+#creates all our models/ Though Alembic is an alternativeLll
 
+from .models import accounts
+
+accounts.Base.metadata.create_all(bind=engine)
 app = FastAPI()
 @app.on_event("startup")
 async def startup():

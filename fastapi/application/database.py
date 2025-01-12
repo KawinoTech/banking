@@ -11,6 +11,7 @@ SQLALCHEMY_DATABASE_URI = f'mysql://{settings.database_username}:{settings.datab
 engine = create_engine(SQLALCHEMY_DATABASE_URI)
 session = sessionmaker(bind=engine, autocommit=False, autoflush=False)
 
+
 Base = declarative_base()
 
 def get_db():

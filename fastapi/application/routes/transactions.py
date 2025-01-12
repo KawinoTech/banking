@@ -5,8 +5,11 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from typing import List
 from uuid import uuid4
+from ..models.transactions import PayBill, BuyGoods, Transfer
+from ..models.users import Customer
+from ..models.accounts import Account
 
-from .. import models, schemas, oauth
+from .. import schemas, oauth
 from ..database import get_db
 
 DAILY_LIMIT = 100
@@ -41,14 +44,14 @@ def transfer(
     Raises:
         HTTPException: Various HTTP exceptions based on transaction validity and errors.
     """
-    new_transaction = models.Transfer(
+    new_transaction = Transfer(
         id=uuid4(),
         ref_no=uuid4(),
         **transaction.payload,
         owner_customer_no=current_user.customer_no
     )
-    account = db.query(models.Account).filter(
-        models.Account.account_no == transaction.payload['account']
+    account = db.query(Account).filter(
+        Account.account_no == transaction.payload['account']
     ).first()
 
     try:
@@ -131,14 +134,14 @@ def buygoods(
             - 501 Not Implemented: If the account has insufficient funds.
             - 500 Internal Server Error: If a database error or unexpected error occurs.
     """
-    new_transaction = models.BuyGoods(
+    new_transaction = BuyGoods(
         id=uuid4(),
         ref_no=uuid4(),
         **transaction.payload,
         owner_customer_no=current_user.customer_no
     )
-    account = db.query(models.Account).filter(
-        models.Account.account_no == transaction.payload['account']
+    account = db.query(Account).filter(
+        Account.account_no == transaction.payload['account']
     ).first()
 
     try:
@@ -221,14 +224,14 @@ def paybill(
             - 501 Not Implemented: If the account has insufficient funds.
             - 500 Internal Server Error: If a database error or unexpected error occurs.
     """
-    new_transaction = models.PayBill(
+    new_transaction = PayBill(
         id=uuid4(),
         ref_no=uuid4(),
         **transaction.payload,
         owner_customer_no=current_user.customer_no
     )
-    account = db.query(models.Account).filter(
-        models.Account.account_no == transaction.payload['account']
+    account = db.query(Account).filter(
+        Account.account_no == transaction.payload['account']
     ).first()
 
     try:
@@ -309,7 +312,7 @@ def all_user_transactions(
         - The function calls methods on the `user` model to fetch categorized transactions.
         - Each transaction undergoes formatting steps for UUID truncation and cash formatting.
     """
-    user = db.query(models.User).filter(models.User.customer_no == current_user.customer_no).first()
+    user = db.query(Customer).filter(Customer.customer_no == current_user.customer_no).first()
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

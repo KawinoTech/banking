@@ -1,5 +1,7 @@
 from fastapi import  Depends, status, APIRouter, HTTPException, status
-from .. import models, schemas, oauth
+from .. import schemas, oauth
+from ..models.cards import BaseCards, DebitCards, CreditCards, PrepaidCards
+from ..models.accounts import Account
 from datetime import datetime
 from ..database import  get_db
 from sqlalchemy.orm import Session
@@ -43,7 +45,7 @@ def apply_debit_card(
     """
     # Generate card details
     try:
-        card_no = models.BaseCards.generate_card_no()
+        card_no = BaseCards.generate_card_no()
     except Exception as e:
         logger.error(f"Error generating card number: {e}")
         raise HTTPException(
@@ -52,7 +54,7 @@ def apply_debit_card(
         )
 
     # Create new debit card application
-    request = models.DebitCards(
+    request = DebitCards(
         card_no=card_no,
         date_issued=datetime.now(),
         expiry_date=datetime.now() + relativedelta(years=3),
@@ -111,8 +113,8 @@ def apply_credit_card(
         HTTPException: If an error occurs during the application process.
     """
     # Generate card application
-    request = models.CreditCards(
-        card_no=models.BaseCards.generate_card_no(),
+    request = CreditCards(
+        card_no=BaseCards.generate_card_no(),
         date_issued=datetime.now(),
         expiry_date=datetime.now() + relativedelta(years=1),
         date_requested=datetime.now(),
@@ -169,8 +171,8 @@ def apply_prepaid_card(
     Raises:
         HTTPException: If the account is invalid, insufficient funds are available, or an error occurs during processing.
     """
-    account_to_debit = db.query(models.Account).filter(
-        models.Account.account_no == new_card.payload['account_number']
+    account_to_debit = db.query(Account).filter(
+        Account.account_no == new_card.payload['account_number']
     ).first()
 
     # Validate account existence and balance
@@ -188,8 +190,8 @@ def apply_prepaid_card(
     # Deduct balance and generate prepaid card
     account_to_debit.account_balance -= new_card.payload['balance']
     del new_card.payload['account_number']  # Clean payload before creating the card
-    request = models.PrepaidCards(
-        card_no=models.BaseCards.generate_card_no(),
+    request = PrepaidCards(
+        card_no=BaseCards.generate_card_no(),
         date_issued=datetime.now(),
         expiry_date=datetime.now() + relativedelta(years=1),
         date_requested=datetime.now(),
@@ -246,8 +248,8 @@ def get_user_debit_cards(
     """
     try:
         # Fetch user debit cards
-        accounts = db.query(models.DebitCards).filter(
-            models.DebitCards.owner_customer_no == current_user.customer_no
+        accounts = db.query(DebitCards).filter(
+            DebitCards.owner_customer_no == current_user.customer_no
         ).all()
 
         for account in accounts:
@@ -296,8 +298,8 @@ def get_user_credit_cards(
     """
     try:
         # Fetch user credit cards
-        accounts = db.query(models.CreditCards).filter(
-            models.CreditCards.owner_customer_no == current_user.customer_no
+        accounts = db.query(CreditCards).filter(
+            CreditCards.owner_customer_no == current_user.customer_no
         ).all()
 
         for account in accounts:
@@ -345,8 +347,8 @@ def get_user_prepaid_cards(
     """
     try:
         # Fetch user prepaid cards
-        accounts = db.query(models.PrepaidCards).filter(
-            models.PrepaidCards.owner_customer_no == current_user.customer_no
+        accounts = db.query(PrepaidCards).filter(
+            PrepaidCards.owner_customer_no == current_user.customer_no
         ).all()
 
         for account in accounts:

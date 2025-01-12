@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from datetime import datetime
 class User(BaseModel):
+    full_name: str
     pin : str
     password_hash : str 
     email : str
@@ -8,7 +9,8 @@ class User(BaseModel):
 
     class Config:
         from_attributes = True
-class ResponseUser(User):
+class ResponseUser(BaseModel):
+    full_name: str
     id : str
 
 class Transaction(BaseModel):
@@ -30,15 +32,8 @@ class BuyGoods(Transaction):
     store_no: str
 
 class Account(BaseModel):
-    account_type : str
-    id_no : str
-    kra_pin : str
-    nationality : str
-    currency : str
-    account_name : str
-    address : str
-    telephone : str
-    next_of_kin : str
+    payload: dict
+    signature: str
 
 class ResponseTransact(BaseModel):
     ref_no: str
