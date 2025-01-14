@@ -103,3 +103,10 @@ class AllTransactions(BaseModel):
     amount: str
     beneficiary: str
     date_posted: str
+
+class SignatoryResponse(BaseModel):
+    name: str
+    email: str
+    file_name: str
+class File(BaseModel):
+    formData: object

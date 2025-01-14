@@ -22,12 +22,12 @@
         </div>
   
         <div class="form-group">
-          <label for="dob">Date of Birth/Incorporation</label>
+          <label for="dob">Date of Incorporation</label>
           <input v-model="formData.dob" type="date" id="dob" name="dob" required />
         </div>
   
         <div class="form-group">
-          <label for="residential_address">Residential Address</label>
+          <label for="residential_address">Premise Address</label>
           <input v-model="formData.residential_address" type="text" id="residential_address" name="residential_address" placeholder="Residential Address" @input="checkAddressInput" />
         </div>
   
@@ -41,24 +41,14 @@
           <input v-model="formData.email" type="email" id="email" name="email" placeholder="example@domain.com" required />
         </div>
   
-        <div class="form-group">
-          <label for="nationality">Nationality</label>
-          <select v-model="formData.nationality" id="nationality" name="nationality" required>
-            <option value="" disabled selected>Select Nationality</option>
-            <option>Kenyan</option>
-            <option>British</option>
-            <option>American</option>
-            <option>French</option>
-          </select>
-        </div>
       </fieldset>
   
       <!-- Identification Details -->
       <fieldset>
         <legend>Identification</legend>
         <div class="form-group">
-          <label for="id_no">National ID Number</label>
-          <input v-model="formData.id_no" type="text" id="id_no" name="id_no" placeholder="National ID Number" @input="checkIdnumberInput" />
+          <label for="id_no">Company Registration Number</label>
+          <input v-model="formData.id_no" type="text" id="id_no" name="id_no" placeholder="Company Registration Number" @input="checkIdnumberInput" />
           <div v-if="!isValididnumber && formData.id_no" class="error-message">
             The ID Number is invalid
           </div>
@@ -72,42 +62,19 @@
           </div>
         </div>
   
-        <div class="form-group">
-          <label for="nssf_no">NSSF Number</label>
-          <input v-model="formData.nssf_no" type="text" id="nssf_no" name="nssf_no" placeholder="NSSF Number" required />
-          <div v-if="!isValidnssf && formData.nssf_no" class="error-message">
-            The NSSF number is invalid
-          </div>
-        </div>
       </fieldset>
   
       <!-- Employment and Financial Details -->
       <fieldset>
-        <legend>Employment and Financial Details</legend>
-        <div class="form-group">
-          <label for="employment_status">Employment Status</label>
-          <select v-model="formData.employment_status" id="employment_status" name="employment_status" required>
-            <option value="" disabled selected>Select Employment Status</option>
-            <option value="employed">Employed</option>
-            <option value="self-employed">Self-Employed</option>
-            <option value="student">Student</option>
-            <option value="unemployed">Unemployed</option>
-            <option value="business">Business</option>
-          </select>
-        </div>
+        <legend>Financial Details</legend>
   
         <div class="form-group">
           <label for="source_of_funds">Source of Funds</label>
-          <select v-model="formData.source_of_funds" id="source_of_funds" name="source_of_funds" required>
-            <option value="" disabled selected>Select Source of Funds</option>
-            <option>Salary</option>
-            <option>Business Income</option>
-            <option>Inheritance</option>
-          </select>
+          <input v-model="formData.source_of_funds" type="text" id="usage" name="usage" placeholder="E.g., Farming, Sales" />
         </div>
   
         <div class="form-group">
-          <label for="annual_income">Annual Income (KES)</label>
+          <label for="annual_income">Annual Turnover (KES)</label>
           <input v-model="formData.annual_income" type="number" id="annual_income" name="annual_income" placeholder="Enter Annual Income" required />
         </div>
   
@@ -117,24 +84,6 @@
         </div>
       </fieldset>
   
-      <!-- Next of Kin Details -->
-      <fieldset>
-        <legend>Next of Kin</legend>
-        <div class="form-group">
-          <label for="next_of_kin">Name</label>
-          <input v-model="formData.next_of_kin" type="text" id="next_of_kin" name="next_of_kin" placeholder="Next of Kin" />
-        </div>
-  
-        <div class="form-group">
-          <label for="relationship">Relationship</label>
-          <select v-model="formData.relationship" id="relationship" name="relationship">
-            <option value="" disabled selected>Select Relationship</option>
-            <option>Parent</option>
-            <option>Sibling</option>
-            <option>Relative</option>
-          </select>
-        </div>
-      </fieldset>
   
       <!-- Account Details -->
       <fieldset>
@@ -143,9 +92,9 @@
           <label for="account_type">Account Type</label>
           <select v-model="formData.account_type" id="account_type" name="account_type" required>
             <option value="" disabled selected>Select Account Type</option>
-            <option>Pay As You Go</option>
-            <option>Savings Account</option>
-            <option>Forex Plus</option>
+            <option>Vue Vantage</option>
+            <option>SME Banking</option>
+            <option>Vue Corporate</option>
           </select>
         </div>
   
@@ -154,13 +103,15 @@
           <select v-model="formData.currency" id="currency" name="currency" required>
             <option value="" disabled selected>Select Currency</option>
             <option>KES</option>
-            <option>EUR</option>
-            <option>POUND</option>
-            <option>USD</option>
           </select>
         </div>
   
       </fieldset>
+      <!-- Signatories -->
+       <Account_Signatories></Account_Signatories>
+      <fieldset>
+
+        </fieldset>
       <fieldset>
         <legend>Documentation</legend>
         <div>
@@ -168,12 +119,12 @@
             <input type="file" @change="handleFileUpload" />
         </div>
         <div>
-          <h3 style="display: inline;">National ID</h3>
+          <h3 style="display: inline;">Business Registration</h3>
             <input type="file" @change="handleFileUpload" />
         </div>
         <div>
           <h3 style="display: inline;">Passport photo</h3>
-            <input type="file" @change="handleFileUpload" />
+            <input type="file" @change="handleFileUpload1" />
         </div>
       </fieldset>
   
@@ -192,6 +143,7 @@
   
   <script>
   import check from '../../utils/utils';
+  import Account_Signatories from './signatories.vue'
   
   const url = 'http://127.0.0.1:8000/post/open_new_account';
   
@@ -226,6 +178,9 @@
         isTandCsclicked: false,
         selectedFile: null,
       };
+    },
+    components: {
+      Account_Signatories
     },
   
     methods: {
@@ -270,9 +225,10 @@
       checkKRApinInput() {
         this.isValidkrapin = this.formData.kra_pin === 'Hello';
       },
-      handleFileUpload(event) {
+      handleFileUpload1(event) {
         this.selectedFile = event.target.files[0]; // Access the selected file
       }
+
     }
   };
   </script>
