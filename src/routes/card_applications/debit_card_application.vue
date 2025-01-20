@@ -49,7 +49,7 @@
 <script>
 import Nav_Bar from '../../components/navbar.vue'
 import utils from '../../utils/utils'
-const url2 = "http://127.0.0.1:8000/post/get_user_current&savings_accounts";
+const url2 = "http://127.0.0.1:8000/post/get_user_personal_accounts";
     export default {
         name: "Debit_App",
         components: {
@@ -128,7 +128,7 @@ const url2 = "http://127.0.0.1:8000/post/get_user_current&savings_accounts";
             setTimeout(() => {
               this.isConfirmationVisible = false;
               this.isProcessing = false;
-              this.$router.push('/error');
+              this.$router.push('/failed');
             }, 1000);
             // Handle error if necessary
          }

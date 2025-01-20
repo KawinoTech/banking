@@ -1,7 +1,7 @@
 from fastapi import  Depends, status, APIRouter, HTTPException, status
 from .. import schemas, oauth
 from ..models.cards import BaseCards, DebitCards, CreditCards, PrepaidCards
-from ..models.accounts import Account
+from ..models.accounts import PersonalAccounts
 from datetime import datetime
 from ..database import  get_db
 from sqlalchemy.orm import Session
@@ -53,24 +53,28 @@ def apply_debit_card(
             detail="Failed to generate card number."
         )
 
-    # Create new debit card application
-    request = DebitCards(
-        card_no=card_no,
-        date_issued=datetime.now(),
-        expiry_date=datetime.now() + relativedelta(years=3),
-        date_requested=datetime.now(),
-        owner_customer_no=current_user.customer_no,
-        id=str(uuid4()),
-        **new_card.payload
-    )
-
     try:
+        account = db.query(PersonalAccounts).filter(
+            PersonalAccounts.account_no == new_card.payload['account_attached_no']
+        ).first()
+        # Create new debit card application
+        request = DebitCards(
+            card_no=card_no,
+            date_issued=datetime.now(),
+            expiry_date=datetime.now() + relativedelta(years=3),
+            date_requested=datetime.now(),
+            personal_account=account,
+            owner_customer_no=current_user.customer_no,
+            id=str(uuid4()),
+            **new_card.payload
+        )
         db.add(request)
         db.commit()
         db.refresh(request)
         logger.info(f"Debit card application created successfully for user {current_user.customer_no}")
         return request
     except Exception as e:
+        print(e)
         logger.error(f"Error processing debit card application for user {current_user.customer_no}: {e}")
         db.rollback()  # Ensure transaction consistency
         raise HTTPException(
@@ -171,8 +175,8 @@ def apply_prepaid_card(
     Raises:
         HTTPException: If the account is invalid, insufficient funds are available, or an error occurs during processing.
     """
-    account_to_debit = db.query(Account).filter(
-        Account.account_no == new_card.payload['account_number']
+    account_to_debit = db.query(PersonalAccounts).filter(
+        PersonalAccounts.account_no == new_card.payload['account_number']
     ).first()
 
     # Validate account existence and balance

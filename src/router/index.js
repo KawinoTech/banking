@@ -1,5 +1,6 @@
 import Buy_goods from '../routes/transacting/buygoods.vue'
 import Pay_Bill from '../routes/transacting/paybill.vue'
+import Air_Time from '../routes/transacting/airtime.vue'
 import Transfer_Funds from '../routes/transacting/transfer_funds.vue'
 import Debit_App from '../routes/card_applications/debit_card_application.vue'
 import Credit_App from '../routes/card_applications/credit_card_application.vue'
@@ -20,6 +21,7 @@ import Not_Found from '../routes/error_pages/404_notfound.vue'
 import Login_Page from '../routes/main/login.vue'
 import Manual_Open_Account from '../routes/manuals/open_account.vue'
 import Success_Pg from '../routes/success.vue'
+import Term_Deposit from '../routes/investments/term_deposits.vue'
 import {createRouter, createWebHistory} from 'vue-router'
 
 const routes = [
@@ -47,6 +49,11 @@ const routes = [
         name: 'Bill',
         component: Pay_Bill,
         path: '/paybill'
+    },
+    {
+        name: 'Air_Time',
+        component: Air_Time,
+        path: '/airtime'
     },
     {
         name: 'Transfer',
@@ -128,6 +135,11 @@ const routes = [
         name: 'Manual_Open_Account',
         component: Manual_Open_Account,
         path: '/instructions_on_opening_transactional_account'
+    },
+    {
+        name: 'Term_Deposit',
+        component: Term_Deposit,
+        path: '/appy_term_deposit'
     },
     {
         /*Routes any unmatching route*/

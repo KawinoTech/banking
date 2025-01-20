@@ -2,9 +2,8 @@ import CryptoJS from 'crypto-js';
 export default {
    checkEmptyValues(obj) {
     for (let key in obj) {
-
         // Chekck if the value is empty (null, undefined, '', [], {})
-        if (obj[key] === null || obj[key] === undefined || obj[key] === '' || (Array.isArray(obj[key]) && obj[key].length === 0) || (typeof obj[key] === 'object' && Object.keys(obj[key]).length === 0)) {
+        if (obj[key] === null || obj[key] === undefined || obj[key] === '' || (Array.isArray(obj[key]) && obj[key].length === 0)) {
           return true; // Value is empty
         
       }
@@ -23,5 +22,12 @@ export default {
 
   return requestBody;
 
+},
+
+findAndReturnSubsequent(str, char) {
+  const index = str.indexOf(char);
+  return index !== -1 && index < str.length - 1
+    ? str.substring(index + 1)
+    : "";
 }
 }

@@ -52,7 +52,7 @@
             <div class="card">
                 <div class="card-content">
                   <h5 class="card-title"><i class="fa-regular fa-clock" style="color: aqua;"></i></h5>
-                  <router-link to="/paybill"><p class="btn">Term Deposit</p></router-link>
+                  <router-link to="/appy_term_deposit"><p class="btn">Term Deposit</p></router-link>
                 </div>
               </div>
         </div>
@@ -68,7 +68,7 @@
             <div class="card">
                 <div class="card-content">
                   <h5 class="card-title"><i class="fa-solid fa-sim-card" style="color: aqua;"></i></h5>
-                  <router-link to="/paybill"><p class="btn">Airtime</p></router-link>
+                  <router-link to="/airtime"><p class="btn">Airtime</p></router-link>
                 </div>
             </div>
         </div>

@@ -134,7 +134,7 @@
 </template>
 
 <script>
-const url2 = "http://127.0.0.1:8000/post/get_user_accounts";
+const url2 = "http://127.0.0.1:8000/post/get_user_transactive_accounts";
 import utils from "../../utils/utils";
 import Nav_Bar from "../../components/navbar.vue";
 
@@ -215,7 +215,6 @@ export default {
           "remarks": this.formData.remarks,
           "account_no": this.formData.account_no
         });
-        console.log(requestBody)
         const response = await fetch("http://127.0.0.1:8000/post/paybill", {
           method: "POST",
           headers: {

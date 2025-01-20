@@ -11,7 +11,9 @@
         <th scope="row">#</th>
         <th scope="col">Account</th>
         <th scope="col">Amount</th>
+        <th scope="col">Ref_No</th>
         <th scope="col">Beneficiary</th>
+        <th scope="col">Type</th>
         <th scope="col">Datetime</th>
         <th scope="col"></th>
       </tr>
@@ -19,10 +21,12 @@
     <tbody>
       <tr v-for="trans in paginatedItems" :key="trans.id">
         <th scope="row"></th>
-        <td>{{ trans.account }}</td>
-        <td>KES: {{ trans.amount }}</td>
-        <td>{{ trans.beneficiary }}</td>
-        <td>{{ trans.date_posted }}</td>
+        <td><span>{{ trans.account }}</span></td>
+        <td><span>KES: {{ trans.amount }}</span></td>
+        <td><span>{{ trans.ref_no }}</span></td>
+        <td><span>{{ trans.beneficiary }}</span></td>
+        <td><span>{{ trans.transaction_type }}</span></td>
+        <td><span>{{ trans.date_posted }}</span></td>
         <td>
           <button type="button" class="btn btn-danger">Download Receipt</button>
         </td>
@@ -54,7 +58,7 @@ export default {
       loading: true,
       all_transactions: [],
       currentPage: 1,
-      itemsPerPage: 5,
+      itemsPerPage: 9,
     };
   },
   mounted() {
@@ -112,5 +116,8 @@ export default {
   display: flex;
   align-items: center;
   gap: 10px;
+}
+span {
+  font-size: small;
 }
 </style>

@@ -1,18 +1,20 @@
 from fastapi import Depends, status, APIRouter, HTTPException
 import logging
+from datetime import datetime
 from fastapi_limiter.depends import RateLimiter
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from typing import List
 from uuid import uuid4
-from ..models.transactions import PayBill, BuyGoods, Transfer
+from ..models.transactions import PayBill, BuyGoods, Transfer, Airtime
 from ..models.users import Customer
-from ..models.accounts import Account
+from ..models.accounts import PersonalAccounts, CorporateAccounts
 
 from .. import schemas, oauth
 from ..database import get_db
 
 DAILY_LIMIT = 100
+classes = [PersonalAccounts, CorporateAccounts]
 router = APIRouter(prefix="/post")
 logger = logging.getLogger(__name__)
 
@@ -47,12 +49,16 @@ def transfer(
     new_transaction = Transfer(
         id=uuid4(),
         ref_no=uuid4(),
+        date_posted=datetime.now(),
         **transaction.payload,
         owner_customer_no=current_user.customer_no
     )
-    account = db.query(Account).filter(
-        Account.account_no == transaction.payload['account']
-    ).first()
+    for clss in classes:
+        account = db.query(clss).filter(
+            clss.account_no == transaction.payload['account']
+        ).first()
+        if account:
+            break
 
     try:
         if not account:
@@ -72,6 +78,7 @@ def transfer(
             )
 
         account.account_balance -= transaction.payload['amount']
+        new_transaction.generate_ref_number()
         db.add(new_transaction)
         db.commit()
         db.refresh(new_transaction)
@@ -137,12 +144,16 @@ def buygoods(
     new_transaction = BuyGoods(
         id=uuid4(),
         ref_no=uuid4(),
+        date_posted=datetime.now(),
         **transaction.payload,
         owner_customer_no=current_user.customer_no
     )
-    account = db.query(Account).filter(
-        Account.account_no == transaction.payload['account']
-    ).first()
+    for clss in classes:
+        account = db.query(clss).filter(
+            clss.account_no == transaction.payload['account']
+        ).first()
+        if account:
+            break
 
     try:
         if not account:
@@ -162,6 +173,7 @@ def buygoods(
             )
 
         account.account_balance -= transaction.payload['amount']
+        new_transaction.generate_ref_number()
         db.add(new_transaction)
         db.commit()
         db.refresh(new_transaction)
@@ -172,12 +184,7 @@ def buygoods(
         )
         return new_transaction
 
-    except IntegrityError:
-        db.rollback()
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Database error occurred."
-        )
+
     except Exception as e:
         db.rollback()
         raise HTTPException(
@@ -228,11 +235,15 @@ def paybill(
         id=uuid4(),
         ref_no=uuid4(),
         **transaction.payload,
+        date_posted=datetime.now(),
         owner_customer_no=current_user.customer_no
     )
-    account = db.query(Account).filter(
-        Account.account_no == transaction.payload['account']
-    ).first()
+    for clss in classes:
+        account = db.query(clss).filter(
+            clss.account_no == transaction.payload['account']
+        ).first()
+        if account:
+            break
 
     try:
         if not account:
@@ -252,6 +263,7 @@ def paybill(
             )
 
         account.account_balance -= transaction.payload["amount"]
+        new_transaction.generate_ref_number()
         db.add(new_transaction)
         db.commit()
         db.refresh(new_transaction)
@@ -262,12 +274,6 @@ def paybill(
         )
         return new_transaction
 
-    except IntegrityError:
-        db.rollback()
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Database error occurred."
-        )
     except Exception as e:
         db.rollback()
         raise HTTPException(
@@ -320,13 +326,14 @@ def all_user_transactions(
         )
 
     try:
-        # Fetch categorized transactions
+        # Fetch categorized transactionss
         c2b_transactions = user.get_c2b_transactions(db)
         bills = user.get_bills(db)
         goods_and_services = user.get_amount(db)
+        airtime = user.get_airtime(db)
 
         # Consolidate all transactions
-        all_transactions = c2b_transactions + bills + goods_and_services
+        all_transactions = c2b_transactions + bills + goods_and_services + airtime
 
         # Format transaction details
         for transaction in all_transactions:
@@ -341,3 +348,85 @@ def all_user_transactions(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error fetching transactions: {str(e)}"
         )
+
+@router.post(
+    "/airtime",
+    status_code=status.HTTP_201_CREATED,
+    response_model=schemas.ResponseTransact,
+    dependencies=[Depends(RateLimiter(times=10, seconds=60))],
+    tags=["transactions"],
+    summary="Transfer funds between accounts",
+    description="Allows users to transfer funds from bank accounts to mobile accounts (MPESA, AIRTEL, Telcom) adhering to specified limits."
+)
+def buy_airtime(
+    transaction: schemas.Transaction,
+    db: Session = Depends(get_db),
+    current_user: str = Depends(oauth.get_current_user)
+):
+    """
+    Transfer funds between accounts.
+
+    Args:
+        transaction (schemas.Transaction): The transaction payload containing account details and the amount.
+        db (Session): Database session.
+        current_user (str): The authenticated user.
+
+    Returns:
+        schemas.ResponseTransact: Details of the transaction.
+
+    Raises:
+        HTTPException: Various HTTP exceptions based on transaction validity and errors.
+    """
+    new_transaction = Airtime(
+        id=uuid4(),
+        remarks="airtime",
+        ref_no=uuid4(),
+        date_posted=datetime.now(),
+        **transaction.payload,
+        owner_customer_no=current_user.customer_no
+    )
+    for clss in classes:
+        account = db.query(clss).filter(
+            clss.account_no == transaction.payload['account']
+        ).first()
+        if account:
+            break
+
+    try:
+        if not account:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Account does not exist."
+            )
+        if transaction.payload['amount'] <= 0:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Transaction amount must be greater than zero."
+            )
+        if account.account_balance < transaction.payload['amount']:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Failed. Insufficient funds."
+            )
+
+        account.account_balance -= transaction.payload['amount']
+        new_transaction.generate_ref_number()
+        db.add(new_transaction)
+        db.commit()
+        db.refresh(new_transaction)
+
+        logger.info(
+            f"User {current_user} transferred {transaction.payload['amount']} "
+            f"from account {transaction.payload['account']}"
+        )
+        return new_transaction
+
+
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"An unexpected error occurred: {str(e)}"
+        )
+    finally:
+        db.close()

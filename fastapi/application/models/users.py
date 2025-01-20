@@ -2,8 +2,8 @@ from sqlalchemy import Column, String, Integer, ForeignKey, Float, Table
 from ..database import Base
 from sqlalchemy.orm import relationship
 from .base_model import BaseModel
-from .transactions import PayBill, BuyGoods, Transfer
-from .accounts import PersonalAccounts
+from .transactions import PayBill, BuyGoods, Transfer, Airtime
+from .accounts import PersonalAccounts, CorporateAccounts
 from .loans import Loan
 from .term_deposits import TermDeposit
 from .customer_service import ClientHelpRequest, ClientReports
@@ -50,6 +50,8 @@ class User(BaseModel):
         return db.query(PayBill).filter_by(owner_customer_no=self.customer_no).all()
     def get_amount(self, db):
         return db.query(BuyGoods).filter_by(owner_customer_no=self.customer_no).all()
+    def get_airtime(self, db):
+        return db.query(Airtime).filter_by(owner_customer_no=self.customer_no).all()
 
 class Customer(User, Base):
     __tablename__ = "customers"
@@ -58,9 +60,11 @@ class Customer(User, Base):
     pin = Column(String(60), nullable=False)
     customer_no = Column(Integer, nullable=False, unique=True, index=True)
     bills = relationship("PayBill", backref="bill_payer")
+    airtime = relationship("Airtime", backref="sender")
     goods_payed = relationship("BuyGoods", backref="buyer")
     c2b_transfers = relationship("Transfer", backref="source")
     personal_accounts = relationship("PersonalAccounts", backref="owner")
+    corporate_accounts = relationship("CorporateAccounts", backref="owner")
     loans = relationship("Loan", backref="loaned_party")
     deposits = relationship("TermDeposit", backref="depositer")
     help_requests = relationship("ClientHelpRequest", backref="requester")

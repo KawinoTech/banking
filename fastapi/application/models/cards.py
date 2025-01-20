@@ -57,7 +57,7 @@ class CreditCards(BaseCards, Base):
     balance = Column(Integer, nullable=False, default=0)
     due_date = Column(DateTime, nullable=False)
     annual_income = Column(Integer, nullable=True)
-    employment_status = Column(String(10), nullable=True)
+    employment_status = Column(String(20), nullable=True)
     rate = Column(Float, nullable=False, default=3.2)
     owner_customer_no = Column(Integer, ForeignKey('customers.customer_no'))
     limit = Column(String(20), nullable=False, default="Not Assigned")
@@ -66,12 +66,12 @@ class CreditCards(BaseCards, Base):
 class DebitCards(BaseCards, Base):
     __tablename__ = "debit_cards"
     
-    # Add card_no as primary key or unique constraint to ensure one-to-one
-    card_no = Column(String(17), primary_key=True)  # Assuming card_no is the primary keyl
+    # Primary key for debit cards
+    card_no = Column(String(17), primary_key=True)  # Assuming card_no is the primary key
     card_type = Column(String(5), nullable=False, default="debit")
     
-    # Define relationship with Account, ensuring it's one-to-one
-    personal_account_attached = relationship("PersonalAccounts", backref="debit_card")
-    corporate_account_attached = relationship("CorporateAccounts", backref="debit_card")
+    # Foreign key pointing to a personal account; one card belongs to one personal account
+    account_attached_no = Column(String(50), ForeignKey('personal_accounts.account_no'), nullable=True)
+    
     owner_customer_no = Column(Integer, ForeignKey('customers.customer_no'))
     card_classification = Column(String(20), nullable=False)
