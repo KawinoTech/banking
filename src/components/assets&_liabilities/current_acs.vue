@@ -6,18 +6,18 @@
     <tr >
       <th scope="col">#</th>
       <th scope="col">Account Number</th>
-      <th scope="col">Currency</th>
+      <th scope="col">Curency</th>
       <th scope="col">Amount</th>
       <th scope="col">Equivalent amount</th>
     </tr>
   </thead>
   <tbody>
-    <tr>
-      <th scope="row">1</th>
-      <td>Mark</td>
-      <td>Otto</td>
-      <td>@mdo</td>
-      <td>@mdo</td>
+    <tr v-for="(account, index) in all_accounts" :key="index">
+      <th scope="row">{{ index }}</th>
+      <td><span>{{ account.account_no }}</span></td>
+      <td><span>{{ account.currency }}</span></td>
+      <td><span>{{ account.account_balance }}</span></td>
+      <td><span>{{ account.account_balance }}</span></td>
     </tr>
   </tbody>
 </table>
@@ -27,6 +27,30 @@
 <script>
 export default {
     name: 'Current_Accounts',
+    data() {
+      return {
+        all_accounts : [],
+      }
+    },
+    mounted() {
+    this.fetchData();
+  },
+    methods: {
+      async fetchData() {
+      try {
+        const response = await fetch('http://127.0.0.1:8000/post/get_user_current_accounts', {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        });
+        const data = await response.json();
+        this.all_accounts.push(...data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
+    }
 };
 </script>
 

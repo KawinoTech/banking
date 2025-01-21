@@ -12,24 +12,12 @@
     </tr>
   </thead>
   <tbody>
-    <tr>
-      <th scope="row">1</th>
-      <td>Mark</td>
-      <td>Otto</td>
-      <td>@mdo</td>
-      <td>@mdo</td>
-    </tr>
-    <tr>
-      <th scope="row">2</th>
-      <td>Jacob</td>
-      <td>Thornton</td>
-      <td>@fat</td>
-      <td>@mdo</td>
-    </tr>
-    <tr>
-      <th scope="row">3</th>
-      <td colspan="2">Larry the Bird</td>
-      <td>@twitter</td>
+    <tr v-for="(account, index) in all_accounts" :key="index">
+      <th scope="row">{{ index }}</th>
+      <td><span>{{ account.account_no }}</span></td>
+      <td><span>{{ account.currency }}</span></td>
+      <td><span>{{ account.account_balance }}</span></td>
+      <td><span>{{ account.account_balance }}</span></td>
     </tr>
   </tbody>
 </table>
@@ -39,6 +27,30 @@
 <script>
 export default {
     name: 'Customer_Savings',
+    data() {
+      return {
+        all_accounts : [],
+      }
+    },
+    mounted() {
+    this.fetchData();
+  },
+    methods: {
+      async fetchData() {
+      try {
+        const response = await fetch('http://127.0.0.1:8000/post/get_user_savings_accounts', {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        });
+        const data = await response.json();
+        this.all_accounts.push(...data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
+    }
 };
 </script>
 

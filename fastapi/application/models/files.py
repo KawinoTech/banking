@@ -40,3 +40,11 @@ class PersonalDocs(AccountDocuments, Base):
 class F_C_A_Docs(AccountDocuments, Base):
     __tablename__ = "fca_documents"
     account_no = Column(String(50), ForeignKey('foreign_currency_accounts.account_no'))
+
+class LoanDocs(AccountDocuments, Base):
+    __tablename__ = "loan_documents"
+    account_no = Column(String(50), ForeignKey('business_loans.account_no'))
+
+class MortgageDocs(AccountDocuments, Base):
+    __tablename__ = "mortgage_documents"
+    account_no = Column(String(50), ForeignKey('mortgages.account_no'))

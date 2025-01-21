@@ -4,7 +4,7 @@ from sqlalchemy.orm import relationship
 from .base_model import BaseModel
 from .transactions import PayBill, BuyGoods, Transfer, Airtime
 from .accounts import PersonalAccounts, CorporateAccounts
-from .loans import Loan
+from .loans import PersonalLoans
 from .term_deposits import TermDeposit
 from .customer_service import ClientHelpRequest, ClientReports
 from flask_bcrypt import Bcrypt
@@ -65,13 +65,13 @@ class Customer(User, Base):
     c2b_transfers = relationship("Transfer", backref="source")
     personal_accounts = relationship("PersonalAccounts", backref="owner")
     corporate_accounts = relationship("CorporateAccounts", backref="owner")
-    loans = relationship("Loan", backref="loaned_party")
     deposits = relationship("TermDeposit", backref="depositer")
     help_requests = relationship("ClientHelpRequest", backref="requester")
     client_reports = relationship("ClientReports", backref="reporter")
     prepaid_cards = relationship("PrepaidCards", backref="prepaid_card_wner")
     debit_cards = relationship("DebitCards", backref="debit_card_owner")
     credit_cards = relationship("CreditCards", backref="credit_card_owner")
+    personal_loans = relationship("PersonalLoans", backref="lendee")
     credit_score = Column(Float, nullable=False, default=0.00)
     relationship_managers = relationship(
         "RelationshipManager",

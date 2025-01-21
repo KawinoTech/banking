@@ -60,7 +60,7 @@
             <div class="card">
                 <div class="card-content">
                   <h5 class="card-title"><i class="fa-solid fa-book" style="color: aqua;"></i></h5>
-                  <router-link to="/paybill"><p class="btn">Loan</p></router-link>
+                  <router-link to="/loan_application"><p class="btn">Loan</p></router-link>
                 </div>
               </div>
         </div>

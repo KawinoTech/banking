@@ -79,6 +79,12 @@ class ResponseAccount1(BaseModel):
     account_no : str
     account_balance: int
     account_type: str
+    currency: str
+class ResponseAccount2(BaseModel):
+    account_no : str
+    account_balance: str
+    account_type: str
+    currency: str
 
 class ResponseHelp(BaseModel):
     id : str
@@ -88,6 +94,36 @@ class ReportResponse(BaseModel):
 class CardApplication(BaseModel):
     payload: dict
     signature: str
+class PersonalLoanApplication(BaseModel):
+    payload: dict
+    signature: str
+class LoanSummary(BaseModel):
+    amount: int
+    payback_period: int
+    purpose: str
+
+class BusinessLoanApplication(BaseModel):
+    id_no: str
+    purpose: str
+    payback_period: int
+    account_name: str
+    address: str
+    pmargin: float
+    dob: str
+    annual_income: float
+    amount: float
+
+class Mortgage(BaseModel):
+    account_name: str
+    employment_status: str
+    annual_income: float
+    payback_period: int
+    property_address: str
+    property_value: float
+    down_payment: float
+    amount: float
+    property_type: str
+    rate: int
 
 class CardApplicationResponse(BaseModel):
     full_name: str

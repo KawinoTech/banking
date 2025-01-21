@@ -95,6 +95,7 @@ def get_user_tds(
 @router.post("/liquidate", status_code=status.HTTP_201_CREATED)
 def liquidate_td(term_deposit: schemas.Liquidate, db: Session = Depends(get_db), current_user: str = Depends(oauth.get_current_user)):
     try:
+        print(term_deposit.payload['account_no'])
         td = db.query(TermDeposit).filter(TermDeposit.account_no == term_deposit.payload['account_no']).first()
         if not td:
             raise HTTPException(
@@ -115,12 +116,7 @@ def liquidate_td(term_deposit: schemas.Liquidate, db: Session = Depends(get_db),
         account.account_balance += td.amount
         td.status = "liquidated"
         db.commit()
-    except IntegrityError:
-        db.rollback()
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Database error occurred."
-        )
+
     except Exception as e:
         db.rollback()
         raise HTTPException(

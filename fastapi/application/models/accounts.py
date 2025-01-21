@@ -3,6 +3,7 @@ from .base_model import BaseModel
 from .cards import DebitCards
 from .files import Signatory, CorporateDocs, PersonalDocs, F_C_A_Docs
 from ..database import Base
+from babel.numbers import format_currency
 from sqlalchemy.orm import relationship
 from datetime import datetime
 
@@ -26,7 +27,17 @@ class Account(BaseModel):
     source_of_funds = Column(Text, nullable=False)
     intended_usage = Column(Text, nullable=False)
 
-    # Foreign key linking to the DebitCards table
+    def truncate_uuid(self):
+        uuid = self.account_no
+        parts = uuid.split('-')
+    
+        # Check if the UUID has the correct structure
+        
+        # Construct the truncated string
+        truncated = f"{parts[0]}-***-{parts[-1][-2:]}"
+        self.account_no = truncated
+    def format_cash(self):
+        self.account_balance = format_currency(self.account_balance, 'USD', locale='en_US')
 
 class PersonalAccounts(Account, Base):
     __tablename__ = "personal_accounts"

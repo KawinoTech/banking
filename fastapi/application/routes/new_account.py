@@ -274,7 +274,7 @@ async def create_corporate_account(
 @router.get(
     "/get_user_personal_accounts", 
     status_code=status.HTTP_200_OK, 
-    response_model=List[schemas.ResponseAccount1]
+    response_model=List[schemas.ResponseAccount2]
 )
 def get_user_accounts(
     db: Session = Depends(get_db), 
@@ -292,9 +292,13 @@ def get_user_accounts(
     Returns:
         List[schemas.ResponseAccount1]: A list of accounts owned by the user.
     """
+
     accounts = db.query(PersonalAccounts).filter(
         PersonalAccounts.owner_customer_no == current_user.customer_no
     ).all()
+    for account in accounts:
+        account.truncate_uuid()
+        account.format_cash()
     return accounts
 
 
@@ -303,7 +307,7 @@ def get_user_accounts(
     status_code=status.HTTP_200_OK, 
     response_model=List[schemas.ResponseAccount1]
 )
-def get_user_current_and_savings_accounts(
+def get_user_transactive_accounts(
     db: Session = Depends(get_db), 
     current_user: str = Depends(oauth.get_current_user)
 ):
@@ -321,11 +325,77 @@ def get_user_current_and_savings_accounts(
         List[schemas.ResponseAccount1]: A list of current and savings accounts owned by the user.
     """
     personal_accounts = db.query(PersonalAccounts).filter(
-        PersonalAccounts.owner_customer_no == current_user.customer_no
+        PersonalAccounts.owner_customer_no == current_user.customer_no,
     ).all()
     corporate_accounts = db.query(CorporateAccounts).filter(
         CorporateAccounts.owner_customer_no == current_user.customer_no
     ).all()
 
     accounts = personal_accounts + corporate_accounts
+    return accounts
+
+@router.get(
+    "/get_user_savings_accounts", 
+    status_code=status.HTTP_200_OK, 
+    response_model=List[schemas.ResponseAccount2]
+)
+def get_user_savings_accounts(
+    db: Session = Depends(get_db), 
+    current_user: str = Depends(oauth.get_current_user)
+):
+    """
+    Retrieve all user accounts.
+
+    This endpoint fetches all accounts associated with the currently authenticated user.
+
+    Args:
+        db (Session): The database session used for queries.
+        current_user (str): The currently authenticated user.
+
+    Returns:
+        List[schemas.ResponseAccount1]: A list of accounts owned by the user.
+    """
+
+    accounts = db.query(PersonalAccounts).filter(
+        PersonalAccounts.owner_customer_no == current_user.customer_no,
+        PersonalAccounts.account_type == "Savings Account"
+    ).all()
+    for account in accounts:
+        account.truncate_uuid()
+        account.format_cash()
+    return accounts
+
+@router.get(
+    "/get_user_current_accounts",
+    status_code=status.HTTP_200_OK, 
+    response_model=List[schemas.ResponseAccount2]
+)
+def get_user_current_accounts(
+    db: Session = Depends(get_db), 
+    current_user: str = Depends(oauth.get_current_user)
+):
+    """
+    Retrieve current and savings accounts for the user.
+
+    This endpoint fetches all "Pay As You Go" and "Savings Account" type accounts associated 
+    with the currently authenticated user.
+
+    Args:
+        db (Session): The database session used for queries.
+        current_user (str): The currently authenticated user.
+
+    Returns:
+        List[schemas.ResponseAccount1]: A list of current and savings accounts owned by the user.
+    """
+    personal_accounts = db.query(PersonalAccounts).filter(
+        PersonalAccounts.owner_customer_no == current_user.customer_no,
+        PersonalAccounts.account_type != "Savings Account"
+    ).all()
+    corporate_accounts = db.query(CorporateAccounts).filter(
+        CorporateAccounts.owner_customer_no == current_user.customer_no
+    ).all()
+    accounts = personal_accounts + corporate_accounts
+    for account in accounts:
+        account.truncate_uuid()
+        account.format_cash()
     return accounts

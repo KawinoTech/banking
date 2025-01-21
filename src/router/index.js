@@ -15,6 +15,7 @@ import Home_Page from '../routes/main/home.vue'
 import My_Cards from '../routes/main/mycards.vue'
 import New_Account from '../routes/main/new_account.vue'
 import Transaction_History from '../routes/main/transaction_history.vue'
+import New_Loan from '../routes/main/loan_application.vue'
 import Login_Error_pg from '../routes/error_pages/loginerror.vue'
 import Error_pg from '../routes/error_pages/error.vue'
 import Not_Found from '../routes/error_pages/404_notfound.vue'
@@ -140,6 +141,11 @@ const routes = [
         name: 'Term_Deposit',
         component: Term_Deposit,
         path: '/appy_term_deposit'
+    },
+    {
+        name: 'New_Loan',
+        component: New_Loan,
+        path: '/loan_application'
     },
     {
         /*Routes any unmatching route*/

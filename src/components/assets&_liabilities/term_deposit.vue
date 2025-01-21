@@ -29,7 +29,7 @@
             <button 
               type="button" 
               class="btn btn-danger" 
-              @click="showConfirmation">
+              @click="showConfirmation(term_deposit.account_no)">
               Liquidate
             </button>
           </td>
@@ -65,6 +65,7 @@ export default {
         all_term_deposits : [],
         isConfirmationVisible: false,
         isProcessing: false,
+        accountNum: ""
       }
     },
     mounted() {
@@ -88,6 +89,7 @@ export default {
     async liquidate(accountNo) {
             try {
               const requestBody = utils.generateHmacSignature({ account_no: accountNo })
+              console.log(JSON.stringify(requestBody))
                 const response = await fetch(`http://127.0.0.1:8000/post/liquidate`, {
                     method: "POST",
                     headers: {
@@ -103,19 +105,21 @@ export default {
         }, 2000);
                 } else {
                     const errorData = await response.json();
-                    alert(`Failed to liquidate: ${errorData.detail || "Unknown error"}`);
+                    this.$router.push("/failed");
+                    console.log(`Failed to liquidate: ${errorData.detail || "Unknown error"}`);
                 }
             } catch (error) {
                 console.error("Error liquidating term deposit:", error);
-                alert("An error occurred while liquidating the term deposit. Please try again.");
+                this.$router.push("/failed");
             }
         },
-        showConfirmation() {
+        showConfirmation(accountNo) {
       this.isConfirmationVisible = true;
+      this.accountNum = accountNo
     },
         confirmTransfer() {
           this.isProcessing = true;
-          this.liquidate(this.accountNo);
+          this.liquidate(this.accountNum);
     },
     cancelTransfer() {
       this.isConfirmationVisible = false;
