@@ -84,7 +84,7 @@
             <div class="card">
                 <div class="card-content">
                   <h5 class="card-title"><i class="fa-solid fa-lock" style="color: aqua;"></i></h5>
-                  <router-link to="/paybill"><p class="btn">Close Account</p></router-link>
+                  <router-link to="/account_closure"><p class="btn">Close Account</p></router-link>
                 </div>
             </div>
         </div>

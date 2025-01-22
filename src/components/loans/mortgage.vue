@@ -90,9 +90,41 @@
             <input v-model="formData.rate" type="number" id="interest-rate" name="interest_rate">
         </div>
 
-        <button @click.prevent="applyLoan" type="submit" class="btn-submit">Submit Application</button>
+        <button @click.prevent="showConfirmation" type="submit" class="btn-submit">Submit Application</button>
     </form>
 </div>
+<div class="modal-overlay" v-if="isConfirmationVisible">
+    <div class="modal-card">
+      <h2 class="modal-title">Confirm Details</h2>
+      <p class="modal-content">
+        Loan Amount: <span>{{ formData.amount }}</span>
+      </p>
+      <p class="modal-content">
+        Repayment Period: <span>{{ formData.payback_period }}</span>
+      </p>
+      <p class="modal-content">
+        Property Value: <span>{{ formData.property_value }}</span>
+      </p>
+      <p class="modal-content">
+        Property address: <span>{{ formData.property_address }}</span>
+      </p>
+      <p class="modal-content">
+        Preferred rate: <span>{{ formData.rate }}</span>
+      </p>
+      <p id="info">Your loan application will be reviewed. <br>
+        Succesful loans will be automatically accessible. <br>
+        If the bank requires further documentation, please be ready to share
+      </p>
+
+      <div v-if="!isProcessing" class="modal-buttons">
+        <button class="modal-btn confirm" @click="confirmTransfer">Yes</button>
+        <button class="modal-btn cancel" @click="cancelTransfer">Cancel</button>
+      </div>
+      <div v-if="isProcessing">
+        <p class="wait">Processing<i class="fa-regular wait fa-clock fa-spin"></i></p>
+      </div>
+    </div>
+  </div>
     </template>
   
     
@@ -198,7 +230,6 @@
         this.purchase_agreement = event.target.files[0];
       },
       showConfirmation() {
-        if (!this.isTermsChecked) return;
         if (utils.checkEmptyValues(this.formData)) {
           alert('Please fill in all required fields.');
           return;
@@ -209,7 +240,7 @@
         this.showTerms = !this.showTerms;
       },
       confirmTransfer() {
-        this.createAccount();
+        this.applyLoan();
         this.isProcessing = true;
       },
       cancelTransfer() {
@@ -336,6 +367,9 @@ select,
         h3 {
           color: white;
           font-size: medium;
+        }
+        span {
+          color: green;
         }
 </style>
     

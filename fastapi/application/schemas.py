@@ -99,8 +99,13 @@ class PersonalLoanApplication(BaseModel):
     signature: str
 class LoanSummary(BaseModel):
     amount: int
+    account_no: str
     payback_period: int
     purpose: str
+    outstanding_amount: float
+    loan_type: str
+    accrued_interest: float
+    principal_paid: float
 
 class BusinessLoanApplication(BaseModel):
     id_no: str

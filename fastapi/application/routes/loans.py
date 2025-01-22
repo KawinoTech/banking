@@ -8,7 +8,7 @@ from ..database import  get_db
 from sqlalchemy.orm import Session
 from ..models.loans import PersonalLoans, BusinessLoans, Mortgages
 from uuid import uuid4
-from ..models.files import LoanDocs
+from ..models.files import LoanDocs, MortgageDocs
 import json
 import logging
 from .utils.utils import save_prof
@@ -24,6 +24,10 @@ def apply_personal_loan(new_loan: schemas.PersonalLoanApplication, db: Session =
         loan = PersonalLoans(owner_customer_no = current_user.customer_no,
                             account_no=uuid4(),
                             maturity_date=datetime.now() + relativedelta(months=new_loan.payload['payback_period']),
+                            last_calculation_date=datetime.now(),
+                            disposable_amount=new_loan.payload['amount'],
+                            next_calculation_date=datetime.now() + relativedelta(days=1),
+                            outstanding_amount=new_loan.payload['amount'],
                             id = uuid4(), **new_loan.payload)
         db.add(loan)
         db.commit()
@@ -60,6 +64,10 @@ async def apply_business_loan(
     loan = BusinessLoans(
         owner_customer_no=current_user.customer_no,
         maturity_date = datetime.now() + relativedelta(months=parsed_payload.payback_period),
+        last_calculation_date=datetime.now(),
+        next_calculation_date=datetime.now() + relativedelta(days=1),
+        outstanding_amount=parsed_payload.amount,
+        disposable_amount=parsed_payload.amount,
         account_no=str(uuid4()),
         **parsed_payload.dict()
     )
@@ -118,6 +126,9 @@ async def apply_mortgage(
         owner_customer_no=current_user.customer_no,
         maturity_date = datetime.now() + relativedelta(years=parsed_payload.payback_period),
         account_no=str(uuid4()),
+        last_calculation_date=datetime.now(),
+        next_calculation_date=datetime.now() + relativedelta(days=1),
+        outstanding_amount=parsed_payload.amount,
         purpose="mortgage",
         **parsed_payload.dict()
     )
@@ -134,11 +145,11 @@ async def apply_mortgage(
         file_location = f"uploads/loan_documents/{filename}"
         with open(file_location, "wb") as f:
             f.write(await file.read())
-    taxcertificate = LoanDocs(name=tax_filename, doc_type="tax-certificate", mortgage_documentt=mortgage)
-    down_payment_cert = LoanDocs(name=down_payment_filename, doc_type="down_payment", mortgage_document=mortgage)
-    crb_listing = LoanDocs(name=crb_filename, doc_type="crb-listing", mortgage_document=mortgage)
-    purchase_agreement_cert = LoanDocs(name=purchase_agreement_filename, doc_type="purchase_agreement", mortgage_document=mortgage)
-    pay_slip_cert = LoanDocs(name=pay_slip_filename, doc_type="pay-slip", mortgage_document=mortgage)
+    taxcertificate = MortgageDocs(name=tax_filename, doc_type="tax-certificate", mortgage_document=mortgage)
+    down_payment_cert = MortgageDocs(name=down_payment_filename, doc_type="down_payment", mortgage_document=mortgage)
+    crb_listing = MortgageDocs(name=crb_filename, doc_type="crb-listing", mortgage_document=mortgage)
+    purchase_agreement_cert = MortgageDocs(name=purchase_agreement_filename, doc_type="purchase_agreement", mortgage_document=mortgage)
+    pay_slip_cert = MortgageDocs(name=pay_slip_filename, doc_type="pay-slip", mortgage_document=mortgage)
 
     try:
         db.add_all([taxcertificate, down_payment_cert, purchase_agreement_cert, mortgage, crb_listing, pay_slip_cert])
@@ -152,3 +163,37 @@ async def apply_mortgage(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An unexpected error occurred while creating the account."
         )
+
+@router.get(
+    "/get_user_loans",
+    status_code=status.HTTP_200_OK, 
+    response_model=List[schemas.LoanSummary]
+)
+def get_user_loans(
+    db: Session = Depends(get_db), 
+    current_user: str = Depends(oauth.get_current_user)
+):
+    """
+    Retrieve current and savings accounts for the user.
+
+    This endpoint fetches all "Pay As You Go" and "Savings Account" type accounts associated 
+    with the currently authenticated user.
+
+    Args:
+        db (Session): The database session used for queries.
+        current_user (str): The currently authenticated user.
+
+    Returns:
+        List[schemas.ResponseAccount1]: A list of current and savings accounts owned by the user.
+    """
+    personal_loans = db.query(PersonalLoans).filter(
+        PersonalLoans.owner_customer_no == current_user.customer_no,
+    ).all()
+    business_loans = db.query(BusinessLoans).filter(
+        BusinessLoans.owner_customer_no == current_user.customer_no
+    ).all()
+
+    accounts = personal_loans + business_loans
+    for account in accounts:
+        account.truncate_uuid()
+    return accounts

@@ -16,6 +16,7 @@ import My_Cards from '../routes/main/mycards.vue'
 import New_Account from '../routes/main/new_account.vue'
 import Transaction_History from '../routes/main/transaction_history.vue'
 import New_Loan from '../routes/main/loan_application.vue'
+import Account_Closure from '../routes/main/account_closure.vue'
 import Login_Error_pg from '../routes/error_pages/loginerror.vue'
 import Error_pg from '../routes/error_pages/error.vue'
 import Not_Found from '../routes/error_pages/404_notfound.vue'
@@ -30,6 +31,11 @@ const routes = [
         name: 'Goods',
         component: Buy_goods,
         path: '/buygoods'
+    },
+    {
+        name: 'Account_Closure',
+        component: Account_Closure,
+        path: '/account_closure'
     },
     {
         name: 'Error_pg',

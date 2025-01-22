@@ -49,7 +49,7 @@
 <script>
 import Nav_Bar from '../../components/navbar.vue'
 import utils from '../../utils/utils'
-const url2 = "http://127.0.0.1:8000/post/get_user_personal_accounts";
+const url2 = "http://127.0.0.1:8000/post/get_user_transactive_accounts";
     export default {
         name: "Debit_App",
         components: {

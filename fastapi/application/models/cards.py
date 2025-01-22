@@ -9,7 +9,7 @@ import string
 class BaseCards(BaseModel):
     full_name = Column(String(70), nullable=False)
     email_address = Column(String(30), nullable=False)
-    phone = Column(String(11), nullable=False)
+    phone = Column(String(15), nullable=False)
     date_issued = Column(DateTime, nullable=False)
     status = Column(String(10), nullable=False, default="Inactive")
     expiry_date = Column(DateTime, nullable=False)

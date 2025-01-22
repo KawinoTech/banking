@@ -118,6 +118,7 @@ def liquidate_td(term_deposit: schemas.Liquidate, db: Session = Depends(get_db),
         db.commit()
 
     except Exception as e:
+        print(e)
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

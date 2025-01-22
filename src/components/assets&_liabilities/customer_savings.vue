@@ -61,4 +61,7 @@ export default {
 .container {
     margin: 10px 20px 10px 20px;
 }
+span {
+  font-size: small;
+}
 </style>

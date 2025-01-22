@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List
 from uuid import uuid4
 import logging
+from sqlalchemy.exc import IntegrityError
 from .. import schemas, oauth
 from ..database import get_db
 from ..models.accounts import PersonalAccounts, ForeignCurrency, CorporateAccounts
@@ -11,7 +12,7 @@ from ..models.files import Signatures, Signatory, CorporateDocs, PersonalDocs, F
 import secrets
 import os
 import json
-
+classes = [PersonalAccounts, CorporateAccounts, ForeignCurrency]
 
 router = APIRouter(prefix="/post")
 def save_prof(file):
@@ -326,9 +327,11 @@ def get_user_transactive_accounts(
     """
     personal_accounts = db.query(PersonalAccounts).filter(
         PersonalAccounts.owner_customer_no == current_user.customer_no,
+        PersonalAccounts.account_status == "pending"
     ).all()
     corporate_accounts = db.query(CorporateAccounts).filter(
-        CorporateAccounts.owner_customer_no == current_user.customer_no
+        CorporateAccounts.owner_customer_no == current_user.customer_no,
+        CorporateAccounts.account_status == "pending"
     ).all()
 
     accounts = personal_accounts + corporate_accounts
@@ -399,3 +402,48 @@ def get_user_current_accounts(
         account.truncate_uuid()
         account.format_cash()
     return accounts
+
+
+@router.post("/close_account/{account_no}",
+             #response_model=schemas.ResponseAccount1
+             )
+def close_account(account_no: str, db: Session = Depends(get_db), current_user: str = Depends(oauth.get_current_user)):
+    for clss in classes:
+        account = db.query(clss).filter(
+            clss.account_no == account_no
+        ).first()
+        if account:
+            break
+    try:
+        if not account:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Account does not exist."
+            )
+        """if account.account_balance != 0.00:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Account closure failure."
+            )"""
+
+
+        account.account_status = "closed"
+        db.commit()
+
+        logger.info(
+            f"Account {account.account_no} closed "
+        )
+        return {"detail": "Account Closed"}
+
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Database error occurred."
+        )
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"An unexpected error occurred: {str(e)}"
+        )
