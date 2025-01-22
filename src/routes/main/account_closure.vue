@@ -33,7 +33,7 @@
         </div>
         <button
           class="btn-close-account"
-          @click="closeAccount(account.account_no, account.account_balance)"
+          @click="showConfirmation(account.account_no, account.account_balance)"
         >
           Close Account
         </button>
@@ -62,6 +62,21 @@
         </button>
       </div>
     </div>
+    <div class="modal-overlay" v-if="isConfirmationVisible">
+    <div class="modal-card">
+      <h2 class="modal-title">Confirm Details</h2>
+      <p class="modal-content">
+        Dear Customer, we regret to see you leaving
+      </p>
+      <div v-if="!isProcessing" class="modal-buttons">
+        <button class="modal-btn confirm" @click="confirmTransfer(accountNo, accountBalance)">Yes</button>
+        <button class="modal-btn cancel" @click="cancelTransfer">Cancel</button>
+      </div>
+      <div v-if="isProcessing">
+        <p class="wait">Processing<i class="fa-regular wait fa-clock fa-spin"></i></p>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -72,6 +87,10 @@ export default {
     return {
       all_accounts: [],
       showModal: false,
+      isConfirmationVisible: false,
+      isProcessing: false,
+      accountNo: "",
+      accountBalance: ""
     };
   },
   components: {
@@ -98,12 +117,8 @@ export default {
         console.error("Error fetching data:", error);
       }
     },
-    async closeAccount(accountNo, accountBalance) {
+    async closeAccount(accountNo) {
       try {
-        if (accountBalance != 0) {
-          this.showModal = true
-          return
-        }
         const response = await fetch(
           `http://127.0.0.1:8000/post/close_account/${accountNo}`,
           {
@@ -115,14 +130,33 @@ export default {
           }
         );
         if (response.ok) {
-          alert("Account closed successfully");
+          setTimeout(() => this.$router.push('/success'), 2000);
           this.fetchData(); // Refresh accounts
         } else {
           alert("Failed to close account. Please try again.");
         }
       } catch (error) {
+        setTimeout(() => this.$router.push('/failed'), 500);
         console.error("Error closing account:", error);
       }
+    },
+    showConfirmation(accountNo, accountBalance) {
+      this.accountNo = accountNo
+      this.accountBalance = accountBalance
+      this.isConfirmationVisible = true;
+    },
+    confirmTransfer(accountNo, accountBalance) {
+      if (accountBalance != 0) {
+        this.isConfirmationVisible = false;
+        this.showModal = true
+        return
+      }
+      this.closeAccount(accountNo);
+      this.isProcessing = true;
+    },
+
+    cancelTransfer() {
+      this.isConfirmationVisible = false;
     },
   },
 };
