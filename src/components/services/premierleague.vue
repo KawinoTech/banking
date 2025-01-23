@@ -1,7 +1,7 @@
 <template>
     <div class="container">
         <div class="video-container">
-            <video controls>
+            <video autoplay muted>
                 <source src="../../assets/videos/epl.mp4" type="video/mp4">
                 Your browser does not support the video tag.
             </video>
@@ -22,7 +22,7 @@
                     reduce gap to six points at the top
                     
                     </p>
-                    <button type="button" class="btn btn-success">Stream<i class="fa-regular fa-circle-play fa-beat"></i></button>
+                    <a href="https://www.premierleague.com/"><button type="button" class="btn btn-success">Stream<i class="fa-regular fa-circle-play fa-beat"></i></button></a>
                 </div>
             </div>
             
@@ -106,7 +106,7 @@ img {
 }
 
 .btn {
-    background: gold;
+    background: rgb(0, 119, 255);
     color: white;
     border: 0;
 }

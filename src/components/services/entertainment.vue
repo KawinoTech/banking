@@ -4,24 +4,24 @@
             <img src="../../assets/images/ufc.jpg" class="card-img-top" alt="...">
             <div class="card-body">
                 <h5 class="card-title">UFC</h5>
-                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                <button type="button" class="btn btn-success">Personal</button>
+                <p class="card-text">Catch the UFC action live and never miss a moment of the excitement, goals, and drama!</p>
+                <a href="https://www.espn.com/mma/schedule/_/league/ufc"><button type="button" class="btn btn-success">Pay Per View</button></a>
             </div>
         </div>
         <div class="card" style="width: 16rem;">
             <img src="../../assets/images/avengers.jpg" class="card-img-top" alt="...">
             <div class="card-body">
                 <h5 class="card-title">Movies & TV Shows</h5>
-                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                <button type="button" class="btn btn-success">Personal</button>
+                <p class="card-text">Check out Netflix movies and TV-Shows</p>
+                <a href="https://www.netflix.com/ke/"><button type="button" class="btn btn-success">Stream</button></a>
             </div>
         </div>
         <div class="card" style="width: 16rem;">
             <img src="../../assets/images/matchday.jpg" class="card-img-top" alt="...">
             <div class="card-body">
                 <h5 class="card-title">NFL</h5>
-                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                <button type="button" class="btn btn-success">Personal</button>
+                <p class="card-text">Catch the NFL action live and never miss a moment of the excitement, goals, and drama!</p>
+                <a href="https://www.dazn.com/en-KE/l/nfl-game-pass"><button type="button" class="btn btn-success">Purchase ticket</button></a>
             </div>
         </div>
     </div>
@@ -47,8 +47,8 @@ export default {
 }
 
 h5 {
-    font-size: medium;
-    color: white;
+    font-size: larger;
+    color: gold;
 }
 p {
     color: aqua;
@@ -58,7 +58,7 @@ p {
     border: none;
 }
 .btn {
-    background: gold;
+    background: rgb(0, 119, 255);
     color: white;
     border: 0;
 }

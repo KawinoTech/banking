@@ -6,29 +6,351 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from typing import List
 from uuid import uuid4
-from ..models.transactions import PayBill, BuyGoods, Transfer, Airtime
-from ..models.users import Customer
+from ..models.transactions import Transfer, BuyGoods, PayBill, Airtime, TopUpWallet
 from ..models.accounts import PersonalAccounts, CorporateAccounts
-
+from ..models.users import Customer
 from .. import schemas, oauth
+from ..schema import transactions
 from ..database import get_db
 
+# Constants
 DAILY_LIMIT = 100
-classes = [PersonalAccounts, CorporateAccounts]
-router = APIRouter(prefix="/post")
+ACCOUNT_CLASSES = [PersonalAccounts, CorporateAccounts]
+
+# Router initialization
+# Set up router with a specific prefix for related endpoints
+router = APIRouter(
+    prefix="/post",
+    tags=["Customer Transacttion"],  # Assign this router to a specific documentation category
+)
+
 logger = logging.getLogger(__name__)
 
 @router.post(
     "/transfer",
     status_code=status.HTTP_201_CREATED,
-    response_model=schemas.ResponseTransact,
+    response_model=transactions.ResponseTransact,
+    dependencies=[Depends(RateLimiter(times=1, seconds=60))],
+    tags=["transactions"],
+    summary="Transfer funds between accounts",
+    description="Allows users to transfer funds between accounts, including mobile payments (MPESA, Airtel, Telcom), respecting transaction limits."
+)
+def transfer(
+    transaction: transactions.Transaction,
+    db: Session = Depends(get_db),
+    current_user: str = Depends(oauth.get_current_user)
+):
+    """
+    Process a fund transfer between accounts.
+    
+    Args:
+        transaction (schemas.Transaction): The transaction details including account, amount, etc.
+        db (Session): The database session.
+        current_user (str): The authenticated user's information.
+        
+    Returns:
+        schemas.ResponseTransact: The transaction result.
+    
+    Raises:
+        HTTPException: Includes error details for issues like account not found or insufficient funds.
+    """
+    
+    # Initialize transaction object
+    new_transaction = Transfer(
+        id=uuid4(),
+        ref_no=uuid4(),
+        date_posted=datetime.now(),
+        **transaction.payload,
+        owner_customer_no=current_user.customer_no
+    )
+    
+    # Search for the account associated with the transaction
+    account = None
+    for account_class in ACCOUNT_CLASSES:
+        account = db.query(account_class).filter(account_class.account_no == transaction.payload['account']).first()
+        if account:
+            break
+
+    try:
+        # Validation checks
+        if not account:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Account does not exist."
+            )
+        if transaction.payload['amount'] <= 0:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Transaction amount must be greater than zero."
+            )
+        if account.account_balance < transaction.payload['amount']:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Insufficient funds for this transaction."
+            )
+
+        # Process the transaction
+        account.account_balance -= transaction.payload['amount']
+        new_transaction.generate_ref_number()  # Ensure that the reference number is generated
+
+        # Save the transaction and commit
+        db.add(new_transaction)
+        db.commit()
+        db.refresh(new_transaction)
+
+        # Log the transaction success
+        logger.info(
+            f"User {current_user} successfully transferred {transaction.payload['amount']} "
+            f"from account {transaction.payload['account']}."
+        )
+
+        return new_transaction
+
+    except IntegrityError as e:
+        # Handle database integrity error (rollback and raise a 500 server error)
+        db.rollback()
+        logger.error(f"Database error occurred: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="A database error occurred while processing the transaction."
+        )
+
+    except Exception as e:
+        # Catch all other exceptions
+        db.rollback()
+        logger.error(f"Unexpected error occurred: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"An unexpected error occurred: {str(e)}"
+        )
+
+
+@router.post(
+    "/buygoods",
+    status_code=status.HTTP_201_CREATED,
+    response_model=transactions.ResponseTransact,
+    tags=["transactions"],
+    summary="Buy goods and services",
+    description="Allows users to purchase goods and services using funds from their account, ensuring that all transactions adhere to account balance limits.",
+    dependencies=[Depends(RateLimiter(times=1, seconds=60))]
+)
+def buygoods(
+    transaction: transactions.Transaction,
+    db: Session = Depends(get_db),
+    current_user: str = Depends(oauth.get_current_user)
+):
+    """
+    Allows users to buy goods and services using funds from their bank accounts.
+    
+    The function performs the following steps:
+    - Verifies if the requested transaction amount is valid (greater than zero).
+    - Confirms the existence of the account and checks whether it has enough funds.
+    - Deducts the transaction amount from the account balance if sufficient funds are available.
+    - Generates a unique reference number for the transaction.
+    - Logs the transaction and responds with the transaction details.
+    
+    Args:
+        transaction (transactions.Transaction): The transaction payload containing the transaction details.
+        db (Session): The database session, injected by FastAPI's dependency system.
+        current_user (str): The authenticated user (obtained using OAuth), representing the user making the purchase.
+
+    Returns:
+        transactions.ResponseTransact: Details of the completed transaction (including the unique reference number and other metadata).
+
+    Raises:
+        HTTPException:
+            - 404: If the account does not exist.
+            - 400: If the transaction amount is invalid or insufficient.
+            - 501: If funds are insufficient.
+            - 500: For unexpected errors (e.g., database failures).
+    """
+
+    # Create the new buy goods transaction
+    new_transaction = BuyGoods(
+        id=uuid4(),
+        ref_no=uuid4(),
+        date_posted=datetime.now(),
+        **transaction.payload,
+        owner_customer_no=current_user.customer_no
+    )
+    
+    # Try to find the account in either Personal or Corporate account classes
+    account = None
+    for clss in ACCOUNT_CLASSES:
+        account = db.query(clss).filter(clss.account_no == transaction.payload['account']).first()
+        if account:  # If account found, break loop
+            break
+
+    try:
+        # Verify if account exists
+        if not account:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Account does not exist."
+            )
+        
+        # Ensure transaction amount is greater than zero
+        if transaction.payload['amount'] <= 0:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Transaction amount must be greater than zero."
+            )
+        
+        # Check if account balance is sufficient
+        if account.account_balance < transaction.payload['amount']:
+            raise HTTPException(
+                status_code=status.HTTP_501_NOT_IMPLEMENTED,
+                detail="Failed. Insufficient funds."
+            )
+
+        # Deduct the transaction amount from the account balance
+        account.account_balance -= transaction.payload['amount']
+
+        # Generate reference number for the transaction
+        new_transaction.generate_ref_number()
+
+        # Commit the transaction to the database
+        db.add(new_transaction)
+        db.commit()
+        db.refresh(new_transaction)
+
+        # Log the transaction for auditing
+        logger.info(
+            f"User {current_user} completed a purchase of {transaction.payload['amount']} "
+            f"from account {transaction.payload['account']}."
+        )
+
+        # Return the transaction details
+        return new_transaction
+
+    except Exception as e:
+        # Rollback the transaction in case of errors
+        db.rollback()
+
+        # Raise an internal server error for unexpected exceptions
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"An unexpected error occurred: {str(e)}"
+        )
+
+
+@router.post(
+    "/paybill",
+    status_code=status.HTTP_201_CREATED,
+    response_model=transactions.ResponseTransact,
     dependencies=[Depends(RateLimiter(times=10, seconds=60))],
     tags=["transactions"],
+    summary="Pay utility bills",
+    description="Allows users to make payments for utility bills (e.g., electricity, water, or other services) "
+                "using funds from their bank accounts while ensuring account balance sufficiency."
+)
+def paybill(
+    transaction: transactions.Transaction,
+    db: Session = Depends(get_db),
+    current_user: str = Depends(oauth.get_current_user)
+):
+    """
+    Allows users to make utility bill payments using funds from their accounts.
+
+    This endpoint facilitates paying utility bills (e.g., electricity, water) by verifying the account balance 
+    and ensuring it is sufficient before allowing the transaction. The function also generates a reference number 
+    for each successful transaction and logs the payment activity.
+
+    Args:
+        transaction (transactions.Transaction): The payload containing transaction details such as account,
+                                                 amount, and other transaction-related data.
+        db (Session): The SQLAlchemy session to interact with the database.
+        current_user (str): The authenticated user making the transaction.
+
+    Returns:
+        transactions.ResponseTransact: Details of the transaction after processing, including reference number 
+                                        and transaction status.
+    
+    Raises:
+        HTTPException:
+            - 404: If the account is not found.
+            - 400: If the transaction amount is invalid.
+            - 501: If there are insufficient funds in the account.
+            - 500: For any unexpected errors during processing.
+    """
+    # Initialize new PayBill transaction
+    new_transaction = PayBill(
+        id=uuid4(),
+        ref_no=uuid4(),
+        **transaction.payload,
+        date_posted=datetime.now(),
+        owner_customer_no=current_user.customer_no
+    )
+
+    # Check account existence and balance sufficiency
+    account = None
+    for clss in ACCOUNT_CLASSES:
+        account = db.query(clss).filter(clss.account_no == transaction.payload['account']).first()
+        if account:  # Break out of loop once account is found
+            break
+
+    try:
+        # Account existence check
+        if not account:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Account does not exist."
+            )
+
+        # Validate transaction amount
+        if transaction.payload['amount'] <= 0:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Transaction amount must be greater than zero."
+            )
+
+        # Ensure sufficient funds
+        if account.account_balance < transaction.payload["amount"]:
+            raise HTTPException(
+                status_code=status.HTTP_501_NOT_IMPLEMENTED,
+                detail="Failed. Insufficient funds."
+            )
+
+        # Deduct the transaction amount from the account balance
+        account.account_balance -= transaction.payload["amount"]
+
+        # Generate the reference number for the transaction
+        new_transaction.generate_ref_number()
+
+        # Commit the transaction and persist it in the database
+        db.add(new_transaction)
+        db.commit()
+        db.refresh(new_transaction)
+
+        # Log the transaction for auditing purposes
+        logger.info(
+            f"User {current_user} made a bill payment of {transaction.payload['amount']} "
+            f"from account {transaction.payload['account']}."
+        )
+
+        # Return the transaction details as a response
+        return new_transaction
+
+    except Exception as e:
+        # Rollback the transaction in case of any error
+        db.rollback()
+        
+        # Raise an internal server error with the specific exception details
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"An unexpected error occurred: {str(e)}"
+        )
+
+@router.post(
+    "/airtime",
+    status_code=status.HTTP_201_CREATED,
+    response_model=transactions.ResponseTransact,
+    dependencies=[Depends(RateLimiter(times=10, seconds=60))],
     summary="Transfer funds between accounts",
     description="Allows users to transfer funds from bank accounts to mobile accounts (MPESA, AIRTEL, Telcom) adhering to specified limits."
 )
-def transfer(
-    transaction: schemas.Transaction,
+def buy_airtime(
+    transaction: transactions.Transaction,
     db: Session = Depends(get_db),
     current_user: str = Depends(oauth.get_current_user)
 ):
@@ -46,14 +368,15 @@ def transfer(
     Raises:
         HTTPException: Various HTTP exceptions based on transaction validity and errors.
     """
-    new_transaction = Transfer(
+    new_transaction = Airtime(
         id=uuid4(),
+        remarks="airtime",
         ref_no=uuid4(),
         date_posted=datetime.now(),
         **transaction.payload,
         owner_customer_no=current_user.customer_no
     )
-    for clss in classes:
+    for clss in ACCOUNT_CLASSES:
         account = db.query(clss).filter(
             clss.account_no == transaction.payload['account']
         ).first()
@@ -89,12 +412,7 @@ def transfer(
         )
         return new_transaction
 
-    except IntegrityError:
-        db.rollback()
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Database error occurred."
-        )
+
     except Exception as e:
         db.rollback()
         raise HTTPException(
@@ -104,182 +422,112 @@ def transfer(
     finally:
         db.close()
 
-
 @router.post(
-    "/buygoods",
+    "/topup_wallet",
     status_code=status.HTTP_201_CREATED,
-    response_model=schemas.ResponseTransact,
-    tags=["transactions"],
-    summary="Buy goods and services",
-    description="Allows users to purchase goods and services using funds from their account, ensuring that all transactions adhere to account balance limits.",
-    dependencies=[Depends(RateLimiter(times=10, seconds=60))]
-)
-def buygoods(
-    transaction: schemas.Transaction,
-    db: Session = Depends(get_db),
-    current_user: str = Depends(oauth.get_current_user)
-):
-    """
-    Handle transactions for purchasing goods and services.
-
-    This endpoint allows a user to initiate a transaction for buying goods or services. 
-    It validates the user's account existence, ensures sufficient funds, and deducts the 
-    appropriate amount from the account balance. A new transaction record is created and stored.
-
-    Args:
-        transaction (schemas.Transaction): The payload containing the account details and transaction amount.
-        db (Session): The database session used to interact with the database.
-        current_user (str): The currently authenticated user performing the transaction.
-
-    Returns:
-        schemas.ResponseTransact: The details of the successful transaction, including IDs and reference numbers.
-
-    Raises:
-        HTTPException: 
-            - 404 Not Found: If the specified account does not exist.
-            - 400 Bad Request: If the transaction amount is invalid (<= 0).
-            - 501 Not Implemented: If the account has insufficient funds.
-            - 500 Internal Server Error: If a database error or unexpected error occurs.
-    """
-    new_transaction = BuyGoods(
-        id=uuid4(),
-        ref_no=uuid4(),
-        date_posted=datetime.now(),
-        **transaction.payload,
-        owner_customer_no=current_user.customer_no
-    )
-    for clss in classes:
-        account = db.query(clss).filter(
-            clss.account_no == transaction.payload['account']
-        ).first()
-        if account:
-            break
-
-    try:
-        if not account:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Account does not exist."
-            )
-        if transaction.payload['amount'] <= 0:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Transaction amount must be greater than zero."
-            )
-        if account.account_balance < transaction.payload['amount']:
-            raise HTTPException(
-                status_code=status.HTTP_501_NOT_IMPLEMENTED,
-                detail="Failed. Insufficient funds."
-            )
-
-        account.account_balance -= transaction.payload['amount']
-        new_transaction.generate_ref_number()
-        db.add(new_transaction)
-        db.commit()
-        db.refresh(new_transaction)
-
-        logger.info(
-            f"User {current_user} completed a purchase of {transaction.payload['amount']} "
-            f"from account {transaction.payload['account']}."
-        )
-        return new_transaction
-
-
-    except Exception as e:
-        db.rollback()
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"An unexpected error occurred: {str(e)}"
-        )
-
-
-
-@router.post(
-    "/paybill",
-    status_code=status.HTTP_201_CREATED,
-    response_model=schemas.ResponseTransact,
+    response_model=transactions.ResponseTransact,
     dependencies=[Depends(RateLimiter(times=10, seconds=60))],
-    tags=["transactions"],
-    summary="Pay utility bills",
-    description="Allows users to make payments for utility bills (e.g., electricity, water, or other services) "
-                "using funds from their bank accounts while ensuring account balance sufficiency."
+    summary="Transfer funds to a mobile wallet",
+    description="Enables users to transfer funds from their bank accounts to mobile wallets like MPESA, Airtel, or Telcom, "
+                "ensuring all transactions comply with account limits."
 )
-def paybill(
-    transaction: schemas.Transaction,
+def topup_wallet(
+    transaction: transactions.Transaction,
     db: Session = Depends(get_db),
     current_user: str = Depends(oauth.get_current_user)
 ):
     """
-    Handle payments for utility bills.
+    Facilitates transferring funds from a bank account to a mobile wallet.
 
-    This endpoint facilitates the payment of bills such as utilities or other services 
-    from a user’s account. It checks for account existence, validates the transaction amount,
-    ensures there are sufficient funds, and creates a new transaction record upon success.
+    This endpoint handles the transfer of funds to mobile wallets (e.g., MPESA, Airtel, or Telcom) by validating
+    account details and ensuring the user's account has sufficient funds. Each successful transaction is recorded
+    with a unique reference number.
 
     Args:
-        transaction (schemas.Transaction): The payload containing the account details and bill payment amount.
-        db (Session): The database session used for database operations.
-        current_user (str): The currently authenticated user performing the transaction.
+        transaction (schemas.Transaction): The payload containing account and transaction details (e.g., amount, account number).
+        db (Session): The database session to perform database operations.
+        current_user (str): The authenticated user initiating the transaction.
 
     Returns:
-        schemas.ResponseTransact: The details of the successfully processed transaction.
+        transactions.ResponseTransact: Details of the successful transaction, including a unique reference number.
 
     Raises:
         HTTPException:
-            - 404 Not Found: If the specified account does not exist.
-            - 400 Bad Request: If the transaction amount is invalid (<= 0).
-            - 501 Not Implemented: If the account has insufficient funds.
-            - 500 Internal Server Error: If a database error or unexpected error occurs.
+            - 404: If the bank account doesn't exist.
+            - 400: If the transaction amount is invalid or insufficient funds are available.
+            - 500: For unexpected errors during processing.
     """
-    new_transaction = PayBill(
+    # Initialize a new TopUpWallet transaction
+    new_transaction = TopUpWallet(
         id=uuid4(),
         ref_no=uuid4(),
-        **transaction.payload,
         date_posted=datetime.now(),
+        **transaction.payload,
         owner_customer_no=current_user.customer_no
     )
-    for clss in classes:
-        account = db.query(clss).filter(
-            clss.account_no == transaction.payload['account']
-        ).first()
-        if account:
+
+    # Validate account existence
+    account = None
+    for clss in ACCOUNT_CLASSES:
+        account = db.query(clss).filter(clss.account_no == transaction.payload['account']).first()
+        if account:  # Exit loop as soon as account is found
             break
 
     try:
+        # Account existence check
         if not account:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Account does not exist."
             )
+
+        # Validate transaction amount
         if transaction.payload['amount'] <= 0:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Transaction amount must be greater than zero."
             )
-        if account.account_balance < transaction.payload["amount"]:
+
+        # Ensure sufficient funds
+        if account.account_balance < transaction.payload['amount']:
             raise HTTPException(
-                status_code=status.HTTP_501_NOT_IMPLEMENTED,
+                status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Failed. Insufficient funds."
             )
 
-        account.account_balance -= transaction.payload["amount"]
+        # Deduct transaction amount from the account balance
+        account.account_balance -= transaction.payload['amount']
+
+        # Generate a unique reference number for the transaction
         new_transaction.generate_ref_number()
+
+        # Persist the transaction in the database
         db.add(new_transaction)
         db.commit()
         db.refresh(new_transaction)
 
+        # Log the transaction for auditing purposes
         logger.info(
-            f"User {current_user} made a bill payment of {transaction.payload['amount']} "
-            f"from account {transaction.payload['account']}."
+            f"User {current_user} transferred {transaction.payload['amount']} "
+            f"from account {transaction.payload['account']} to a mobile wallet."
         )
+
+        # Return the transaction details as the response
         return new_transaction
 
     except Exception as e:
+        # Rollback the transaction on any error
         db.rollback()
+
+        # Log the exception
+        logger.error(f"Error processing wallet top-up: {str(e)}")
+
+        # Raise an internal server error exception
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"An unexpected error occurred: {str(e)}"
         )
+
 
 
 @router.get(
@@ -331,6 +579,7 @@ def all_user_transactions(
         bills = user.get_bills(db)
         goods_and_services = user.get_amount(db)
         airtime = user.get_airtime(db)
+        topups = user.get_topups(db)
 
         # Consolidate all transactions
         all_transactions = c2b_transactions + bills + goods_and_services + airtime
@@ -348,85 +597,3 @@ def all_user_transactions(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error fetching transactions: {str(e)}"
         )
-
-@router.post(
-    "/airtime",
-    status_code=status.HTTP_201_CREATED,
-    response_model=schemas.ResponseTransact,
-    dependencies=[Depends(RateLimiter(times=10, seconds=60))],
-    tags=["transactions"],
-    summary="Transfer funds between accounts",
-    description="Allows users to transfer funds from bank accounts to mobile accounts (MPESA, AIRTEL, Telcom) adhering to specified limits."
-)
-def buy_airtime(
-    transaction: schemas.Transaction,
-    db: Session = Depends(get_db),
-    current_user: str = Depends(oauth.get_current_user)
-):
-    """
-    Transfer funds between accounts.
-
-    Args:
-        transaction (schemas.Transaction): The transaction payload containing account details and the amount.
-        db (Session): Database session.
-        current_user (str): The authenticated user.
-
-    Returns:
-        schemas.ResponseTransact: Details of the transaction.
-
-    Raises:
-        HTTPException: Various HTTP exceptions based on transaction validity and errors.
-    """
-    new_transaction = Airtime(
-        id=uuid4(),
-        remarks="airtime",
-        ref_no=uuid4(),
-        date_posted=datetime.now(),
-        **transaction.payload,
-        owner_customer_no=current_user.customer_no
-    )
-    for clss in classes:
-        account = db.query(clss).filter(
-            clss.account_no == transaction.payload['account']
-        ).first()
-        if account:
-            break
-
-    try:
-        if not account:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Account does not exist."
-            )
-        if transaction.payload['amount'] <= 0:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Transaction amount must be greater than zero."
-            )
-        if account.account_balance < transaction.payload['amount']:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Failed. Insufficient funds."
-            )
-
-        account.account_balance -= transaction.payload['amount']
-        new_transaction.generate_ref_number()
-        db.add(new_transaction)
-        db.commit()
-        db.refresh(new_transaction)
-
-        logger.info(
-            f"User {current_user} transferred {transaction.payload['amount']} "
-            f"from account {transaction.payload['account']}"
-        )
-        return new_transaction
-
-
-    except Exception as e:
-        db.rollback()
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"An unexpected error occurred: {str(e)}"
-        )
-    finally:
-        db.close()

@@ -4,7 +4,7 @@
             <div class="card">
                 <div class="card-content">
                   <h5 class="card-title"><i class="fa-brands fa-amazon-pay" style="color: aqua;"></i></h5>
-                  <router-link to="/transfer_funds"><p  class="btn">Amazon Pay</p></router-link>
+                  <router-link to="/amazon_pay"><p  class="btn">Amazon Pay</p></router-link>
                 </div>
             </div>
         </div>
@@ -12,7 +12,7 @@
             <div class="card">
                 <div class="card-content">
                   <h5 class="card-title"><i class="fa-brands fa-apple-pay" style="color: aqua;"></i></h5>
-                  <router-link to="/buygoods"><p class="btn">Apple Pay</p></router-link>
+                  <router-link to="/apple_pay"><p class="btn">Apple Pay</p></router-link>
                 </div>
               </div>
         </div>
@@ -20,7 +20,7 @@
             <div class="card">
                 <div class="card-content">
                   <h5 class="card-title"><i class="fa-brands fa-google-pay" style="color: aqua;"></i></h5>
-                  <router-link to="/my_cards"><p class="btn">Google Pay</p></router-link>
+                  <router-link to="/google_pay"><p class="btn">Google Pay</p></router-link>
                 </div>
               </div>
         </div>
@@ -28,7 +28,7 @@
             <div class="card">
                 <div class="card-content">
                   <h5 class="card-title"><i class="fa-brands fa-paypal" style="color: aqua;"></i></h5>
-                  <router-link to="/transaction_history"><p class="btn">PayPal</p></router-link>
+                  <router-link to="/pay_pal"><p class="btn">PayPal</p></router-link>
                 </div>
               </div>
         </div>

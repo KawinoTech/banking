@@ -1,97 +1,161 @@
 <template>
-    <Nav_Bar></Nav_Bar>
-    <div class="background-container">
-  </div>
-    <section id="customer-care">
-  <div class="contact-info">
-    <h2>Contact Customer Care</h2>
-    <p1>We’re here to help! You can reach us through the following ways:</p1>
-    <ul>
-      <li><p>Email:</p> <a href="mailto:support@example.com">support@example.com</a></li>
-      <li><p>Phone:</p> <a href="tel:+1234567890">+1 (234) 567-890</a></li>
-      <li><p>Live Chat:</p> <a href="#">Start a live chat</a></li>
-    </ul>
-  </div>
-  <div class="message-form">
-    <h2>Send Us a Message</h2>
-    <form action="/submit-message" method="post">
+  <Nav_Bar></Nav_Bar>
+  <div class="background-container"></div>
+  <section id="customer-care">
+    <div class="contact-info">
+      <h2>Contact Customer Care</h2>
+      <p>We’re here to help! You can reach us through the following ways:</p>
+      <ul>
+        <li>
+          <p>Email:</p>
+          <a href="mailto:support@example.com">support@example.com</a>
+        </li>
+        <li>
+          <p>Phone:</p>
+          <a href="tel:+1234567890">+1 (234) 567-890</a>
+        </li>
+        <li>
+          <p>Live Chat:</p>
+          <a href="#">Start a live chat</a>
+        </li>
+      </ul>
+    </div>
 
-      <label for="message">Message</label>
-      <p v-if="formData.text === ''" class="empty">Fill in the required space*</p>
-      <textarea v-model="formData.text" type="text" id="text" name="text" placeholder="Write your message here" required></textarea>
+    <div class="message-form">
+      <h2>Send Us a Message</h2>
+      <form action="/submit-message" method="post">
+        <label for="message">Message</label>
+        <p v-if="formData.text === ''" class="empty">Fill in the required space*</p>
+        <textarea
+          v-model="formData.text"
+          type="text"
+          id="text"
+          name="text"
+          placeholder="Write your message here"
+          required
+        ></textarea>
 
-      <button v-if="!submitted" type="submit" @click.prevent="helpDesk">Send Message</button>
-      <p v-else>Please wait while we process you request ..<i class="fa-solid fa-hourglass-start fa-spin-pulse"></i></p>
-    </form>
+        <button type="submit" @click.prevent="showConfirmation">
+          Send Message
+        </button>
+      </form>
+    </div>
+  </section>
+
+  <div class="modal-overlay" v-if="isConfirmationVisible">
+    <div class="modal-card">
+      <h2 class="modal-title">Confirm Details</h2>
+      <div v-if="!isProcessing" class="modal-buttons">
+        <button class="modal-btn confirm" @click="confirm">Yes</button>
+        <button class="modal-btn cancel" @click="cancel">Cancel</button>
+      </div>
+      <div v-if="isProcessing">
+        <p class="wait">
+          Processing<i class="fa-regular wait fa-clock fa-spin"></i>
+        </p>
+      </div>
+    </div>
   </div>
-</section>
 </template>
+
 <script>
-import Nav_Bar from '../../components/navbar.vue'
-import check from '../../utils/utils'
+import Nav_Bar from '../../components/navbar.vue';
+import utils from '../../utils/utils';
+
 export default {
   name: 'Customer_Service',
 
-     data(){
-        return {
-            submitted: false,
-            formData: {
-            text: ''
-        },
-        error_message: {
+  data() {
+    return {
+      // State variables for controlling form and modal behavior
+      submitted: false, // Tracks whether the form is submitted
+      isConfirmationVisible: false, // Controls confirmation modal visibility
+      isProcessing: false, // Indicates processing animation state
+      formData: {
+        text: '', // User's report message
+      },
+    };
+  },
 
+  components: {
+    Nav_Bar,
+  },
+
+  methods: {
+    /**
+     * Submits the reported problem to the API.
+     * Redirects to success or failure pages based on the API response.
+     */
+    async reportProblem() {
+      this.submitted = true; // Mark the form as submitted
+      try {
+        const response = await fetch('http://127.0.0.1:8000/post/report_problem', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+          },
+          body: JSON.stringify({
+            text: this.formData.text,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to post data');
         }
-        };
-     },
-     components: {
-        Nav_Bar
-     },
-     methods: {
-     async helpDesk() {
-     this.submitted = true;
-     try{
-          if (check.checkEmptyValues(this.formData)){
-          throw new Error('Empty Fields');
-          }
-          const response = await fetch('http://127.0.0.1:8000/post/request_help',
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-            },
-              body: JSON.stringify(
-                {
-                "text": this.formData.text,}
-              )
-          });
-          if (!response.ok) {
-                        throw new Error('Failed to post data');
-              }
-          setTimeout(() => {
-                this.$router.push('/success');
-          }, 3000);
-        }
-        catch (error) {
-        console.error('Error posting data:', error);
+
         setTimeout(() => {
-                this.$router.push('/failed');
-          }, 1000);
-        this.submitted = false;
-      }
-      }
-    }
-};
+          this.$router.push('/success'); // Navigate to success page after delay
+        }, 2000);
+      } catch (error) {
+        console.error('Error posting data:', error);
 
+        setTimeout(() => {
+          this.$router.push('/failed'); // Navigate to failure page after delay
+        }, 1000);
+
+        this.submitted = false; // Reset submission state
+      }
+    },
+
+    /**
+     * Validates form input and displays the confirmation modal if valid.
+     */
+    showConfirmation() {
+      if (utils.checkEmptyValues(this.formData)) {
+        alert('Please fill in the required fields.');
+        return;
+      }
+      this.isConfirmationVisible = true; // Show the confirmation modal
+    },
+
+    /**
+     * Confirms the action and initiates the report submission process.
+     */
+    confirm() {
+      this.reportProblem(); // Call the report submission method
+      this.isProcessing = true; // Display processing animation
+    },
+
+    /**
+     * Cancels the confirmation modal and hides it.
+     */
+    cancel() {
+      this.isConfirmationVisible = false; // Hide the confirmation modal
+    },
+  },
+};
 </script>
+
+
 <style scoped>
-    .background-container {
-      background-image: url('../../assets/images/support.jpg'); /* Replace with your image path */
-      background-size: cover; /* Scales image to cover the entire area */
-      background-repeat: no-repeat; /* Prevents the image from repeating */
-      background-position: center; /* Center aligns the image */
-      position: relative;
-      height: 100vh;}
+.background-container {
+  background-image: url('../../assets/images/support.jpg'); /* Replace with your image path */
+  background-size: cover; /* Scales image to cover the entire area */
+  background-repeat: no-repeat; /* Prevents the image from repeating */
+  background-position: center; /* Center aligns the image */
+  position: relative;
+  height: 100vh;}
 #customer-care {
   padding: 20px;
   position: absolute;
@@ -191,13 +255,6 @@ i {
   font-family: 'Times New Roman', Times, serif;
   font-style: italic;
   font-weight: bolder;
-  color: red;
   padding: 0;
-}
-p1 {
-    font-size: 16px;
-    color: aqua;
-    text-align: start;
-    margin-bottom: 20px;
 }
 </style>

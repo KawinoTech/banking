@@ -10,6 +10,7 @@ from ..models.accounts import PersonalAccounts, ForeignCurrency, CorporateAccoun
 from typing import List
 from ..models.files import Signatures, Signatory, CorporateDocs, PersonalDocs, F_C_A_Docs
 import secrets
+from ..schema import transactions
 import os
 import json
 classes = [PersonalAccounts, CorporateAccounts, ForeignCurrency]

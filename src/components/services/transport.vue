@@ -3,19 +3,19 @@
         <div class="card" style="width: 18rem;">
             <img src="../../assets/images/uber.png" class="card-img-top" alt="...">
             <div class="card-body">
-                <button type="button" class="btn btn-success">Request ride</button>
+                <a href="https://www.uber.com/ke/en/ride/"><button type="button" class="btn btn-success">Request ride</button></a>
             </div>
         </div>
         <div class="card" style="width: 18rem;">
             <img src="../../assets/images/bolt1.jpg" class="card-img-top" alt="...">
             <div class="card-body">
-                <button type="button" class="btn btn-success">Request ride</button>
+                <a href="https://bolt.eu/en-ke/"><button type="button" class="btn btn-success">Request ride</button></a>
             </div>
         </div>
         <div class="card" style="width: 18rem;">
             <img src="../../assets/images/little.png" class="card-img-top" alt="...">
             <div class="card-body">
-                <button type="button" class="btn btn-success">Request ride</button>
+                <a href="https://www.little.bz/"><button type="button" class="btn btn-success">Request ride</button></a>
             </div>
         </div>
     </div>
@@ -48,7 +48,7 @@ p {
     border: none;
 }
 .btn {
-    background: gold;
+    background: rgb(0, 119, 255);
     color: white;
     border: 0;
 }

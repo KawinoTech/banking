@@ -29,5 +29,19 @@ findAndReturnSubsequent(str, char) {
   return index !== -1 && index < str.length - 1
     ? str.substring(index + 1)
     : "";
+},
+
+checkBalance(account_no, userEnteredamount, allUseraccounts) {
+  if (account_no && userEnteredamount) {
+    for (const account of allUseraccounts) {
+      if (
+        this.findAndReturnSubsequent(account_no, ':') ===
+        account.account_no
+      ) {
+        const newbalance = account.account_balance - userEnteredamount;
+        return newbalance
+      }
+    }
+  }
 }
 }

@@ -5,6 +5,10 @@ import Transfer_Funds from '../routes/transacting/transfer_funds.vue'
 import Debit_App from '../routes/card_applications/debit_card_application.vue'
 import Credit_App from '../routes/card_applications/credit_card_application.vue'
 import Prepaid_App from '../routes/card_applications/prepaid_card_application.vue'
+import Amazon_Pay from '../routes/third_party_wallets/amazon_pay.vue'
+import Apple_Pay from '../routes/third_party_wallets/apple_pay.vue'
+import Google_Pay from '../routes/third_party_wallets/google_pay.vue'
+import Pay_Pal from '../routes/third_party_wallets/pay_pal.vue'
 import Savings_Account from '../routes/account_products/savings.vue'
 import Investment_Banking from '../routes/account_products/investment_banking.vue'
 import Transactional_Account from '../routes/account_products/transactional_account.vue'
@@ -31,6 +35,26 @@ const routes = [
         name: 'Goods',
         component: Buy_goods,
         path: '/buygoods'
+    },
+    {
+        name: 'Amazon_Pay',
+        component: Amazon_Pay,
+        path: '/amazon_pay'
+    },
+    {
+        name: 'Apple_Pay',
+        component: Apple_Pay,
+        path: '/apple_pay'
+    },
+    {
+        name: 'Google_Pay',
+        component: Google_Pay,
+        path: '/google_pay'
+    },
+    {
+        name: 'Pay_Pal',
+        component: Pay_Pal,
+        path: '/pay_pal'
     },
     {
         name: 'Account_Closure',

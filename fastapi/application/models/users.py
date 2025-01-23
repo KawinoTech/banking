@@ -2,7 +2,7 @@ from sqlalchemy import Column, String, Integer, ForeignKey, Float, Table
 from ..database import Base
 from sqlalchemy.orm import relationship
 from .base_model import BaseModel
-from .transactions import PayBill, BuyGoods, Transfer, Airtime
+from .transactions import PayBill, BuyGoods, Transfer, Airtime, TopUpWallet
 from .accounts import PersonalAccounts, CorporateAccounts
 from .loans import PersonalLoans
 from .term_deposits import TermDeposit
@@ -52,6 +52,8 @@ class User(BaseModel):
         return db.query(BuyGoods).filter_by(owner_customer_no=self.customer_no).all()
     def get_airtime(self, db):
         return db.query(Airtime).filter_by(owner_customer_no=self.customer_no).all()
+    def get_topups(self, db):
+        return db.query(TopUpWallet).filter_by(owner_customer_no=self.customer_no).all()
 
 class Customer(User, Base):
     __tablename__ = "customers"
@@ -63,6 +65,7 @@ class Customer(User, Base):
     airtime = relationship("Airtime", backref="sender")
     goods_payed = relationship("BuyGoods", backref="buyer")
     c2b_transfers = relationship("Transfer", backref="source")
+    topups = relationship("TopUpWallet", backref="source")
     personal_accounts = relationship("PersonalAccounts", backref="owner")
     corporate_accounts = relationship("CorporateAccounts", backref="owner")
     deposits = relationship("TermDeposit", backref="depositer")

@@ -16,25 +16,6 @@ class ResponseUser(BaseModel):
     full_name: str
     id : str
 
-class Transaction(BaseModel):
-    payload: dict
-    signature: str
-
-class HelpDesk(BaseModel):
-    text : str
-class Report(BaseModel):
-    text : str
-
-
-class Transfer(Transaction):
-    beneficiary: str
-class PayBill(Transaction):
-    account_no: str
-    bus_no: str
-
-class BuyGoods(Transaction):
-    store_no: str
-
 class Account(BaseModel):
     account_type: str
     account_name: str
@@ -65,8 +46,6 @@ class ForeignCurrencyAccount(Account):
 
 class CorporateAccount(Account):
     pass
-class ResponseTransact(BaseModel):
-    ref_no: str
 
 class ResponseAccount(BaseModel):
     account_name: str
@@ -75,6 +54,7 @@ class LoginUser(BaseModel):
     password_hash: str
 class TokenData(BaseModel):
     customer_no: int
+
 class ResponseAccount1(BaseModel):
     account_no : str
     account_balance: int
@@ -85,12 +65,6 @@ class ResponseAccount2(BaseModel):
     account_balance: str
     account_type: str
     currency: str
-
-class ResponseHelp(BaseModel):
-    id : str
-class ReportResponse(BaseModel):
-    id : str
-
 class CardApplication(BaseModel):
     payload: dict
     signature: str

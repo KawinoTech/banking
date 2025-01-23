@@ -15,21 +15,38 @@
             <p v-if="formData.text === ''" class="empty">Fill in the required space*</p>
             <textarea v-model="formData.text" type="text" id="text" name="text" placeholder="Describe the issue..." required></textarea>
         </div>
-        <button v-if="!submitted" type="submit" @click.prevent="reportProblem">Report</button>
-      <p v-else>Please wait while we process you request ..<i class="fa-solid fa-hourglass-start fa-spin-pulse"></i></p>
+        <button class="btn" type="submit" @click.prevent="showConfirmation">Report</button>
     </form>
 </div>
-
+<div class="modal-overlay" v-if="isConfirmationVisible">
+      <div class="modal-card">
+        <h2 class="modal-title">Confirm Details</h2>
+        <p class="modal-content">
+          Dear Customer, our team will swiftly get <br>back to you immediately to give feedback
+        </p>
+        <div v-if="!isProcessing" class="modal-buttons">
+          <button class="modal-btn confirm" @click="confirm">Yes</button>
+          <button class="modal-btn cancel" @click="cancel">Cancel</button>
+        </div>
+        <div v-if="isProcessing">
+          <p class="wait">
+            Processing<i class="fa-regular wait fa-clock fa-spin"></i>
+          </p>
+        </div>
+      </div>
+    </div>
 </template>
 <script>
 import Nav_Bar from '../../components/navbar.vue'
-import check from '../../utils/utils'
+import utils from '../../utils/utils'
 export default {
   name: 'Report_Problem',
 
      data(){
         return {
             submitted: false,
+            isConfirmationVisible: false,
+            isProcessing: false,
             formData: {
             text: ''
         }
@@ -42,9 +59,6 @@ export default {
      async reportProblem() {
      this.submitted = true;
      try{
-          if (check.checkEmptyValues(this.formData)){
-          throw new Error('Empty Fields');
-          }
           const response = await fetch('http://127.0.0.1:8000/post/report_problem',
           {
             method: 'POST',
@@ -62,7 +76,7 @@ export default {
               }
           setTimeout(() => {
                 this.$router.push('/success');
-          }, 10000);
+          }, 2000);
         }
         catch (error) {
         console.error('Error posting data:', error);
@@ -71,7 +85,21 @@ export default {
           }, 1000);
         this.submitted = false;
       }
+      },
+      showConfirmation() {
+      if (utils.checkEmptyValues(this.formData)) {
+        alert("Please fill in the required fields.");
+        return;
       }
+      this.isConfirmationVisible = true;
+    },
+    confirm() {
+      this.reportProblem();
+      this.isProcessing = true;
+    },
+    cancel() {
+      this.isConfirmationVisible = false;
+    },
     }
 };
 
@@ -156,7 +184,8 @@ button {
 }
 
 button:hover {
-  background-color: #218838;
+  background-color: rgba(255, 0, 0, 0.514);
+  color: white;
 }
 
 i {
@@ -169,5 +198,9 @@ i {
   font-style: italic;
   font-weight: lighter;
   color: red;
+}
+.btn {
+  width: 100px;
+  background: red;
 }
 </style>

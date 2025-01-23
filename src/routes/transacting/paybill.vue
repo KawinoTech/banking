@@ -103,26 +103,26 @@
     </button>
   </form>
   <div class="modal-overlay" v-if="isConfirmationVisible">
-      <div class="modal-card">
-        <h2 class="modal-title">Confirm Details</h2>
-        <p class="modal-content">
+      <div class="modal-card-">
+        <h2 class="modal-title-">Confirm Details</h2>
+        <p class="modal-content-">
           Account Number: <span>{{ formData.account_no }}</span>
         </p>
-        <p class="modal-content">
+        <p class="modal-content-">
           Paybill Number: <span>{{ formData.beneficiary }}</span>
         </p>
-        <p class="modal-content">
+        <p class="modal-content-">
           Amount: <span>{{ formData.amount }}</span>
         </p>
-        <p class="modal-content">
+        <p class="modal-content-">
           Source Account: <span>{{ formData.account }}</span>
         </p>
-        <p class="modal-content">
+        <p class="modal-content-">
           Description: <span>{{ formData.remarks }}</span>
         </p>
-        <div v-if="!isProcessing" class="modal-buttons">
-          <button class="modal-btn confirm" @click="confirmTransfer">Yes</button>
-          <button class="modal-btn cancel" @click="cancelTransfer">Cancel</button>
+        <div v-if="!isProcessing" class="modal-buttons-">
+          <button class="modal-btn- confirm" @click="confirmTransfer">Yes</button>
+          <button class="modal-btn- cancel" @click="cancelTransfer">Cancel</button>
         </div>
         <div v-if="isProcessing">
           <p class="wait">
@@ -141,40 +141,58 @@ import Nav_Bar from "../../components/navbar.vue";
 export default {
   name: "Pay_Bill",
   components: {
-    Nav_Bar
+    Nav_Bar,
   },
   data() {
+    /**
+     * Component's reactive data properties.
+     */
     return {
       formData: {
-        amount: "",
-        account_no: "",
-        remarks: "",
-        beneficiary: "",
-        account: "",
-        password: "",
+        amount: "",        // The payment amount
+        account_no: "",    // The account number of the payee
+        remarks: "",       // Purpose of the payment
+        beneficiary: "",   // The business/payee identifier
+        account: "",       // The user's selected account for debit
+        password: "",      // User's PIN/password for authorization
       },
-      all_accounts: [],
-      loading: true,
-      balance: "",
-      isConfirmationVisible: false,
-      isProcessing: false,
+      all_accounts: [],       // List of user accounts from the API
+      loading: true,          // Indicates whether data is being fetched
+      balance: "",            // Calculated balance after potential transaction
+      isConfirmationVisible: false, // Toggles the visibility of the confirmation modal
+      isProcessing: false,    // Indicates processing status for transactions
     };
   },
 
   mounted() {
+    /**
+     * Lifecycle hook executed after component mount.
+     * Fetches user accounts from the backend.
+     */
     this.fetchData();
   },
 
   methods: {
     findAndReturnSubsequent(str, char) {
+      /**
+       * Extracts the substring after a specified character.
+       * 
+       * @param {string} str - The input string.
+       * @param {string} char - The character to search for in the string.
+       * @returns {string} Substring after the specified character or an empty string if not found.
+       */
       const index = str.indexOf(char);
       return index !== -1 && index < str.length - 1
         ? str.substring(index + 1)
-        : ""; // Character not found or it's the last character
+        : ""; // If character not found or is the last character
     },
 
     check_balance() {
-      if (this.formData.account !== "" && this.formData.amount !== "") {
+      /**
+       * Calculates the remaining balance for the selected account
+       * after the entered transaction amount.
+       */
+      if (this.formData.account && this.formData.amount) {
         for (const account of this.all_accounts) {
           if (
             this.findAndReturnSubsequent(this.formData.account, ":") ===
@@ -187,34 +205,51 @@ export default {
     },
 
     confirmTransfer() {
+      /**
+       * Initiates the bill payment process and sets processing status.
+       */
       this.payBill();
       this.isProcessing = true;
     },
+
     cancelTransfer() {
+      /**
+       * Cancels and hides the confirmation modal.
+       */
       this.isConfirmationVisible = false;
     },
 
     showConfirmation() {
-        // Validate before showing confirmation
-        if (utils.checkEmptyValues(this.formData)) {
-          alert('Please fill in all required fields.');
-          return;
-        }
-        this.isConfirmationVisible = true;
-      },
+      /**
+       * Validates required fields and shows the confirmation modal.
+       */
+      if (utils.checkEmptyValues(this.formData)) {
+        alert("Please fill in all required fields.");
+        return;
+      }
+      this.isConfirmationVisible = true;
+    },
 
     async payBill() {
+      /**
+       * Sends a POST request to execute the Pay Bill transaction.
+       */
       try {
+        // Validate input fields
         if (utils.checkEmptyValues(this.formData)) {
           throw new Error("Empty Fields");
         }
+
+        // Prepare request body with security signature
         const requestBody = utils.generateHmacSignature({
-          "amount": Number(this.formData.amount),
-          "account": this.findAndReturnSubsequent(this.formData.account, ":"),
-          "beneficiary": this.formData.beneficiary,
-          "remarks": this.formData.remarks,
-          "account_no": this.formData.account_no
+          amount: Number(this.formData.amount),
+          account: this.findAndReturnSubsequent(this.formData.account, ":"),
+          beneficiary: this.formData.beneficiary,
+          remarks: this.formData.remarks,
+          account_no: this.formData.account_no,
         });
+
+        // Send POST request to the API
         const response = await fetch("http://127.0.0.1:8000/post/paybill", {
           method: "POST",
           headers: {
@@ -223,9 +258,12 @@ export default {
           },
           body: JSON.stringify(requestBody),
         });
+
         if (!response.ok) {
           throw new Error("Failed to post data");
         }
+
+        // Redirect to success page
         setTimeout(() => {
           this.$router.push("/success");
         }, 2000);
@@ -238,6 +276,9 @@ export default {
     },
 
     async fetchData() {
+      /**
+       * Fetches the user's transaction accounts from the backend API.
+       */
       try {
         const response = await fetch(url2, {
           method: "GET",
@@ -247,7 +288,7 @@ export default {
         });
         const data = await response.json();
         this.all_accounts.push(...data);
-        this.loading = false;
+        this.loading = false; // Data fetching complete
       } catch (error) {
         console.error("Error fetching data:", error);
       }
