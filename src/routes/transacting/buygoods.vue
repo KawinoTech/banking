@@ -132,6 +132,7 @@
 import utils from "../../utils/utils";
 import Nav_Bar from "../../components/navbar.vue";
 const url2 = "http://127.0.0.1:8000/post/get_user_transactive_accounts";
+const url3 = 'http://127.0.0.1:8000/post/get_user_transactive_loans';
 
 export default {
   name: "Buy_goods",
@@ -180,6 +181,19 @@ export default {
         this.all_accounts.push(...data);   // Updates the accounts list
       } catch (error) {
         console.error("Error fetching data:", error); // Handles any fetch errors
+      }
+      try {
+        const response = await fetch(url3, {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+          },
+        });
+
+        const data = await response.json();
+        this.all_accounts.push(...data);
+      } catch (error) {
+        console.error('Error fetching data:', error);
       }
     },
     showConfirmation() {

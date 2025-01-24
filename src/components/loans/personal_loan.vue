@@ -43,18 +43,18 @@
     </form>
 </div>
 <div class="modal-overlay" v-if="isConfirmationVisible">
-    <div class="modal-card">
-      <h2 class="modal-title">Confirm Details</h2>
-      <p class="modal-content">
+    <div class="modal-card-">
+      <h2 class="modal-title-">Confirm Details</h2>
+      <p class="modal-content-">
         Loan Amount: <span>{{ formData.loan_amount }}</span>
       </p>
-      <p class="modal-content">
+      <p class="modal-content-">
         Repayment Period: <span>{{ formData.repayment_period }}</span>
       </p>
-      <p class="modal-content">
+      <p class="modal-content-">
         Purpose: <span>{{ formData.purpose }}</span>
       </p>
-      <p class="modal-content">
+      <p class="modal-content-">
         Ratw: <span>Fixed at 7.54</span>
       </p>
       <p id="info">Your loan application will be reviewed. <br>
@@ -62,9 +62,9 @@
         If the bank requires further documentation, please be ready to share
       </p>
 
-      <div v-if="!isProcessing" class="modal-buttons">
-        <button class="modal-btn confirm" @click="confirmTransfer">Yes</button>
-        <button class="modal-btn cancel" @click="cancelTransfer">Cancel</button>
+      <div v-if="!isProcessing" class="modal-buttons-">
+        <button class="modal-btn- confirm" @click="confirmTransfer">Yes</button>
+        <button class="modal-btn- cancel" @click="cancelTransfer">Cancel</button>
       </div>
       <div v-if="isProcessing">
         <p class="wait">Processing<i class="fa-regular wait fa-clock fa-spin"></i></p>
@@ -161,93 +161,93 @@
   </script>
   
   
-  <style scoped>
-        .container {
-            max-width: 800px;
-            margin: 20px auto;
-            background: rgb(0, 19, 31);
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
+<style scoped>
+.container {
+    max-width: 800px;
+    margin: 20px auto;
+    background: rgb(0, 19, 31);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
 
-        h1 {
-            text-align: center;
-            color: gold;
-        }
+h1 {
+    text-align: center;
+    color: gold;
+}
 
-        form {
-            display: flex;
-            flex-direction: column;
-        }
+form {
+    display: flex;
+    flex-direction: column;
+}
 
-        label {
-            margin-top: 15px;
-            font-weight: bold;
-            color: white;
-        }
+label {
+    margin-top: 15px;
+    font-weight: bold;
+    color: white;
+}
 
-        input, select, textarea {
-            margin-top: 5px;
-            padding: 10px;
-            font-size: 16px;
-            border: 1px solid aqua;
-            border-radius: 4px;
-            width: 100%;
-            box-sizing: border-box;
-        }
+input, select, textarea {
+    margin-top: 5px;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid aqua;
+    border-radius: 4px;
+    width: 100%;
+    box-sizing: border-box;
+}
 
-        input:focus, select:focus, textarea:focus {
-            border-color: gold;
-            outline: none;
-        }
+input:focus, select:focus, textarea:focus {
+    border-color: gold;
+    outline: none;
+}
 
-        .form-group {
-            margin-top: 10px;
-        }
+.form-group {
+    margin-top: 10px;
+}
 
-        .form-section {
-            margin-top: 20px;
-            padding: 15px;
-            border: 1px solid aqua;
-            border-radius: 8px;
-            background-color: rgb(0, 19, 31);
-        }
+.form-section {
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px solid aqua;
+    border-radius: 8px;
+    background-color: rgb(0, 19, 31);
+}
 
-        .form-section h2 {
-            margin-top: 0;
-            color: gold;
-        }
+.form-section h2 {
+    margin-top: 0;
+    color: gold;
+}
 
-        .btn-submit {
-            margin-top: 20px;
-            padding: 15px;
-            font-size: 16px;
-            color: #ffffff;
-            background-color: #007BFF;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
+.btn-submit {
+    margin-top: 20px;
+    padding: 15px;
+    font-size: 16px;
+    color: #ffffff;
+    background-color: #007BFF;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
 
-        .btn-submit:hover {
-            background-color: #0056b3;
-        }
+.btn-submit:hover {
+    background-color: #0056b3;
+}
 
-        .required {
-            color: red;
-        }
-        select, #repayment-period, #loan-amount, #monthly-income {
-          background-color: rgb(0, 19, 31);
-          color: white;
-        }
-        span {
-          color: green;
-        }
-        #info {
-          color: white;
-          font-family: Arial, Helvetica, sans-serif;
-          font-style: italic;
-        }
+.required {
+    color: red;
+}
+select, #repayment-period, #loan-amount, #monthly-income {
+  background-color: rgb(0, 19, 31);
+  color: white;
+}
+span {
+  color: green;
+}
+#info {
+  color: white;
+  font-family: Arial, Helvetica, sans-serif;
+  font-style: italic;
+}
   </style>
   

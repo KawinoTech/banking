@@ -76,7 +76,7 @@
             <div class="card">
                 <div class="card-content">
                   <h5 class="card-title"><i class="fa-solid fa-money-bill-trend-up" style="color: aqua;"></i></h5>
-                  <router-link to="/paybill"><p class="btn">FinMarket</p></router-link>
+                  <router-link to="/financial_markets"><p class="btn">FinMarket</p></router-link>
                 </div>
             </div>
         </div>

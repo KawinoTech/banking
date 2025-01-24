@@ -143,6 +143,7 @@
  */
 
 const url2 = 'http://127.0.0.1:8000/post/get_user_transactive_accounts';
+const url3 = 'http://127.0.0.1:8000/post/get_user_transactive_loans';
 import Nav_Bar from '../../components/navbar.vue';
 import utils from '../../utils/utils';
 
@@ -257,7 +258,7 @@ export default {
         setTimeout(() => {
           this.isConfirmationVisible = false;
           this.isProcessing = false;
-          this.$router.push('/error');
+          this.$router.push('/failed');
         }, 1000);
       }
     },
@@ -269,6 +270,19 @@ export default {
     async fetchData() {
       try {
         const response = await fetch(url2, {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+          },
+        });
+
+        const data = await response.json();
+        this.all_accounts.push(...data);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+      try {
+        const response = await fetch(url3, {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${localStorage.getItem('accessToken')}`,

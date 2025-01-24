@@ -4,31 +4,29 @@ from typing import List
 from uuid import uuid4
 import logging
 from sqlalchemy.exc import IntegrityError
-from .. import schemas, oauth
+from ..schema import accounts
+from .. import oauth
 from ..database import get_db
 from ..models.accounts import PersonalAccounts, ForeignCurrency, CorporateAccounts
+from ..models.loans import PersonalLoans, BusinessLoans
 from typing import List
-from ..models.files import Signatures, Signatory, CorporateDocs, PersonalDocs, F_C_A_Docs
-import secrets
-from ..schema import transactions
-import os
+from ..models.files import CorporateDocs, PersonalDocs, F_C_A_Docs
 import json
-classes = [PersonalAccounts, CorporateAccounts, ForeignCurrency]
+from .utils.utils import save_prof
+CLASSES = [PersonalAccounts, CorporateAccounts, ForeignCurrency]
 
-router = APIRouter(prefix="/post")
-def save_prof(file):
-    random_hex = secrets.token_hex(8)
-    _, f_ext = os.path.splitext(file.filename)
-    raw_fn = random_hex + f_ext
-    return raw_fn
 
-router = APIRouter(prefix="/post")
+# Set up router with a specific prefix for related endpoints
+router = APIRouter(
+    prefix="/post",
+    tags=["Account Opening"],  # Assign this router to a specific documentation category
+)
 logger = logging.getLogger(__name__)
 
 @router.post(
     "/open_personal_account",
     status_code=status.HTTP_201_CREATED,
-    response_model=schemas.ResponseAccount,
+    response_model=accounts.ResponseAccount,
     summary="Create a new personal account",
     description="Allows authenticated users to create a new personal account. Each account is uniquely identified, "
                 "associated with the current user, and validated to ensure compliance with account type restrictions."
@@ -50,12 +48,12 @@ async def create_personal_account(
     "Savings Accountl", and "Current Account".
 
     Args:
-        new_account (schemas.Account): The account details provided by the user.
+        new_account (accounts.Account): The account details provided by the user.
         db (Session): The database session used for database operations.
         current_user (str): The current authenticated user making the request.
 
     Returns:
-        schemas.ResponseAccount: Details of the newly created account.
+        accounts.ResponseAccount: Details of the newly created account.
 
     Raises:
         HTTPException:
@@ -63,7 +61,7 @@ async def create_personal_account(
             - 409: If the user already has an account of the specified type.
             - 500: If an unexpected error occurs while processing the request.
     """
-    parsed_payload = schemas.PersonalAccount(**json.loads(payload))
+    parsed_payload = accounts.PersonalAccount(**json.loads(payload))
     valid_account_types = ["Pay As You Go", "Savings Account", "Current Account"]
     # Validate the provided account type
     if parsed_payload.account_type not in valid_account_types:
@@ -122,7 +120,7 @@ async def create_personal_account(
 @router.post(
     "/open_foreign_currency_account",
     status_code=status.HTTP_201_CREATED,
-    response_model=schemas.ResponseAccount,
+    response_model=accounts.ResponseAccount,
     summary="Create a new foreign currency account",
     description=(
         "This endpoint allows authenticated users to create a new foreign currency account. "
@@ -146,12 +144,12 @@ async def create_foreign_currency_account(
     Accounts are restricted to a predefined type (`Forex Plus`) and are created in the specified currency.
 
     Args:
-        new_account (schemas.Account): The details of the account to be created.
+        new_account (accounts.Account): The details of the account to be created.
         db (Session): The database session used for performing database operations.
         current_user (str): The authenticated user making the request.
 
     Returns:
-        schemas.ResponseAccount: Details of the newly created foreign currency account.
+        accounts.ResponseAccount: Details of the newly created foreign currency account.
 
     Raises:
         HTTPException:
@@ -159,7 +157,7 @@ async def create_foreign_currency_account(
             - 409: If a foreign currency account of this type already exists for the user.
             - 500: If an unexpected error occurs during account creation.
     """
-    parsed_payload = schemas.ForeignCurrencyAccount(**json.loads(payload))
+    parsed_payload = accounts.ForeignCurrencyAccount(**json.loads(payload))
     # Define allowed account type
     valid_account_types = ["Forex Plus", "Forex Advantage", "Forex Go"]
 
@@ -217,7 +215,7 @@ async def create_foreign_currency_account(
             detail="An unexpected error occurred while creating the account."
         )
 @router.post("/open_corporate_account",
-response_model=schemas.ResponseAccount,
+response_model=accounts.ResponseAccount,
 summary="Create a new corporate account",
 description="Allows authenticated users to create a new corporate account. Each account is assigned a unique account number, "
             "is associated with the current user, and is validated to ensure compliance with account type restrictions.")
@@ -230,7 +228,7 @@ async def create_corporate_account(
     db: Session = Depends(get_db),
     current_user: str = Depends(oauth.get_current_user)
 ):
-    parsed_payload = schemas.CorporateAccount(**json.loads(payload))
+    parsed_payload = accounts.CorporateAccount(**json.loads(payload))
     valid_account_types = ["Vue Vantage", "SME Banking", "Vue Corporate"]
     # Validate the provided account type
     if parsed_payload.account_type not in valid_account_types:
@@ -276,14 +274,14 @@ async def create_corporate_account(
 @router.get(
     "/get_user_personal_accounts", 
     status_code=status.HTTP_200_OK, 
-    response_model=List[schemas.ResponseAccount2]
+    response_model=List[accounts.ResponseAccount2]
 )
 def get_user_accounts(
     db: Session = Depends(get_db), 
     current_user: str = Depends(oauth.get_current_user)
 ):
     """
-    Retrieve all user accounts.
+    Retrieve all user personal accounts.
 
     This endpoint fetches all accounts associated with the currently authenticated user.
 
@@ -292,11 +290,12 @@ def get_user_accounts(
         current_user (str): The currently authenticated user.
 
     Returns:
-        List[schemas.ResponseAccount1]: A list of accounts owned by the user.
+        List[accounts.ResponseAccount1]: A list of accounts owned by the user.
     """
 
     accounts = db.query(PersonalAccounts).filter(
-        PersonalAccounts.owner_customer_no == current_user.customer_no
+        PersonalAccounts.owner_customer_no == current_user.customer_no,
+        PersonalAccounts.account_status == "pending"
     ).all()
     for account in accounts:
         account.truncate_uuid()
@@ -306,25 +305,32 @@ def get_user_accounts(
 
 @router.get(
     "/get_user_transactive_accounts",
-    status_code=status.HTTP_200_OK, 
-    response_model=List[schemas.ResponseAccount1]
+    status_code=status.HTTP_200_OK,
+    response_model=List[accounts.ResponseAccount1]
 )
 def get_user_transactive_accounts(
-    db: Session = Depends(get_db), 
+    db: Session = Depends(get_db),
     current_user: str = Depends(oauth.get_current_user)
 ):
     """
-    Retrieve current and savings accounts for the user.
+    Retrieve all transactive accounts (personal and corporate) associated with the current user.
 
-    This endpoint fetches all "Pay As You Go" and "Savings Account" type accounts associated 
-    with the currently authenticated user.
+    - **Endpoint**: `/get_user_transactive_accounts`
+    - **HTTP Method**: GET
+    - **Response Model**: List[accounts.ResponseAccount1]
 
-    Args:
-        db (Session): The database session used for queries.
-        current_user (str): The currently authenticated user.
+    ### Parameters:
+    - `db` (Session): The database session dependency.
+    - `current_user` (str): The currently authenticated user, resolved using OAuth.
 
-    Returns:
-        List[schemas.ResponseAccount1]: A list of current and savings accounts owned by the user.
+    ### Functionality:
+    - Queries the `PersonalAccounts` and `CorporateAccounts` tables for accounts:
+      - Belonging to the user (`owner_customer_no` matches `current_user.customer_no`).
+      - With an account status of `"pending"`.
+    - Combines the results from both tables into a single list and returns it.
+
+    ### Returns:
+    - A list of transactive accounts (personal and corporate).
     """
     personal_accounts = db.query(PersonalAccounts).filter(
         PersonalAccounts.owner_customer_no == current_user.customer_no,
@@ -334,70 +340,97 @@ def get_user_transactive_accounts(
         CorporateAccounts.owner_customer_no == current_user.customer_no,
         CorporateAccounts.account_status == "pending"
     ).all()
-
     accounts = personal_accounts + corporate_accounts
     return accounts
 
+
 @router.get(
-    "/get_user_savings_accounts", 
-    status_code=status.HTTP_200_OK, 
-    response_model=List[schemas.ResponseAccount2]
+    "/get_user_savings_accounts",
+    status_code=status.HTTP_200_OK,
+    response_model=List[accounts.ResponseAccount2]
 )
 def get_user_savings_accounts(
-    db: Session = Depends(get_db), 
+    db: Session = Depends(get_db),
     current_user: str = Depends(oauth.get_current_user)
 ):
     """
-    Retrieve all user accounts.
+    Retrieve all savings accounts associated with the current user.
 
-    This endpoint fetches all accounts associated with the currently authenticated user.
+    - **Endpoint**: `/get_user_savings_accounts`
+    - **HTTP Method**: GET
+    - **Response Model**: List[accounts.ResponseAccount2]
 
-    Args:
-        db (Session): The database session used for queries.
-        current_user (str): The currently authenticated user.
+    ### Parameters:
+    - `db` (Session): The database session dependency.
+    - `current_user` (str): The currently authenticated user, resolved using OAuth.
 
-    Returns:
-        List[schemas.ResponseAccount1]: A list of accounts owned by the user.
+    ### Functionality:
+    - Queries the `PersonalAccounts` table for accounts:
+      - Belonging to the user (`owner_customer_no` matches `current_user.customer_no`).
+      - With an account type of `"Savings Account"`.
+    - Processes each account:
+      - Truncates UUIDs for display purposes using `truncate_uuid()`.
+      - Formats cash values for presentation using `format_cash()`.
+    - Returns the processed list of savings accounts.
+
+    ### Returns:
+    - A list of personal savings accounts.
     """
-
     accounts = db.query(PersonalAccounts).filter(
         PersonalAccounts.owner_customer_no == current_user.customer_no,
-        PersonalAccounts.account_type == "Savings Account"
+        PersonalAccounts.account_type == "Savings Account",
+        PersonalAccounts.account_status == "pending"
     ).all()
     for account in accounts:
         account.truncate_uuid()
         account.format_cash()
     return accounts
+
 
 @router.get(
     "/get_user_current_accounts",
-    status_code=status.HTTP_200_OK, 
-    response_model=List[schemas.ResponseAccount2]
+    status_code=status.HTTP_200_OK,
+    response_model=List[accounts.ResponseAccount2]
 )
 def get_user_current_accounts(
-    db: Session = Depends(get_db), 
+    db: Session = Depends(get_db),
     current_user: str = Depends(oauth.get_current_user)
 ):
     """
-    Retrieve current and savings accounts for the user.
+    Retrieve all current accounts (personal and corporate) associated with the current user.
 
-    This endpoint fetches all "Pay As You Go" and "Savings Account" type accounts associated 
-    with the currently authenticated user.
+    - **Endpoint**: `/get_user_current_accounts`
+    - **HTTP Method**: GET
+    - **Response Model**: List[accounts.ResponseAccount2]
 
-    Args:
-        db (Session): The database session used for queries.
-        current_user (str): The currently authenticated user.
+    ### Parameters:
+    - `db` (Session): The database session dependency.
+    - `current_user` (str): The currently authenticated user, resolved using OAuth.
 
-    Returns:
-        List[schemas.ResponseAccount1]: A list of current and savings accounts owned by the user.
+    ### Functionality:
+    - Queries the `PersonalAccounts` table for accounts:
+      - Belonging to the user (`owner_customer_no` matches `current_user.customer_no`).
+      - Not of type `"Savings Account"`.
+    - Queries the `CorporateAccounts` table for all accounts belonging to the user.
+    - Combines the results from both tables into a single list.
+    - Processes each account:
+      - Truncates UUIDs for display purposes using `truncate_uuid()`.
+      - Formats cash values for presentation using `format_cash()`.
+    - Returns the processed list of current accounts.
+
+    ### Returns:
+    - A list of personal and corporate current accounts.
     """
     personal_accounts = db.query(PersonalAccounts).filter(
         PersonalAccounts.owner_customer_no == current_user.customer_no,
-        PersonalAccounts.account_type != "Savings Account"
+        PersonalAccounts.account_type != "Savings Account",
+        PersonalAccounts.account_status == "pending"
     ).all()
     corporate_accounts = db.query(CorporateAccounts).filter(
-        CorporateAccounts.owner_customer_no == current_user.customer_no
+        CorporateAccounts.owner_customer_no == current_user.customer_no,
+        CorporateAccounts.account_status == "pending"
     ).all()
+
     accounts = personal_accounts + corporate_accounts
     for account in accounts:
         account.truncate_uuid()
@@ -405,44 +438,80 @@ def get_user_current_accounts(
     return accounts
 
 
-@router.post("/close_account/{account_no}",
-             #response_model=schemas.ResponseAccount1
-             )
-def close_account(account_no: str, db: Session = Depends(get_db), current_user: str = Depends(oauth.get_current_user)):
-    for clss in classes:
-        account = db.query(clss).filter(
-            clss.account_no == account_no
-        ).first()
+
+@router.post("/close_account/{account_no}")
+def close_account(
+    account_no: str, 
+    db: Session = Depends(get_db), 
+    current_user: str = Depends(oauth.get_current_user)
+):
+    """
+    Close a user's account.
+
+    - **Endpoint**: `/close_account/{account_no}`
+    - **HTTP Method**: POST
+
+    ### Parameters:
+    - `account_no` (str): The unique account number of the account to be closed.
+    - `db` (Session): The database session dependency.
+    - `current_user` (str): The currently authenticated user, resolved using OAuth.
+
+    ### Functionality:
+    - Searches for the account in multiple account CLASSES (`CLASSES`).
+    - If the account exists:
+        - Marks the account's status as "closed".
+        - Commits the changes to the database.
+    - Logs the closure operation.
+    - Handles errors for:
+        - Non-existent accounts.
+        - Database issues.
+        - Other unexpected exceptions.
+
+    ### Returns:
+    - Success message if the account is successfully closed.
+
+    ### Raises:
+    - `HTTPException`: For account not found, database errors, or unexpected issues.
+    """
+    account = None  # Ensure `account` is defined even if no account is found
+    for clss in CLASSES:
+        account = db.query(clss).filter(clss.account_no == account_no).first()
         if account:
             break
+
     try:
+        # Check if the account was found
         if not account:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Account does not exist."
             )
-        """if account.account_balance != 0.00:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Account closure failure."
-            )"""
 
+        # Uncomment the following block to enforce balance checks before closure:
+        # if account.account_balance != 0.00:
+        #     raise HTTPException(
+        #         status_code=status.HTTP_400_BAD_REQUEST,
+        #         detail="Account closure failure: Account balance must be zero."
+        #     )
 
+        # Close the account
         account.account_status = "closed"
         db.commit()
 
-        logger.info(
-            f"Account {account.account_no} closed "
-        )
+        # Log the successful operation
+        logger.info(f"Account {account.account_no} closed successfully.")
         return {"detail": "Account Closed"}
 
     except IntegrityError:
+        # Handle database integrity issues
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Database error occurred."
+            detail="Database error occurred while closing the account."
         )
+
     except Exception as e:
+        # Handle unexpected exceptions
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

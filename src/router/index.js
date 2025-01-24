@@ -16,6 +16,7 @@ import Corporate_Account from '../routes/account_products/corporate_banking.vue'
 import Customer_Service from '../routes/customer_service/customer_service.vue'
 import Report_Problem from '../routes/customer_service/report_problem.vue'
 import Home_Page from '../routes/main/home.vue'
+import Financial_Markets from '../routes/main/financial_markets.vue'
 import My_Cards from '../routes/main/mycards.vue'
 import New_Account from '../routes/main/new_account.vue'
 import Transaction_History from '../routes/main/transaction_history.vue'
@@ -60,6 +61,11 @@ const routes = [
         name: 'Account_Closure',
         component: Account_Closure,
         path: '/account_closure'
+    },
+    {
+        name: 'Financial_Markets',
+        component: Financial_Markets,
+        path: '/financial_markets'
     },
     {
         name: 'Error_pg',

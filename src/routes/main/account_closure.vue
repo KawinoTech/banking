@@ -1,6 +1,10 @@
 <template>
+  <!-- Navigation bar -->
   <Nav_Bar></Nav_Bar>
+
   <h3>Close Account</h3>
+
+  <!-- Accordion to display accounts -->
   <div class="accordion" id="accordionExample">
     <div
       class="accordion-item"
@@ -19,6 +23,7 @@
           <strong>{{ account.account_type }}</strong>: {{ account.account_no || `Accordion Item #${index + 1}` }}
         </button>
       </h2>
+
       <div
         :id="'collapse' + index"
         class="accordion-collapse collapse"
@@ -31,6 +36,8 @@
           <p>Balance: {{ account.account_balance }}</p>
           <p>Account Number: {{ account.account_no }}</p>
         </div>
+
+        <!-- Button to trigger account closure -->
         <button
           class="btn-close-account"
           @click="showConfirmation(account.account_no, account.account_balance)"
@@ -40,38 +47,39 @@
       </div>
     </div>
   </div>
-  <div
-      v-if="showModal"
-      class="modal-overlay"
-    >
-      <div class="modal-content">
-        <h2>Sorry Customer</h2>
-        <p>
-          We could not proceed with your request. Please withdraw all funds from this account before attempting to close it.
-        </p>
-        <p>
-          If you have any questions, contact our support team at 
-          <a href="mailto:support@example.com">support@example.com</a> or call us at 
-          <a href="tel:+123456789">+1 (234) 567-89</a>.
-        </p>
-        <p>
-          Our operating hours are Monday to Friday, 9 AM to 6 PM.
-        </p>
-        <button @click="showModal = false" class="btnclose">
-          Close
-        </button>
-      </div>
-    </div>
-    <div class="modal-overlay" v-if="isConfirmationVisible">
-    <div class="modal-card">
-      <h2 class="modal-title">Confirm Details</h2>
-      <p class="modal-content">
-        Dear Customer, we regret to see you leaving
+
+  <!-- Modal for failure scenario (when the account balance is not zero) -->
+  <div v-if="showModal" class="modal-overlay">
+    <div class="modal-content">
+      <h2>Sorry Customer</h2>
+      <p class="modal-text">
+        We could not proceed with your request. Please withdraw all funds from this account before attempting to close it.
       </p>
-      <div v-if="!isProcessing" class="modal-buttons">
-        <button class="modal-btn confirm" @click="confirmTransfer(accountNo, accountBalance)">Yes</button>
-        <button class="modal-btn cancel" @click="cancelTransfer">Cancel</button>
+      <p class="modal-text">
+        If you have any questions, contact our support team at 
+        <a href="mailto:support@example.com">support@example.com</a> or call us at 
+        <a href="tel:+123456789">+1 (234) 567-89</a>.
+      </p>
+      <p class="modal-text">
+        Our operating hours are Monday to Friday, 9 AM to 6 PM.
+      </p>
+      <button @click="showModal = false" class="btnclose">
+        Close
+      </button>
+    </div>
+  </div>
+
+  <!-- Confirmation modal for account closure -->
+  <div class="modal-overlay" v-if="isConfirmationVisible">
+    <div class="modal-card-">
+      <h2 class="modal-title-">Confirm Details</h2>
+      <p class="modal-content-">Dear Customer, we regret to see you leaving</p>
+
+      <div v-if="!isProcessing" class="modal-buttons-">
+        <button class="modal-btn- confirm" @click="confirmTransfer(accountNo, accountBalance)">Yes</button>
+        <button class="modal-btn- cancel" @click="cancelTransfer">Cancel</button>
       </div>
+
       <div v-if="isProcessing">
         <p class="wait">Processing<i class="fa-regular wait fa-clock fa-spin"></i></p>
       </div>
@@ -79,27 +87,30 @@
   </div>
 </template>
 
+
 <script>
 import Nav_Bar from "../../components/navbar.vue";
+
 export default {
   name: "Account_Closure",
   data() {
     return {
-      all_accounts: [],
-      showModal: false,
-      isConfirmationVisible: false,
-      isProcessing: false,
-      accountNo: "",
-      accountBalance: ""
+      all_accounts: [], // Stores all user accounts
+      showModal: false, // Controls the display of the error modal
+      isConfirmationVisible: false, // Controls the visibility of the confirmation modal
+      isProcessing: false, // Controls the display of a loading spinner during the closure process
+      accountNo: "", // The account number selected for closure
+      accountBalance: "", // The balance of the selected account
     };
   },
   components: {
-    Nav_Bar,
+    Nav_Bar, // Navigation bar component
   },
   mounted() {
-    this.fetchData();
+    this.fetchData(); // Fetch accounts data when the component is mounted
   },
   methods: {
+    // Fetches all accounts for the logged-in user
     async fetchData() {
       try {
         const response = await fetch(
@@ -112,11 +123,12 @@ export default {
           }
         );
         const data = await response.json();
-        this.all_accounts = data;
+        this.all_accounts = data; // Store the fetched accounts
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error("Error fetching data:", error); // Log any error during fetch
       }
     },
+    // Makes an API call to close the account
     async closeAccount(accountNo) {
       try {
         const response = await fetch(
@@ -130,37 +142,40 @@ export default {
           }
         );
         if (response.ok) {
-          setTimeout(() => this.$router.push('/success'), 2000);
-          this.fetchData(); // Refresh accounts
+          setTimeout(() => this.$router.push('/success'), 2000); // Redirect to success page after closure
+          this.fetchData(); // Refresh the list of accounts
         } else {
           alert("Failed to close account. Please try again.");
         }
       } catch (error) {
-        setTimeout(() => this.$router.push('/failed'), 500);
-        console.error("Error closing account:", error);
+        setTimeout(() => this.$router.push('/failed'), 500); // Redirect to failed page on error
+        console.error("Error closing account:", error); // Log any error during account closure
       }
     },
+    // Shows the confirmation modal when trying to close an account
     showConfirmation(accountNo, accountBalance) {
-      this.accountNo = accountNo
-      this.accountBalance = accountBalance
-      this.isConfirmationVisible = true;
+      this.accountNo = accountNo; // Set the selected account number
+      this.accountBalance = accountBalance; // Set the selected account balance
+      this.isConfirmationVisible = true; // Show the confirmation modal
     },
+    // Handles the account closure after confirmation
     confirmTransfer(accountNo, accountBalance) {
-      if (accountBalance != 0) {
-        this.isConfirmationVisible = false;
-        this.showModal = true
-        return
+      if (accountBalance !== 0) {
+        this.isConfirmationVisible = false; // Close the confirmation modal
+        this.showModal = true; // Show the error modal
+        return;
       }
-      this.closeAccount(accountNo);
-      this.isProcessing = true;
+      this.closeAccount(accountNo); // Close the account
+      this.isProcessing = true; // Show the processing spinner
     },
-
+    // Cancels the account closure and hides the confirmation modal
     cancelTransfer() {
       this.isConfirmationVisible = false;
     },
   },
 };
 </script>
+
 
 <style>
 /* Add your styles for the button here */
@@ -251,7 +266,9 @@ h3 {
 .btnclose:hover {
   background-color: #b52b3b;
 }
-
+.modal-text {
+  color: aqua;
+}
 /* Responsive animation */
 @keyframes fadeIn {
   from {

@@ -1,307 +1,318 @@
 <template>
-  <h1>
-    Open Personal Account
-    <i class="fa-solid fa-circle-question">
-      <div class="details">
-        <router-link to="/instructions_on_opening_transactional_account">
-          <p class="info">Click to find details on account opening</p>
-        </router-link>
-      </div>
-    </i>
-  </h1>
-
-  <form action="#" class="account-form">
-    <!-- Personal Information -->
-    <fieldset>
-      <legend>Personal Information</legend>
-      
-      <div class="form-group">
-        <label for="account_name">Account Name</label>
-        <input
-          v-model="formData.account_name"
-          type="text"
-          id="account_name"
-          name="account_name"
-          placeholder="Account Name"
-          @input="checkAccNameInput"
-        />
-        <div v-if="!isValidaccount_name && formData.account_name" class="error-message">
-          Account Name MUST contain at least 3 unique names
+  <div>
+    <!-- Page Header -->
+    <h1>
+      Open Personal Account
+      <i class="fa-solid fa-circle-question">
+        <div class="details">
+          <router-link to="/instructions_on_opening_transactional_account">
+            <p class="info">Click to find details on account opening</p>
+          </router-link>
         </div>
-      </div>
+      </i>
+    </h1>
 
-      <div class="form-group">
-        <label for="account_type">Account Type</label>
-        <select v-model="formData.account_type" id="account_type" name="account_type" required>
-          <option value="" disabled selected>Select Account Type</option>
-          <option>Pay As You Go</option>
-          <option>Savings Account</option>
-        </select>
-      </div>
+    <!-- Account Form -->
+    <form action="#" class="account-form">
+      <!-- Personal Information Section -->
+      <fieldset>
+        <legend>Personal Information</legend>
+        
+        <div class="form-group">
+          <label for="account_name">Account Name</label>
+          <input
+            v-model="formData.account_name"
+            type="text"
+            id="account_name"
+            name="account_name"
+            placeholder="Account Name"
+            @input="checkAccNameInput"
+          />
+          <div v-if="!isValidaccount_name && formData.account_name" class="error-message">
+            Account Name MUST contain at least 3 unique names
+          </div>
+        </div>
 
-      <div class="form-group">
-        <label for="dob">Date of Birth/Incorporation</label>
-        <input v-model="formData.dob" type="date" id="dob" name="dob" required />
-      </div>
+        <div class="form-group">
+          <label for="account_type">Account Type</label>
+          <select v-model="formData.account_type" id="account_type" name="account_type" required>
+            <option value="" disabled selected>Select Account Type</option>
+            <option>Pay As You Go</option>
+            <option>Savings Account</option>
+          </select>
+        </div>
 
-      <div class="form-group">
-        <label for="address">Residential Address</label>
-        <input
-          v-model="formData.address"
-          type="text"
-          id="address"
-          name="address"
-          placeholder="Residential Address"
-        />
-      </div>
+        <div class="form-group">
+          <label for="dob">Date of Birth/Incorporation</label>
+          <input v-model="formData.dob" type="date" id="dob" name="dob" required />
+        </div>
 
-      <div class="form-group">
-        <label for="telephone">Telephone</label>
-        <div v-if="!isValidtelephone && formData.telephone" class="error-message">
+        <div class="form-group">
+          <label for="address">Residential Address</label>
+          <input
+            v-model="formData.address"
+            type="text"
+            id="address"
+            name="address"
+            placeholder="Residential Address"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="telephone">Telephone</label>
+          <input
+            v-model="formData.telephone"
+            type="text"
+            id="telephone"
+            name="telephone"
+            placeholder="Telephone"
+            @input="checkTelephoneInput"
+          />
+          <div v-if="!isValidtelephone && formData.telephone" class="error-message">
             Incorrect format
+          </div>
         </div>
-        <input v-model="formData.telephone" type="text" id="telephone" name="telephone" placeholder="Telephone" @input="checkTelephoneInput"/>
-      </div>
 
-      <div class="form-group">
-        <label for="email">Email Address</label>
-        <div v-if="!isValidemail && formData.email" class="error-message">
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input
+            v-model="formData.email"
+            type="email"
+            id="email"
+            name="email"
+            placeholder="example@domain.com"
+            @input="checkEmailInput"
+            required
+          />
+          <div v-if="!isValidemail && formData.email" class="error-message">
             Incorrect format
+          </div>
         </div>
-        <input
-          v-model="formData.email"
-          type="email"
-          id="email"
-          name="email"
-          @input="checkEmailInput"
-          placeholder="example@domain.com"
-          required
-        />
-      </div>
 
+        <div class="form-group">
+          <label for="nationality">Nationality</label>
+          <select v-model="formData.nationality" id="nationality" name="nationality" required>
+            <option value="" disabled selected>Select Nationality</option>
+            <option>Kenyan</option>
+            <option>British</option>
+            <option>American</option>
+            <option>French</option>
+          </select>
+        </div>
+      </fieldset>
+
+      <!-- Identification Details Section -->
+      <fieldset>
+        <legend>Identification</legend>
+        
+        <div class="form-group">
+          <label for="id_no">National ID Number</label>
+          <input
+            v-model="formData.id_no"
+            type="text"
+            id="id_no"
+            name="id_no"
+            placeholder="National ID Number"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="kra_pin">KRA PIN</label>
+          <input
+            v-model="formData.kra_pin"
+            type="text"
+            id="kra_pin"
+            name="kra_pin"
+            placeholder="KRA PIN"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="nssf_no">NSSF Number</label>
+          <input
+            v-model="formData.nssf_no"
+            type="text"
+            id="nssf_no"
+            name="nssf_no"
+            placeholder="NSSF Number"
+            required
+          />
+        </div>
+      </fieldset>
+
+      <!-- Employment and Financial Details Section -->
+      <fieldset>
+        <legend>Employment and Financial Details</legend>
+        
+        <div class="form-group">
+          <label for="employment_status">Employment Status</label>
+          <select v-model="formData.employment_status" id="employment_status" name="employment_status" required>
+            <option value="" disabled selected>Select Employment Status</option>
+            <option value="employed">Employed</option>
+            <option value="self-employed">Self-Employed</option>
+            <option value="student">Student</option>
+            <option value="unemployed">Unemployed</option>
+            <option value="business">Business</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="source_of_funds">Source of Funds</label>
+          <select v-model="formData.source_of_funds" id="source_of_funds" name="source_of_funds" required>
+            <option value="" disabled selected>Select Source of Funds</option>
+            <option>Salary</option>
+            <option>Business Income</option>
+            <option>Inheritance</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="annual_income">Annual Income (KES)</label>
+          <input
+            v-model="formData.annual_income"
+            type="number"
+            id="annual_income"
+            name="annual_income"
+            placeholder="Enter Annual Income"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="usage">Purpose of Account</label>
+          <input
+            v-model="formData.intended_usage"
+            type="text"
+            id="usage"
+            name="usage"
+            placeholder="E.g., Online shopping, travel"
+          />
+        </div>
+      </fieldset>
+
+      <!-- Next of Kin Section -->
+      <fieldset>
+        <legend>Next of Kin</legend>
+
+        <div class="form-group">
+          <label for="next_of_kin">Name</label>
+          <input
+            v-model="formData.next_of_kin"
+            type="text"
+            id="next_of_kin"
+            name="next_of_kin"
+            placeholder="Next of Kin"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="next_of_kin_id">National ID/Passport Number</label>
+          <input
+            v-model="formData.next_of_kin_id"
+            type="text"
+            id="next_of_kin_id"
+            name="next_of_kin_id"
+            placeholder="National ID/Passport Number"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="nok_relationship">Relationship</label>
+          <select v-model="formData.nok_relationship" id="nok_relationship" name="nok_relationship">
+            <option value="" disabled selected>Select Relationship</option>
+            <option>Parent</option>
+            <option>Sibling</option>
+            <option>Relative</option>
+          </select>
+        </div>
+      </fieldset>
+
+      <!-- Documentation Section -->
+      <fieldset>
+        <legend>Documentation</legend>
+        
+        <div>
+          <h3 style="display: inline;">Tax Compliance</h3>
+          <input class="docs" type="file" @change="handleFileUpload1" />
+        </div>
+
+        <div>
+          <h3 style="display: inline;">National ID</h3>
+          <input class="docs" type="file" @change="handleFileUpload2" />
+        </div>
+
+        <div>
+          <h3 style="display: inline;">Passport Photo</h3>
+          <input class="docs" type="file" @change="handleFileUpload3" />
+        </div>
+      </fieldset>
+
+      <!-- Terms and Conditions -->
       <div class="form-group">
-        <label for="nationality">Nationality</label>
-        <select v-model="formData.nationality" id="nationality" name="nationality" required>
-          <option value="" disabled selected>Select Nationality</option>
-          <option>Kenyan</option>
-          <option>British</option>
-          <option>American</option>
-          <option>French</option>
-        </select>
-      </div>
-    </fieldset>
-
-    <!-- Identification Details -->
-    <fieldset>
-      <legend>Identification</legend>
-      
-      <div class="form-group">
-        <label for="id_no">National ID Number</label>
-        <input
-          v-model="formData.id_no"
-          type="text"
-          id="id_no"
-          name="id_no"
-          placeholder="National ID Number"
-        />
+        <label class="terms">
+          <input
+            v-model="isTermsChecked"
+            type="checkbox"
+            name="terms"
+            required
+            @change="toggleTerms"
+          />
+          I agree to the terms and conditions.
+        </label>
+        <p id="tandc" style="color: green;">
+          Terms and Conditions {{ isTermsChecked ? 'checked' : 'unchecked' }}
+        </p>
       </div>
 
-      <div class="form-group">
-        <label for="kra_pin">KRA PIN</label>
-        <input
-          v-model="formData.kra_pin"
-          type="text"
-          id="kra_pin"
-          name="kra_pin"
-          placeholder="KRA PIN"
-        />
-      </div>
-
-      <div class="form-group">
-        <label for="nssf_no">NSSF Number</label>
-        <input
-          v-model="formData.nssf_no"
-          type="text"
-          id="nssf_no"
-          name="nssf_no"
-          placeholder="NSSF Number"
-          required
-        />
-      </div>
-    </fieldset>
-
-    <!-- Employment and Financial Details -->
-    <fieldset>
-      <legend>Employment and Financial Details</legend>
-      
-      <div class="form-group">
-        <label for="employment_status">Employment Status</label>
-        <select v-model="formData.employment_status" id="employment_status" name="employment_status" required>
-          <option value="" disabled selected>Select Employment Status</option>
-          <option value="employed">Employed</option>
-          <option value="self-employed">Self-Employed</option>
-          <option value="student">Student</option>
-          <option value="unemployed">Unemployed</option>
-          <option value="business">Business</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label for="source_of_funds">Source of Funds</label>
-        <select v-model="formData.source_of_funds" id="source_of_funds" name="source_of_funds" required>
-          <option value="" disabled selected>Select Source of Funds</option>
-          <option>Salary</option>
-          <option>Business Income</option>
-          <option>Inheritance</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label for="annual_income">Annual Income (KES)</label>
-        <input
-          v-model="formData.annual_income"
-          type="number"
-          id="annual_income"
-          name="annual_income"
-          placeholder="Enter Annual Income"
-          required
-        />
-      </div>
-
-      <div class="form-group">
-        <label for="usage">Purpose of Account</label>
-        <input
-          v-model="formData.intended_usage"
-          type="text"
-          id="usage"
-          name="usage"
-          placeholder="E.g., Online shopping, travel"
-        />
-      </div>
-    </fieldset>
-
-    <!-- Next of Kin Details -->
-    <fieldset>
-      <legend>Next of Kin</legend>
-
-      <div class="form-group">
-        <label for="next_of_kin">Name</label>
-        <input
-          v-model="formData.next_of_kin"
-          type="text"
-          id="next_of_kin"
-          name="next_of_kin"
-          placeholder="Next of Kin"
-        />
-      </div>
-
-      <div class="form-group">
-        <label for="next_of_kin_id">National ID/Passport Number</label>
-        <input
-          v-model="formData.next_of_kin_id"
-          type="text"
-          id="next_of_kin_id"
-          name="next_of_kin_id"
-          placeholder="National ID/Passport Number"
-        />
-      </div>
-
-      <div class="form-group">
-        <label for="nok_relationship">Relationship</label>
-        <select v-model="formData.nok_relationship" id="nok_relationship" name="nok_relationship">
-          <option value="" disabled selected>Select Relationship</option>
-          <option>Parent</option>
-          <option>Sibling</option>
-          <option>Relative</option>
-        </select>
-      </div>
-    </fieldset>
-
-    <!-- Documentation -->
-    <fieldset>
-      <legend>Documentation</legend>
-      
-      <div>
-        <h3 style="display: inline;">Tax Compliance</h3>
-        <input class="docs" type="file" @change="handleFileUpload1" />
-      </div>
-
-      <div>
-        <h3 style="display: inline;">National ID</h3>
-        <input class="docs" type="file" @change="handleFileUpload2" />
-      </div>
-
-      <div>
-        <h3 style="display: inline;">Passport Photo</h3>
-        <input class="docs" type="file" @change="handleFileUpload3" />
-      </div>
-    </fieldset>
-
-    <!-- Terms and Conditions -->
-    <div class="form-group">
-      <label class="terms">
-        <input
-          v-model="isTermsChecked"
-          type="checkbox"
-          name="terms"
-          required
-          @change="toggleTerms"
-        />
-        I agree to the terms and conditions.
-      </label>
-      <p id="tandc" style="color: green;">
-        Terms and Conditions {{ isTermsChecked ? 'checked' : 'unchecked' }}
-      </p>
-    </div>
-
-    <button
-      type="button"
-      class="btn btn-success"
-      @click.prevent="showConfirmation"
-    >
-      Open Account
-    </button>
-
+      <button
+        type="button"
+        class="btn btn-success"
+        @click.prevent="showConfirmation"
+      >
+        Open Account
+      </button>
+    </form>
     <div v-if="showTerms" class="overlay">
       <div class="terms-modal">
         <Terms_Conditions />
         <button class="close-btn" @click="toggleTerms">Close</button>
       </div>
     </div>
-  </form>
+          <!-- Confirmation Modal -->
+    <div v-if="isConfirmationVisible" class="modal-overlay">
+        <div class="modal-card-">
+          <h2 class="modal-title-">Confirm Details</h2>
+          <p class="modal-content-">
+            Account Name: <span>{{ formData.account_name }}</span>
+          </p>
+          <p class="modal-content-">
+            Type: <span>{{ formData.account_type }}</span>
+          </p>
+          <p class="modal-content-">
+            Telephone: <span>{{ formData.telephone }}</span>
+          </p>
+          <p class="modal-content-">
+            Email: <span>{{ formData.email }}</span>
+          </p>
 
-  <div class="modal-overlay" v-if="isConfirmationVisible">
-    <div class="modal-card">
-      <h2 class="modal-title">Confirm Details</h2>
-      <p class="modal-content">
-        Account Name: <span>{{ formData.account_name }}</span>
-      </p>
-      <p class="modal-content">
-        Type: <span>{{ formData.account_type }}</span>
-      </p>
-      <p class="modal-content">
-        Telephone: <span>{{ formData.telephone }}</span>
-      </p>
-      <p class="modal-content">
-        Email: <span>{{ formData.email }}</span>
-      </p>
-
-      <div v-if="!isProcessing" class="modal-buttons">
-        <button class="modal-btn confirm" @click="confirmTransfer">Yes</button>
-        <button class="modal-btn cancel" @click="cancelTransfer">Cancel</button>
-      </div>
-      <div v-if="isProcessing">
-        <p class="wait">Processing<i class="fa-regular wait fa-clock fa-spin"></i></p>
-      </div>
+          <div v-if="!isProcessing" class="modal-buttons-">
+            <button class="modal-btn- confirm" @click="confirmTransfer">Yes</button>
+            <button class="modal-btn- cancel" @click="cancelTransfer">Cancel</button>
+          </div>
+          <div v-if="isProcessing">
+            <p class="wait">Processing<i class="fa-regular wait fa-clock fa-spin"></i></p>
+          </div>
+        </div>
     </div>
   </div>
 </template>
 
-  
-  
+
 <script>
 import utils from '../../utils/utils';
 import Terms_Conditions from '../../components/account_opening/terms_and_conditions.vue';
+
+// The URL endpoint for creating a personal account
 const url = 'http://127.0.0.1:8000/post/open_personal_account';
 
 export default {
@@ -310,49 +321,56 @@ export default {
     Terms_Conditions,
   },
   data() {
+    /**
+     * Data properties for managing form inputs, validation, and UI state.
+     */
     return {
+      // Form data fields
       formData: {
-        account_type: '',
-        account_name: '',
-        id_no: '',
-        nationality: '',
-        kra_pin: '',
-        telephone: '',
-        next_of_kin: '',
-        next_of_kin_id: '',
-        email: '',
-        dob: '',
-        nssf_no: '',
-        employment_status: '',
-        source_of_funds: '',
-        address: '',
-        annual_income: '',
-        intended_usage: '',
-        nok_relationship: '',
+        account_type: '',        // Type of account (e.g., Savings, Pay As You Go)
+        account_name: '',        // Account holder's name
+        id_no: '',               // National ID number
+        nationality: '',         // Nationality of the account holder
+        kra_pin: '',             // KRA PIN for tax purposes
+        telephone: '',           // Telephone number in international format
+        next_of_kin: '',         // Name of next of kin
+        next_of_kin_id: '',      // ID or passport number of next of kin
+        email: '',               // Email address
+        dob: '',                 // Date of birth or incorporation
+        nssf_no: '',             // NSSF number
+        employment_status: '',   // Employment status (e.g., employed, student)
+        source_of_funds: '',     // Source of account funding
+        address: '',             // Residential address
+        annual_income: '',       // Annual income in KES
+        intended_usage: '',      // Purpose of the account
+        nok_relationship: '',    // Relationship with next of kin
       },
-      isValidaccount_name: false,
-      isValidtelephone: false,
-      isValidemail: false,
-      isTermsChecked: false,
-      isConfirmationVisible: false,
-      isProcessing: false,
-      tax_cert: null,
-      reg_cert: null,
-      passport: null,
-      showTerms: false,
+      isValidaccount_name: false, // Validation flag for account name
+      isValidtelephone: false,   // Validation flag for telephone number
+      isValidemail: false,       // Validation flag for email
+      isTermsChecked: false,     // Whether terms and conditions are accepted
+      isConfirmationVisible: false, // Confirmation modal visibility
+      isProcessing: false,       // State of account creation process
+      tax_cert: null,            // Uploaded tax compliance certificate
+      reg_cert: null,            // Uploaded registration certificate
+      passport: null,            // Uploaded passport photo
+      showTerms: false,          // Terms and conditions visibility
     };
   },
   methods: {
+    /**
+     * Sends a POST request to create a personal account with the provided form data and documents.
+     * Handles both success and error scenarios.
+     */
     async createAccount() {
       try {
-        if (utils.checkEmptyValues(this.formData)) {
-          throw new Error('Empty Fields');
-        }
+        // Prepare form data for submission
         const formData = new FormData();
         formData.append('tax_cert', this.tax_cert);
         formData.append('reg_cert', this.reg_cert);
         formData.append('passport', this.passport);
 
+        // Generate HMAC signature for security
         const requestBody = utils.generateHmacSignature({
           account_type: this.formData.account_type,
           nationality: this.formData.nationality,
@@ -373,9 +391,11 @@ export default {
           next_of_kin_id: this.formData.next_of_kin_id,
         });
 
+        // Append payload and signature to form data
         formData.append('signature', requestBody['signature']);
         formData.append('payload', JSON.stringify(requestBody['payload']));
 
+        // Submit form data to the server
         const response = await fetch(url, {
           method: 'POST',
           headers: {
@@ -388,64 +408,90 @@ export default {
           throw new Error('Failed to post data');
         }
 
+        // Redirect to success page upon successful account creation
         this.success = true;
         setTimeout(() => this.$router.push('/success'), 2000);
       } catch (error) {
         console.error('Error posting data:', error);
+
+        // Redirect to failure page upon error
         setTimeout(() => this.$router.push('/failed'), 500);
       }
     },
 
+    /**
+     * Validates the account name format (e.g., First Middle Last with capitalization).
+     */
     checkAccNameInput() {
       const namePattern = /^[A-Z][a-z]* [A-Z][a-z]* [A-Z][a-z]*$/;
       this.isValidaccount_name = namePattern.test(this.formData.account_name);
     },
-    checkTelephoneInput() {
-        const namePattern = /^\+\d{1,3}\s\d{9}$/;
-        if (namePattern.test(this.formData.telephone)) {
-          this.isValidtelephone = true;
-        }
-        else {
-          this.isValidtelephone = false;
-        }
-      },
-      checkEmailInput() {
-        const namePattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-        if (namePattern.test(this.formData.email)) {
-          this.isValidemail = true;
-        }
-        else {
-          this.isValidemail = false;
-        }
-      },
 
+    /**
+     * Validates the telephone number format (e.g., +123 123456789).
+     */
+    checkTelephoneInput() {
+      const namePattern = /^\+\d{1,3}\s\d{9}$/;
+      this.isValidtelephone = namePattern.test(this.formData.telephone);
+    },
+
+    /**
+     * Validates the email address format.
+     */
+    checkEmailInput() {
+      const namePattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      this.isValidemail = namePattern.test(this.formData.email);
+    },
+
+    /**
+     * Toggles the visibility of terms and conditions.
+     */
     toggleTerms() {
       this.showTerms = !this.showTerms;
     },
 
+    /**
+     * Handles file upload for tax compliance certificate.
+     */
     handleFileUpload1(event) {
       this.tax_cert = event.target.files[0];
     },
 
+    /**
+     * Handles file upload for registration certificate.
+     */
     handleFileUpload2(event) {
       this.reg_cert = event.target.files[0];
     },
 
+    /**
+     * Handles file upload for passport photo.
+     */
     handleFileUpload3(event) {
       this.passport = event.target.files[0];
     },
 
+    /**
+     * Initiates the account creation process and shows a processing state.
+     */
     confirmTransfer() {
       this.createAccount();
       this.isProcessing = true;
     },
 
+    /**
+     * Cancels the account creation process and hides the confirmation modal.
+     */
     cancelTransfer() {
       this.isConfirmationVisible = false;
     },
 
+    /**
+     * Displays the confirmation modal after validating terms acceptance and form completeness.
+     */
     showConfirmation() {
       if (!this.isTermsChecked) {
+        alert('Please check the Terms and Conditions');
         return;
       }
       if (utils.checkEmptyValues(this.formData)) {
@@ -598,5 +644,8 @@ h3 {
 }
 span {
   color: green;
+}
+.wait {
+  color: white;
 }
 </style>

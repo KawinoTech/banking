@@ -8,6 +8,7 @@ from typing import List
 from uuid import uuid4
 from ..models.transactions import Transfer, BuyGoods, PayBill, Airtime, TopUpWallet
 from ..models.accounts import PersonalAccounts, CorporateAccounts
+from ..models.loans import PersonalLoans, BusinessLoans
 from ..models.users import Customer
 from .. import schemas, oauth
 from ..schema import transactions
@@ -15,13 +16,13 @@ from ..database import get_db
 
 # Constants
 DAILY_LIMIT = 100
-ACCOUNT_CLASSES = [PersonalAccounts, CorporateAccounts]
+ACCOUNT_CLASSES = [PersonalAccounts, CorporateAccounts, BusinessLoans, PersonalLoans]
 
 # Router initialization
 # Set up router with a specific prefix for related endpoints
 router = APIRouter(
     prefix="/post",
-    tags=["Customer Transacttion"],  # Assign this router to a specific documentation category
+    tags=["Customer Transaction"],  # Assign this router to a specific documentation category
 )
 
 logger = logging.getLogger(__name__)
@@ -83,14 +84,24 @@ def transfer(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Transaction amount must be greater than zero."
             )
-        if account.account_balance < transaction.payload['amount']:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Insufficient funds for this transaction."
-            )
+        if account.account_type == "Personal Loan" or account.account_type == "Business Loan":
+            if account.disposable_amount < transaction.payload['amount']:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Insufficient funds for this transaction."
+                )
+            else:
+                account.disposable_amount -= transaction.payload['amount']
+        else:
+            if account.account_balance < transaction.payload['amount']:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Insufficient funds for this transaction."
+                )
+            else:
+                 account.account_balance -= transaction.payload['amount']
 
         # Process the transaction
-        account.account_balance -= transaction.payload['amount']
         new_transaction.generate_ref_number()  # Ensure that the reference number is generated
 
         # Save the transaction and commit
@@ -196,15 +207,22 @@ def buygoods(
                 detail="Transaction amount must be greater than zero."
             )
         
-        # Check if account balance is sufficient
-        if account.account_balance < transaction.payload['amount']:
-            raise HTTPException(
-                status_code=status.HTTP_501_NOT_IMPLEMENTED,
-                detail="Failed. Insufficient funds."
-            )
-
-        # Deduct the transaction amount from the account balance
-        account.account_balance -= transaction.payload['amount']
+        if account.account_type == "Personal Loan" or account.account_type == "Business Loan":
+            if account.disposable_amount < transaction.payload['amount']:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Insufficient funds for this transaction."
+                )
+            else:
+                account.disposable_amount -= transaction.payload['amount']
+        else:
+            if account.account_balance < transaction.payload['amount']:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Insufficient funds for this transaction."
+                )
+            else:
+                 account.account_balance -= transaction.payload['amount']
 
         # Generate reference number for the transaction
         new_transaction.generate_ref_number()
@@ -297,22 +315,22 @@ def paybill(
                 detail="Account does not exist."
             )
 
-        # Validate transaction amount
-        if transaction.payload['amount'] <= 0:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Transaction amount must be greater than zero."
-            )
-
-        # Ensure sufficient funds
-        if account.account_balance < transaction.payload["amount"]:
-            raise HTTPException(
-                status_code=status.HTTP_501_NOT_IMPLEMENTED,
-                detail="Failed. Insufficient funds."
-            )
-
-        # Deduct the transaction amount from the account balance
-        account.account_balance -= transaction.payload["amount"]
+        if account.account_type == "Personal Loan" or account.account_type == "Business Loan":
+            if account.disposable_amount < transaction.payload['amount']:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Insufficient funds for this transaction."
+                )
+            else:
+                account.disposable_amount -= transaction.payload['amount']
+        else:
+            if account.account_balance < transaction.payload['amount']:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Insufficient funds for this transaction."
+                )
+            else:
+                 account.account_balance -= transaction.payload['amount']
 
         # Generate the reference number for the transaction
         new_transaction.generate_ref_number()
@@ -394,13 +412,22 @@ def buy_airtime(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Transaction amount must be greater than zero."
             )
-        if account.account_balance < transaction.payload['amount']:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Failed. Insufficient funds."
-            )
-
-        account.account_balance -= transaction.payload['amount']
+        if account.account_type == "Personal Loan" or account.account_type == "Business Loan":
+            if account.disposable_amount < transaction.payload['amount']:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Insufficient funds for this transaction."
+                )
+            else:
+                account.disposable_amount -= transaction.payload['amount']
+        else:
+            if account.account_balance < transaction.payload['amount']:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Insufficient funds for this transaction."
+                )
+            else:
+                 account.account_balance -= transaction.payload['amount']
         new_transaction.generate_ref_number()
         db.add(new_transaction)
         db.commit()
@@ -533,7 +560,7 @@ def topup_wallet(
 @router.get(
     "/all_user_transactions",
     status_code=status.HTTP_200_OK,
-    response_model=List[schemas.AllTransactions],
+    response_model=List[transactions.AllTransactions],
     summary="Retrieve all user transactions",
     description="Fetches all transactions performed by the current user, categorized by type, "
                 "including customer-to-business transactions, bill payments, and goods/services purchases."

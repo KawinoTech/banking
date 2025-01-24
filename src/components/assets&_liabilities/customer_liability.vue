@@ -10,6 +10,7 @@
       <th scope="col">Principal</th>
       <th scope="col">Accrued Int.</th>
       <th scope="col">Principal Paid</th>
+      <th scope="col">Disposable</th>
       <th scope="col">Outst. Amount</th>
     </tr>
   </thead>
@@ -17,10 +18,11 @@
     <tr v-for="(account, index) in all_accounts" :key="index">
       <th scope="row">{{ index }}</th>
       <td><span>{{ account.account_no}}</span></td>
-      <td><span>{{ account.loan_type }}</span></td>
+      <td><span>{{ account.account_type }}</span></td>
       <td><span>{{ account.amount }}</span></td>
       <td><span>{{ account.accrued_interest }}</span></td>
       <td><span>{{ account.principal_paid }}</span></td>
+      <td><span>{{ account.disposable_amount }}</span></td>
       <td><span>{{ account.outstanding_amount }}</span></td>
     </tr>
   </tbody>

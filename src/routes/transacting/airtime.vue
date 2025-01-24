@@ -84,20 +84,20 @@
       </button>
     </form>
     <div class="modal-overlay" v-if="isConfirmationVisible">
-        <div class="modal-card">
-          <h2 class="modal-title">Confirm Details</h2>
-          <p class="modal-content">
+        <div class="modal-card-">
+          <h2 class="modal-title-">Confirm Details</h2>
+          <p class="modal-content-">
             Account Number: <span>{{ formData.account }}</span>
           </p>
-          <p class="modal-content">
+          <p class="modal-content-">
             Beneficiary: <span>{{ formData.beneficiary }}</span>
           </p>
-          <p class="modal-content">
+          <p class="modal-content-">
             Amount: <span>{{ formData.amount }}</span>
           </p>
-          <div v-if="!isProcessing" class="modal-buttons">
-            <button class="modal-btn confirm" @click="confirmTransfer">Yes</button>
-            <button class="modal-btn cancel" @click="cancelTransfer">Cancel</button>
+          <div v-if="!isProcessing" class="modal-buttons-">
+            <button class="modal-btn- confirm" @click="confirmTransfer">Yes</button>
+            <button class="modal-btn- cancel" @click="cancelTransfer">Cancel</button>
           </div>
           <div v-if="isProcessing">
             <p class="wait">
@@ -109,7 +109,8 @@
   </template>
   
   <script>
-  const url2 = "http://127.0.0.1:8000/post/get_user_personal_accounts";
+  const url2 = "http://127.0.0.1:8000/post/get_user_transactive_accounts";
+  const url3 = 'http://127.0.0.1:8000/post/get_user_transactive_loans';
   import utils from "../../utils/utils";
   import Nav_Bar from "../../components/navbar.vue";
   
@@ -223,6 +224,19 @@
         } catch (error) {
           console.error("Error fetching data:", error);
         }
+        try {
+        const response = await fetch(url3, {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+          },
+        });
+
+        const data = await response.json();
+        this.all_accounts.push(...data);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
       },
     },
   };
@@ -252,6 +266,9 @@
   }
   form {
     margin-left: 10px;
+  }
+  .wait {
+    color: white;
   }
   </style>
   

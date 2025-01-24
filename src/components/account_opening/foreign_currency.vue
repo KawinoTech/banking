@@ -269,23 +269,23 @@
   </div>
 </div>
 <div class="modal-overlay" v-if="isConfirmationVisible">
-      <div class="modal-card">
-        <h2 class="modal-title">Confirm Details</h2>
-        <p class="modal-content">
+      <div class="modal-card-">
+        <h2 class="modal-title-">Confirm Details</h2>
+        <p class="modal-content-">
           Account Name: <span>{{ formData.account_name }}</span>
         </p>
-        <p class="modal-content">
+        <p class="modal-content-">
           Type: <span>{{ formData.account_type }}</span>
         </p>
-        <p class="modal-content">
+        <p class="modal-content-">
           Telephone: <span>{{ formData.telephone }}</span>
         </p>
-        <p class="modal-content">
+        <p class="modal-content-">
           Email: <span>{{ formData.email }}</span>
         </p>
-        <div v-if="!isProcessing" class="modal-buttons">
-          <button class="modal-btn confirm" @click="confirmTransfer">Yes</button>
-          <button class="modal-btn cancel" @click="cancelTransfer">Cancel</button>
+        <div v-if="!isProcessing" class="modal-buttons-">
+          <button class="modal-btn- confirm" @click="confirmTransfer">Yes</button>
+          <button class="modal-btn- cancel" @click="cancelTransfer">Cancel</button>
         </div>
         <div v-if="isProcessing">
           <p class="wait">
@@ -312,43 +312,46 @@ export default {
   data() {
     return {
       formData: {
-        account_type: '',
-        account_name: '',
-        currency: '',
-        address: '',
-        id_no: '',
-        nationality: '',
-        kra_pin: '',
-        telephone: '',
-        next_of_kin: '',
-        next_of_kin_id: '',
-        email: '',
-        dob: '',
-        employment_status: '',
-        source_of_funds: '',
-        annual_income: '',
-        intended_usage: '',
-        nok_relationship: '',
+        account_type: '',           // Type of account to open
+        account_name: '',           // Name of the account holder
+        currency: '',               // Currency type
+        address: '',                // Address of the account holder
+        id_no: '',                  // Identification number
+        nationality: '',            // Nationality of the account holder
+        kra_pin: '',                // Tax identification number
+        telephone: '',              // Contact telephone number
+        next_of_kin: '',            // Name of the next of kin
+        next_of_kin_id: '',         // ID of the next of kin
+        email: '',                  // Email address of the account holder
+        dob: '',                    // Date of birth
+        employment_status: '',      // Employment status
+        source_of_funds: '',        // Source of funds
+        annual_income: '',          // Annual income
+        intended_usage: '',         // Intended usage of the account
+        nok_relationship: '',       // Relationship to next of kin
       },
-      isValidaccount_name: false,
-      isConfirmationVisible: false,
-      isProcessing: false,
-      isValidtelephone: false,
-      isValidemail: false,
-      utility: null,
-      reg_cert: null,
-      passport: null,
-      salary_slip: null,
-      showTerms: false,
-      isTermsChecked: false,
+      isValidaccount_name: false,   // Validity state for account name
+      isValidtelephone: false,     // Validity state for telephone number
+      isValidemail: false,         // Validity state for email address
+      isConfirmationVisible: false, // Confirmation modal visibility
+      isProcessing: false,         // Processing state indicator
+      showTerms: false,            // Terms and conditions modal visibility
+      isTermsChecked: false,       // Boolean for terms acceptance
+      utility: null,               // Utility bill file
+      reg_cert: null,              // Registration certificate file
+      passport: null,              // Passport file
+      salary_slip: null,           // Salary slip file
     };
   },
   methods: {
+    // Handles account creation
     async createAccount() {
       try {
+        // Check for empty fields in form data
         if (utils.checkEmptyValues(this.formData)) {
           throw new Error('Empty Fields');
         }
+
         const formData = new FormData();
         formData.append('utility', this.utility);
         formData.append('reg_cert', this.reg_cert);
@@ -390,6 +393,7 @@ export default {
           throw new Error('Failed to post data');
         }
 
+        // On success, redirect to success page
         this.success = true;
         setTimeout(() => this.$router.push('/success'), 2000);
       } catch (error) {
@@ -397,10 +401,26 @@ export default {
         setTimeout(() => this.$router.push('/failed'), 500);
       }
     },
+
+    // Validates account name input
     checkAccNameInput() {
       const namePattern = /^[A-Z][a-z]* [A-Z][a-z]* [A-Z][a-z]*$/;
       this.isValidaccount_name = namePattern.test(this.formData.account_name);
     },
+
+    // Validates telephone input
+    checkTelephoneInput() {
+      const namePattern = /^\+\d{1,3}\s\d{9}$/;
+      this.isValidtelephone = namePattern.test(this.formData.telephone);
+    },
+
+    // Validates email input
+    checkEmailInput() {
+      const namePattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      this.isValidemail = namePattern.test(this.formData.email);
+    },
+
+    // Handles file uploads
     handleFileUpload1(event) {
       this.utility = event.target.files[0];
     },
@@ -413,9 +433,13 @@ export default {
     handleFileUpload4(event) {
       this.salary_slip = event.target.files[0];
     },
-    handleFileUpload(event) {
-      this.selectedFile = event.target.files[0];
+
+    // Toggles terms and conditions modal
+    toggleTerms() {
+      this.showTerms = !this.showTerms;
     },
+
+    // Displays confirmation modal
     showConfirmation() {
       if (!this.isTermsChecked) return;
       if (utils.checkEmptyValues(this.formData)) {
@@ -424,37 +448,21 @@ export default {
       }
       this.isConfirmationVisible = true;
     },
-    toggleTerms() {
-      this.showTerms = !this.showTerms;
-    },
+
+    // Confirms the account creation process
     confirmTransfer() {
       this.createAccount();
       this.isProcessing = true;
     },
+
+    // Cancels the account creation process
     cancelTransfer() {
       this.isConfirmationVisible = false;
     },
-    checkTelephoneInput() {
-        const namePattern = /^\+\d{1,3}\s\d{9}$/;
-        if (namePattern.test(this.formData.telephone)) {
-          this.isValidtelephone = true;
-        }
-        else {
-          this.isValidtelephone = false;
-        }
-      },
-      checkEmailInput() {
-        const namePattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-        if (namePattern.test(this.formData.email)) {
-          this.isValidemail = true;
-        }
-        else {
-          this.isValidemail = false;
-        }
-      },
   },
 };
 </script>
+
   
   <style scoped>
   h1 {
@@ -584,6 +592,9 @@ export default {
 }
 span {
   color: green;
+}
+.wait {
+  color: white;
 }
   </style>
   

@@ -38,14 +38,14 @@
     </table>
   </div>
   <div class="modal-overlay" v-if="isConfirmationVisible">
-      <div class="modal-card">
-        <h2 class="modal-title">Confirm Details</h2>
+      <div class="modal-card-">
+        <h2 class="modal-title-">Confirm Details</h2>
         <p class="caution">Please note that liquidating before maturity date
           <br>may potentially mean all accrued interest will be lost
         </p>
-        <div v-if="!isProcessing" class="modal-buttons">
-          <button class="modal-btn confirm" @click="confirmTransfer">Yes</button>
-          <button class="modal-btn cancel" @click="cancelTransfer">Cancel</button>
+        <div v-if="!isProcessing" class="modal-buttons-">
+          <button class="modal-btn- confirm" @click="confirmTransfer">Yes</button>
+          <button class="modal-btn- cancel" @click="cancelTransfer">Cancel</button>
         </div>
         <div v-if="isProcessing">
           <p class="wait">

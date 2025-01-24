@@ -59,26 +59,26 @@
       </button>
     </form>
     <div class="modal-overlay" v-if="isConfirmationVisible">
-        <div class="modal-card">
-          <h2 class="modal-title">Confirm Details</h2>
-          <p class="modal-content">
+        <div class="modal-card-">
+          <h2 class="modal-title-">Confirm Details</h2>
+          <p class="modal-content-">
             Account Number: <span>{{ formData.account }}</span>
           </p>
-          <p class="modal-content">
+          <p class="modal-content-">
             Tenure: <span>{{ formData.tenure }} months</span>
           </p>
-          <p class="modal-content">
+          <p class="modal-content-">
             Amount: <span>{{ formData.amount }}</span>
           </p>
-          <p class="modal-content">
+          <p class="modal-content-">
             Fixed Rate: <span>{{ this.interestRate }}</span>
           </p>
-          <p class="modal-content">
+          <p class="modal-content-">
             Potential Interest: <span>{{ potentialInterest }}</span>
           </p>
-          <div v-if="!isProcessing" class="modal-buttons">
-            <button class="modal-btn confirm" @click="confirmTransfer">Yes</button>
-            <button class="modal-btn cancel" @click="cancelTransfer">Cancel</button>
+          <div v-if="!isProcessing" class="modal-buttons-">
+            <button class="modal-btn- confirm" @click="confirmTransfer">Yes</button>
+            <button class="modal-btn- cancel" @click="cancelTransfer">Cancel</button>
           </div>
           <div>
 
@@ -93,130 +93,153 @@
   </template>
   
   <script>
+  // URL for fetching user account data
   const url2 = "http://127.0.0.1:8000/post/get_user_transactive_accounts";
+  
+  // Import necessary utility functions and components
   import utils from "../../utils/utils";
   import Nav_Bar from "../../components/navbar.vue";
-  
+
   export default {
-    name: "Term_Deposit",
+    name: "Term_Deposit", // Component name
     components: {
-      Nav_Bar
+      Nav_Bar // Navigation bar component
     },
+
+    // Computed property to calculate potential interest for a term deposit
     computed: {
-        potentialInterest() {
-            return (Number(this.formData.amount) * Math.pow(1 + this.interestRate/100, this.formData.tenure));
-        }
+      potentialInterest() {
+        return (Number(this.formData.amount) * Math.pow(1 + this.interestRate / 100, this.formData.tenure));
+      }
     },
+
     data() {
       return {
+        // Form data to hold user input values
         formData: {
-          amount: "",
-          tenure: "",
-          account: "",
-          password: "",
+          amount: "", // Amount to invest
+          tenure: "", // Tenure for the deposit (in years/months)
+          account: "", // Account from which the investment will be made
+          password: "", // User password for validation (if necessary)
         },
-        all_accounts: [],
-        balance: "",
-        isConfirmationVisible: false,
-        isProcessing: false,
-        interestRate: 4.453
+
+        all_accounts: [], // List of all user accounts
+        balance: "", // Balance after checking the available funds for the deposit
+        isConfirmationVisible: false, // Flag to show confirmation modal
+        isProcessing: false, // Flag to show processing state (for spinner or progress indication)
+        interestRate: 4.453 // Default interest rate for the term deposit
       };
     },
-  
+
     mounted() {
-      this.fetchData();
+      this.fetchData(); // Fetch user account data when the component is mounted
     },
-  
+
     methods: {
+      // Helper method to find and return the substring after a specified character in a string
       findAndReturnSubsequent(str, char) {
         const index = str.indexOf(char);
         return index !== -1 && index < str.length - 1
           ? str.substring(index + 1)
-          : ""; // Character not found or it's the last character
+          : ""; // Return substring after character if it exists, else return empty string
       },
-  
+
+      // Method to check if the balance is sufficient for the term deposit
       check_balance() {
         if (this.formData.account !== "" && this.formData.amount !== "") {
           for (const account of this.all_accounts) {
-            if (
-              this.findAndReturnSubsequent(this.formData.account, ":") ===
-              account.account_no
-            ) {
-              this.balance = account.account_balance - this.formData.amount;
+            if (this.findAndReturnSubsequent(this.formData.account, ":") === account.account_no) {
+              this.balance = account.account_balance - this.formData.amount; // Calculate the remaining balance
             }
           }
         }
       },
-  
+
+      // Method to confirm the term deposit creation
       confirmTransfer() {
-        this.bookTermDeposit();
-        this.isProcessing = true;
+        this.bookTermDeposit(); // Call method to book the term deposit
+        this.isProcessing = true; // Set processing state to true (e.g., show a spinner)
       },
+
+      // Method to cancel the term deposit creation
       cancelTransfer() {
-        this.isConfirmationVisible = false;
+        this.isConfirmationVisible = false; // Hide the confirmation modal
       },
-  
+
+      // Method to show the confirmation modal after validating the input
       showConfirmation() {
-          // Validate before showing confirmation
-          if (utils.checkEmptyValues(this.formData)) {
-            alert('Please fill in all required fields.');
-            return;
-          }
-          this.isConfirmationVisible = true;
-        },
+        // Validate if any fields are empty
+        if (utils.checkEmptyValues(this.formData)) {
+          alert('Please fill in all required fields.'); // Show alert if any fields are empty
+          return;
+        }
+        this.isConfirmationVisible = true; // Show the confirmation modal
+      },
 
-
-  
+      // Method to book the term deposit with the provided details
       async bookTermDeposit() {
         try {
+          // Validate if any fields are empty before proceeding
           if (utils.checkEmptyValues(this.formData)) {
             throw new Error("Empty Fields");
           }
+
+          // Generate the HMAC signature for the request body (used for authentication)
           const requestBody = utils.generateHmacSignature({
-            "amount": Number(this.formData.amount),
-            "maturity_period": this.formData.tenure,
-            "account": this.findAndReturnSubsequent(this.formData.account, ":"),
+            "amount": Number(this.formData.amount), // Convert amount to a number
+            "maturity_period": this.formData.tenure, // The tenure (duration) of the deposit
+            "account": this.findAndReturnSubsequent(this.formData.account, ":") // Extract account number
           });
+
+          // Make the API request to book the term deposit
           const response = await fetch("http://127.0.0.1:8000/post/book_td", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+              Authorization: `Bearer ${localStorage.getItem("accessToken")}`, // Pass access token in headers
             },
-            body: JSON.stringify(requestBody),
+            body: JSON.stringify(requestBody), // Send the signed request body
           });
+
+          // Check if the request was successful
           if (!response.ok) {
             throw new Error("Failed to post data");
           }
+
+          // If successful, redirect to the success page
           setTimeout(() => {
             this.$router.push("/success");
           }, 2000);
         } catch (error) {
+          // Handle any errors during the API call
           console.error("Error posting data:", error);
           setTimeout(() => {
-            this.$router.push("/failed");
+            this.$router.push("/failed"); // Redirect to failed page in case of error
           }, 2000);
         }
       },
-  
+
+      // Method to fetch the user's account data
       async fetchData() {
         try {
           const response = await fetch(url2, {
             method: "GET",
             headers: {
-              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+              Authorization: `Bearer ${localStorage.getItem("accessToken")}`, // Pass access token in headers
             },
           });
+
           const data = await response.json();
-          this.all_accounts.push(...data);
-          this.loading = false;
+          this.all_accounts.push(...data); // Add fetched accounts to the list
+          this.loading = false; // Set loading to false when data is loaded
         } catch (error) {
-          console.error("Error fetching data:", error);
+          console.error("Error fetching data:", error); // Log any errors during data fetching
         }
       },
     },
   };
-  </script>
+</script>
+
   
   <style scoped>
   h1 {

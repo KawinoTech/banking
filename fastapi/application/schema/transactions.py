@@ -59,3 +59,11 @@ class ResponseTransact(BaseModel):
         ref_no (str): A unique reference number for the transaction.
     """
     ref_no: str
+
+class AllTransactions(BaseModel):
+    account: str
+    amount: str
+    ref_no: str
+    transaction_type: str
+    beneficiary: str
+    date_posted: str
