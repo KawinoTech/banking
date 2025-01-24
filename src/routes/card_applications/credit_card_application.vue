@@ -48,9 +48,37 @@
       </label>
 
       <!-- Submit Button -->
-      <button type="button" class="btn btn-success" @click="applyCard">Apply Now</button>
+      <button type="button" class="btn btn-success" @click="showConfirmation">Apply Now</button>
     </form>
   </div>
+  <div class="modal-overlay" v-if="isConfirmationVisible">
+      <div class="modal-card-">
+        <h2 class="modal-title-">Confirm Details</h2>
+        <p class="modal-content-">
+          Card Name: <span>{{ formData.full_name }}</span>
+        </p>
+        <p class="modal-content-">
+          Delivery: <span>{{ formData.delivery_option }}</span>
+        </p>
+        <p class="modal-content-">
+          Classification: <span>{{ formData.card_classification }}</span>
+        </p>
+        <p id="details" class="modal-content-">
+          Dear Customer, our team will follow up immediately and <br>
+          Notify you of your debit card processing This will happen<br>in the next 24hrs
+          Thank you for choosing Vue JS Bank <br>
+        </p>
+        <div v-if="!isProcessing" class="modal-buttons-">
+          <button class="modal-btn- confirm" @click="confirm">Yes</button>
+          <button class="modal-btn- cancel" @click="cancel">Cancel</button>
+        </div>
+        <div v-if="isProcessing">
+          <p class="wait">
+            Processing<i class="fa-regular wait fa-clock fa-spin"></i>
+          </p>
+        </div>
+      </div>
+    </div>
 </template>
 
 <script>
@@ -113,11 +141,36 @@ import utils from '../../utils/utils'
             setTimeout(() => {
               this.isConfirmationVisible = false;
               this.isProcessing = false;
-              this.$router.push('/error');
+              this.$router.push('/failed');
             }, 1000);
             // Handle error if necessary
          }
+      },
+      confirm() {
+      /**
+       * Initiates the bill payment process and sets processing status.
+       */
+      this.applyCard();
+      this.isProcessing = true;
+    },
+
+    cancel() {
+      /**
+       * Cancels and hides the confirmation modal.
+       */
+      this.isConfirmationVisible = false;
+    },
+
+    showConfirmation() {
+      /**
+       * Validates required fields and shows the confirmation modal.
+       */
+      if (utils.checkEmptyValues(this.formData)) {
+        alert("Please fill in all required fields.");
+        return;
       }
+      this.isConfirmationVisible = true;
+    }
   }
 }
 </script>
@@ -151,30 +204,30 @@ import utils from '../../utils/utils'
     }
 
     button {
-      background-color: #007bff;
+      background-color: rgba(0, 128, 0, 0.719);
       color: white;
-      border: none;
       font-weight: bold;
       cursor: pointer;
-      transition: background-color 0.3s ease;
+      border: none;
+      width: 20%;
     }
-
     button:hover {
-      background-color: #0056b3;
+      background-color: green
     }
 
     .terms {
       font-size: 0.9em;
-      color: #555555;
-      display: flex;
-      align-items: center;
+      color: white;
     }
 
-    .terms input {
-      margin-right: 10px;
-    }
     input, select{
       background-color: rgb(0, 19, 31);
+      color: white;
+    }
+    span {
+      color: green;
+    }
+    #details {
       color: white;
     }
 </style>

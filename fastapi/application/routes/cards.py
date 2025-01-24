@@ -1,63 +1,88 @@
-from fastapi import  Depends, status, APIRouter, HTTPException, status
-from .. import schemas, oauth
-from ..models.cards import BaseCards, DebitCards, CreditCards, PrepaidCards
-from ..models.accounts import PersonalAccounts
-from datetime import datetime
-from ..database import  get_db
+from fastapi import Depends, status, APIRouter, HTTPException
 from sqlalchemy.orm import Session
+from datetime import datetime
 from uuid import uuid4
-import logging
 from typing import List
 from dateutil.relativedelta import relativedelta
+import logging
 
+from .. import oauth
+from ..models.cards import BaseCards, DebitCards, CreditCards, PrepaidCards
+from ..models.accounts import PersonalAccounts
+from ..database import get_db
+from ..schema import cards
+
+# Set up the logger
 logger = logging.getLogger(__name__)
-router = APIRouter(prefix="/post")
+
+# Set up the router
+router = APIRouter(
+    prefix="/post",
+    tags=["Card Services"],  # Group these endpoints under the "Card Services" category in the API docs
+)
 
 @router.post(
     "/debit_card_application",
     status_code=status.HTTP_201_CREATED,
-    response_model=schemas.CardApplicationResponse,
+    response_model=cards.CardApplicationResponse,
     summary="Apply for a debit card",
-    description="This endpoint allows authenticated users to apply for a new debit card. The application includes generating a card number, setting issuance and expiry dates, and associating it with the current user."
+    description=(
+        "This endpoint allows authenticated users to apply for a new debit card. "
+        "The application includes generating a card number, setting issuance and expiry dates, "
+        "and associating it with the current user."
+    ),
 )
 def apply_debit_card(
-    new_card: schemas.CardApplication,
+    new_card: cards.CardApplication,
     db: Session = Depends(get_db),
     current_user: str = Depends(oauth.get_current_user)
 ):
     """
     Apply for a debit card.
 
-    This endpoint allows authenticated users to apply for a new debit card. The card details, including
-    the card number, issuance date, expiry date, and owner information, are automatically generated and 
-    stored in the database.
+    This endpoint generates a new debit card application for authenticated users. It assigns 
+    a unique card number, sets issuance and expiry dates, and associates the card with the 
+    requesting user.
 
     Args:
-        new_card (schemas.CardApplication): The payload containing debit card application details.
+        new_card (cards.CardApplication): The payload containing debit card application details.
         db (Session): The database session for executing queries.
         current_user (str): The authenticated user making the request.
 
     Returns:
-        schemas.CardApplicationResponse: The details of the successfully created debit card application.
+        cards.CardApplicationResponse: The details of the successfully created debit card.
 
     Raises:
-        HTTPException: If an error occurs during the process of creating the application.
+        HTTPException: If an error occurs during card number generation or database operations.
     """
-    # Generate card details
+    logger.info("Processing debit card application...")
+
+    # Step 1: Generate a card number
     try:
         card_no = BaseCards.generate_card_no()
+        logger.debug(f"Generated card number: {card_no}")
     except Exception as e:
-        logger.error(f"Error generating card number: {e}")
+        logger.error(f"Failed to generate card number: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to generate card number."
+            detail="An error occurred while generating the card number.",
         )
 
+    # Step 2: Validate the associated account and create the debit card application
     try:
+        # Check if the attached account exists in the database
         account = db.query(PersonalAccounts).filter(
             PersonalAccounts.account_no == new_card.payload['account_attached_no']
         ).first()
-        # Create new debit card application
+
+        if not account:
+            logger.warning(f"Account {new_card.payload['account_attached_no']} not found for user {current_user.customer_no}")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Account {new_card.payload['account_attached_no']} does not exist.",
+            )
+
+        # Create a new debit card application
         request = DebitCards(
             card_no=card_no,
             date_issued=datetime.now(),
@@ -66,35 +91,37 @@ def apply_debit_card(
             personal_account=account,
             owner_customer_no=current_user.customer_no,
             id=str(uuid4()),
-            **new_card.payload
+            **new_card.payload,
         )
         db.add(request)
         db.commit()
         db.refresh(request)
+
         logger.info(f"Debit card application created successfully for user {current_user.customer_no}")
         return request
+    except HTTPException:
+        raise  # Re-raise known exceptions
     except Exception as e:
-        print(e)
-        logger.error(f"Error processing debit card application for user {current_user.customer_no}: {e}")
-        db.rollback()  # Ensure transaction consistency
+        logger.error(f"Error creating debit card application for user {current_user.customer_no}: {e}")
+        db.rollback()  # Roll back the transaction to ensure database consistency
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to process debit card application."
+            detail="Failed to process the debit card application. Please try again later.",
         )
-    finally:
-        db.close()
-
 
 @router.post(
     "/credit_card_application",
     status_code=status.HTTP_201_CREATED,
-    response_model=schemas.CardApplicationResponse,
+    response_model=cards.CardApplicationResponse,
     summary="Apply for a credit card",
-    description="This endpoint allows authenticated users to apply for a new credit card, generating a unique card number, "
-                "and associating it with the current user. The card has a default expiry of one year."
+    description=(
+        "This endpoint allows authenticated users to apply for a new credit card. "
+        "A unique card number is generated, and the card is associated with the current user. "
+        "The card has a default expiry of one year."
+    ),
 )
 def apply_credit_card(
-    new_card: schemas.CardApplication,
+    new_card: cards.CardApplication,
     db: Session = Depends(get_db),
     current_user: str = Depends(oauth.get_current_user)
 ):
@@ -106,32 +133,46 @@ def apply_credit_card(
     issue date, expiry date, and due date.
 
     Args:
-        new_card (schemas.CardApplication): The payload containing credit card application details.
+        new_card (cards.CardApplication): The payload containing credit card application details.
         db (Session): The database session for executing queries.
         current_user (str): The authenticated user making the request.
 
     Returns:
-        schemas.CardApplicationResponse: The details of the successfully created credit card application.
+        cards.CardApplicationResponse: The details of the successfully created credit card.
 
     Raises:
         HTTPException: If an error occurs during the application process.
     """
-    # Generate card application
-    request = CreditCards(
-        card_no=BaseCards.generate_card_no(),
-        date_issued=datetime.now(),
-        expiry_date=datetime.now() + relativedelta(years=1),
-        date_requested=datetime.now(),
-        owner_customer_no=current_user.customer_no,
-        due_date=datetime.now(),
-        id=str(uuid4()),
-        **new_card.payload
-    )
+    logger.info("Processing credit card application...")
 
+    # Step 1: Generate a card number
     try:
+        card_no = BaseCards.generate_card_no()
+        logger.debug(f"Generated card number: {card_no}")
+    except Exception as e:
+        logger.error(f"Failed to generate card number: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An error occurred while generating the card number."
+        )
+
+    # Step 2: Create the credit card application
+    try:
+        request = CreditCards(
+            card_no=card_no,
+            date_issued=datetime.now(),
+            expiry_date=datetime.now() + relativedelta(years=1),
+            date_requested=datetime.now(),
+            owner_customer_no=current_user.customer_no,
+            due_date=datetime.now(),  # Optional: Add logic if `due_date` has a specific meaning
+            id=str(uuid4()),
+            **new_card.payload,
+        )
+
         db.add(request)
         db.commit()
         db.refresh(request)
+
         logger.info(f"Credit card application successfully created for user {current_user.customer_no}")
         return request
     except Exception as e:
@@ -139,24 +180,23 @@ def apply_credit_card(
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to process credit card application."
+            detail="Failed to process the credit card application. Please try again later.",
         )
-    finally:
-        db.close()
 
-#
 @router.post(
     "/prepaid_card_application",
     status_code=status.HTTP_201_CREATED,
-    response_model=schemas.CardApplicationResponse,
+    response_model=cards.CardApplicationResponse,
     summary="Apply for a prepaid card",
-    description="This endpoint allows authenticated users to apply for a new prepaid card. It debits the specified "
-                "account for the card's initial balance and associates the card with the user."
+    description=(
+        "This endpoint allows authenticated users to apply for a new prepaid card. "
+        "It debits the specified account for the card's initial balance and associates the card with the user."
+    ),
 )
 def apply_prepaid_card(
-    new_card: schemas.CardApplication,
+    new_card: cards.CardApplication,
     db: Session = Depends(get_db),
-    current_user: str = Depends(oauth.get_current_user)
+    current_user: str = Depends(oauth.get_current_user),
 ):
     """
     Apply for a prepaid card.
@@ -165,206 +205,225 @@ def apply_prepaid_card(
     deducts the initial balance from the specified account, and saves the card details to the database.
 
     Args:
-        new_card (schemas.CardApplication): The payload containing prepaid card application details, including account number and balance.
+        new_card (cards.CardApplication): The payload containing prepaid card application details,
+            including account number and initial balance.
         db (Session): The database session for executing queries.
         current_user (str): The authenticated user making the request.
 
     Returns:
-        schemas.CardApplicationResponse: The details of the successfully created prepaid card application.
+        cards.CardApplicationResponse: The details of the successfully created prepaid card.
 
     Raises:
-        HTTPException: If the account is invalid, insufficient funds are available, or an error occurs during processing.
+        HTTPException: If the account is invalid, insufficient funds are available, 
+        or an error occurs during processing.
     """
+    logger.info("Initiating prepaid card application process...")
+
+    # Step 1: Fetch and validate the account
     account_to_debit = db.query(PersonalAccounts).filter(
         PersonalAccounts.account_no == new_card.payload['account_number']
     ).first()
 
-    # Validate account existence and balance
     if not account_to_debit:
+        logger.error("Account not found for account number: %s", new_card.payload['account_number'])
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Account not found for the specified account number."
+            detail="Account not found for the specified account number.",
         )
+
     if account_to_debit.account_balance < new_card.payload['balance']:
+        logger.error(
+            "Insufficient funds for account number: %s, Requested: %s, Available: %s",
+            new_card.payload['account_number'],
+            new_card.payload['balance'],
+            account_to_debit.account_balance,
+        )
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Insufficient funds in the specified account."
+            detail="Insufficient funds in the specified account.",
         )
 
-    # Deduct balance and generate prepaid card
+    # Step 2: Deduct balance
     account_to_debit.account_balance -= new_card.payload['balance']
-    del new_card.payload['account_number']  # Clean payload before creating the card
-    request = PrepaidCards(
-        card_no=BaseCards.generate_card_no(),
-        date_issued=datetime.now(),
-        expiry_date=datetime.now() + relativedelta(years=1),
-        date_requested=datetime.now(),
-        owner_customer_no=current_user.customer_no,
-        id=str(uuid4()),
-        **new_card.payload
-    )
 
+    # Step 3: Generate and create the prepaid card
     try:
-        db.add(request)
+        card_no = BaseCards.generate_card_no()
+        logger.debug(f"Generated card number: {card_no}")
+
+        del new_card.payload['account_number']  # Remove account number from payload as it's no longer needed
+        prepaid_card = PrepaidCards(
+            card_no=card_no,
+            date_issued=datetime.now(),
+            expiry_date=datetime.now() + relativedelta(years=1),
+            date_requested=datetime.now(),
+            owner_customer_no=current_user.customer_no,
+            id=str(uuid4()),
+            **new_card.payload,
+        )
+
+        db.add(prepaid_card)
         db.commit()
-        db.refresh(request)
+        db.refresh(prepaid_card)
+
         logger.info(f"Prepaid card application successfully created for user {current_user.customer_no}")
-        return request
+        return prepaid_card
     except Exception as e:
         logger.error(f"Failed to process prepaid card application for user {current_user.customer_no}: {e}")
         db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to process prepaid card application."
+            detail="Failed to process prepaid card application. Please try again later.",
         )
-    finally:
-        db.close()
 
 
 @router.get(
-    "/get_user_debit_cards", 
-    status_code=status.HTTP_200_OK, 
-    response_model=List[schemas.GetDebitCards],
+    "/get_user_debit_cards",
+    status_code=status.HTTP_200_OK,
+    response_model=List[cards.GetDebitCards],
     summary="Retrieve user's debit cards",
-    description="Fetch all debit cards associated with the current authenticated user. Card numbers are obfuscated, "
-                "UUIDs are truncated, and date fields are formatted for readability."
+    description=(
+        "Fetch all debit cards associated with the authenticated user. Card numbers are obfuscated, UUIDs are "
+        "truncated, and date fields are formatted for readability."
+    ),
 )
 def get_user_debit_cards(
-    db: Session = Depends(get_db), 
-    current_user: str = Depends(oauth.get_current_user)
+    db: Session = Depends(get_db),
+    current_user: str = Depends(oauth.get_current_user),
 ):
     """
     Retrieve user's debit cards.
 
-    Fetches all debit cards associated with the current authenticated user. The card number is partially obfuscated, 
-    UUIDs are truncated, and datetime fields are formatted for improved readability. The date issued is printed 
-    for reference.
+    Fetch all debit cards associated with the current authenticated user. Card details include obfuscated card numbers,
+    truncated UUIDs, and formatted datetime fields for improved readability.
 
     Args:
-        db (Session): The database session for executing queries.
+        db (Session): Database session for executing queries.
         current_user (str): The authenticated user making the request.
 
     Returns:
-        List[schemas.GetDebitCards]: A list of debit card details for the authenticated user.
+        List[schemas.GetDebitCards]: Debit card details for the authenticated user.
 
     Raises:
-        HTTPException: If an error occurs during data retrieval.
+        HTTPException: If data retrieval fails.
     """
+    logger.info("Fetching debit cards for user %s", current_user.customer_no)
     try:
-        # Fetch user debit cards
-        accounts = db.query(DebitCards).filter(
+        # Query and process debit cards
+        debit_cards = db.query(DebitCards).filter(
             DebitCards.owner_customer_no == current_user.customer_no
         ).all()
 
-        for account in accounts:
-            account.reformat_card_no()  # Obfuscate card number
-            account.truncate_uuid()  # Truncate UUID
-            account.truncate_datetime()  # Truncate datetime fields
+        for card in debit_cards:
+            card.reformat_card_no()  # Obfuscate card number
+            card.truncate_uuid()  # Truncate UUID
+            card.truncate_datetime()  # Format datetime fields
 
-        return accounts
+        return debit_cards
     except Exception as e:
         logger.error(f"Error fetching debit cards for user {current_user.customer_no}: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to retrieve debit cards."
+            detail="Failed to retrieve debit cards.",
         )
-    finally:
-        db.close()
 
 
 @router.get(
-    "/get_user_credit_cards", 
-    status_code=status.HTTP_200_OK, 
-    response_model=List[schemas.GetCreditCards],
+    "/get_user_credit_cards",
+    status_code=status.HTTP_200_OK,
+    response_model=List[cards.GetCreditCards],
     summary="Retrieve user's credit cards",
-    description="Fetch all credit cards associated with the current authenticated user. The card number is partially "
-                "obfuscated, and the date fields are truncated for improved readability."
+    description=(
+        "Fetch all credit cards associated with the authenticated user. Card numbers are obfuscated, and date fields "
+        "are formatted for readability."
+    ),
 )
 def get_user_credit_cards(
-    db: Session = Depends(get_db), 
-    current_user: str = Depends(oauth.get_current_user)
+    db: Session = Depends(get_db),
+    current_user: str = Depends(oauth.get_current_user),
 ):
     """
     Retrieve user's credit cards.
 
-    Fetches all credit cards associated with the current authenticated user. The card number is partially obfuscated, 
-    and datetime fields are truncated for improved readability.
+    Fetch all credit cards associated with the current authenticated user. Card details include obfuscated card numbers
+    and formatted datetime fields for improved readability.
 
     Args:
-        db (Session): The database session for executing queries.
+        db (Session): Database session for executing queries.
         current_user (str): The authenticated user making the request.
 
     Returns:
-        List[schemas.GetCreditCards]: A list of credit card details for the authenticated user.
+        List[schemas.GetCreditCards]: Credit card details for the authenticated user.
 
     Raises:
-        HTTPException: If an unexpected error occurs during data retrieval.
+        HTTPException: If data retrieval fails.
     """
+    logger.info("Fetching credit cards for user %s", current_user.customer_no)
     try:
-        # Fetch user credit cards
-        accounts = db.query(CreditCards).filter(
+        # Query and process credit cards
+        credit_cards = db.query(CreditCards).filter(
             CreditCards.owner_customer_no == current_user.customer_no
         ).all()
 
-        for account in accounts:
-            account.reformat_card_no()  # Obfuscate card number
-            account.truncate_datetime()  # Truncate datetime fields
+        for card in credit_cards:
+            card.reformat_card_no()  # Obfuscate card number
+            card.truncate_datetime()  # Format datetime fields
 
-        return accounts
+        return credit_cards
     except Exception as e:
         logger.error(f"Error fetching credit cards for user {current_user.customer_no}: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to retrieve credit cards."
+            detail="Failed to retrieve credit cards.",
         )
-    finally:
-        db.close()
 
 
 @router.get(
-    "/get_user_prepaid_cards", 
-    status_code=status.HTTP_200_OK, 
-    response_model=List[schemas.GetPrepaidCards],
+    "/get_user_prepaid_cards",
+    status_code=status.HTTP_200_OK,
+    response_model=List[cards.GetPrepaidCards],
     summary="Retrieve user's prepaid cards",
-    description="Fetch all prepaid cards associated with the current authenticated user. The card number is partially "
-                "obfuscated, and the date fields are truncated for improved readability."
+    description=(
+        "Fetch all prepaid cards associated with the authenticated user. Card numbers are obfuscated, and date fields "
+        "are formatted for readability."
+    ),
 )
 def get_user_prepaid_cards(
-    db: Session = Depends(get_db), 
-    current_user: str = Depends(oauth.get_current_user)
+    db: Session = Depends(get_db),
+    current_user: str = Depends(oauth.get_current_user),
 ):
     """
     Retrieve user's prepaid cards.
 
-    Fetches all prepaid cards associated with the current authenticated user. The card number is partially obfuscated, 
-    and datetime fields are truncated for improved readability.
+    Fetch all prepaid cards associated with the current authenticated user. Card details include obfuscated card numbers
+    and formatted datetime fields for improved readability.
 
     Args:
-        db (Session): The database session for executing queries.
+        db (Session): Database session for executing queries.
         current_user (str): The authenticated user making the request.
 
     Returns:
-        List[schemas.GetPrepaidCards]: A list of prepaid card details for the authenticated user.
+        List[schemas.GetPrepaidCards]: Prepaid card details for the authenticated user.
 
     Raises:
-        HTTPException: If an unexpected error occurs during data retrieval.
+        HTTPException: If data retrieval fails.
     """
+    logger.info("Fetching prepaid cards for user %s", current_user.customer_no)
     try:
-        # Fetch user prepaid cards
-        accounts = db.query(PrepaidCards).filter(
+        # Query and process prepaid cards
+        prepaid_cards = db.query(PrepaidCards).filter(
             PrepaidCards.owner_customer_no == current_user.customer_no
         ).all()
 
-        for account in accounts:
-            account.reformat_card_no()  # Obfuscate card number
-            account.truncate_datetime()  # Truncate datetime fields
+        for card in prepaid_cards:
+            card.reformat_card_no()  # Obfuscate card number
+            card.truncate_datetime()  # Format datetime fields
 
-        return accounts
+        return prepaid_cards
     except Exception as e:
         logger.error(f"Error fetching prepaid cards for user {current_user.customer_no}: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to retrieve prepaid cards."
+            detail="Failed to retrieve prepaid cards.",
         )
-    finally:
-        db.close()
+

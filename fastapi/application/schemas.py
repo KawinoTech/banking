@@ -65,9 +65,7 @@ class ResponseAccount2(BaseModel):
     account_balance: str
     account_type: str
     currency: str
-class CardApplication(BaseModel):
-    payload: dict
-    signature: str
+
 class PersonalLoanApplication(BaseModel):
     payload: dict
     signature: str
@@ -103,46 +101,6 @@ class Mortgage(BaseModel):
     amount: float
     property_type: str
     rate: int
-
-class CardApplicationResponse(BaseModel):
-    full_name: str
-    email_address: str
-    phone: str
-    card_type: str
-    delivery_option: str
-    card_no: str
-    status: str
-    date_issued: datetime
-    expiry_date: datetime
-
-class GetDebitCards(BaseModel):
-    full_name: str
-    card_type: str
-    card_classification: str
-    card_no: str
-    account_attached_no: str
-    status: str
-    date_issued: str
-    expiry_date: str
-
-class GetCreditCards(BaseModel):
-    full_name: str
-    balance: int
-    due_date: datetime
-    card_classification: str
-    card_no: str
-    status: str
-    date_issued: str
-    expiry_date: str
-    limit: str
-
-class GetPrepaidCards(BaseModel):
-    full_name: str
-    balance: int
-    card_no: str
-    status: str
-    date_issued: str
-    expiry_date: str
 
 class AllTransactions(BaseModel):
     account: str

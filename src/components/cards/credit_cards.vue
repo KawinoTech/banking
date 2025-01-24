@@ -1,19 +1,36 @@
 <template>
+  <!-- Credit Cards Section -->
   <h style="color: aqua; margin: 0px 10px;" class="heading">Credit Cards</h>
-  <div style="margin: 10px;"><h v-if="all_cards.length === 0" style="color: white">Sorry! No card available</h></div>
+  
+  <!-- Message when no cards are available -->
+  <div style="margin: 10px;">
+    <h v-if="all_cards.length === 0" style="color: white">Sorry! No card available</h>
+  </div>
+
+  <!-- Display user credit cards -->
   <div class="users_cards">
-    <div v-for="card in all_cards" :key="card" class="card_container">
+    <div v-for="card in all_cards" :key="card.card_no" class="card_container">
+      <!-- Card Container -->
       <div class="card">
+        <!-- Card Header -->
         <div class="card_head">
           <div class="chip"></div>
           <div style="margin-left: 120px;" class="card_type">{{ card.card_classification }}</div>
         </div>
+
+        <!-- Card Number -->
         <div class="card-number">{{ card.card_no }}</div>
+
+        <!-- Card Details -->
         <div class="card-details">
           <div class="name">{{ card.full_name }}</div>
         </div>
+
+        <!-- Card Logo -->
         <div class="logo">VISA</div>
       </div>
+
+      <!-- Card Additional Details -->
       <div class="card_details">
         <div class="card_general_details">
           <div class="card_dates">
@@ -30,6 +47,9 @@
           <div><p>Due Date: <span>{{ card.due_date }}</span></p></div>
         </div>
       </div>
+
+      <!-- Uncomment buttons section if needed -->
+      <!--
       <div class="card_buttons">
         <button type="button" class="btn btn-success">Block</button>
         <button type="button" class="btn btn-success">Reset PIN</button>
@@ -37,23 +57,47 @@
         <button type="button" class="btn btn-success">Replace</button>
         <button type="button" class="btn btn-success">Enhance</button>
       </div>
+      -->
     </div>
   </div>
-  <router-link to="/credit_card_application"><button style="margin-left: 30px; margin-bottom: 20px;" type="button" class="btn btn-success">Apply Credit Card</button></router-link>
+
+  <!-- Link to apply for a credit card -->
+  <router-link to="/credit_card_application">
+    <button style="margin-left: 30px; margin-bottom: 20px;" type="button" class="btn btn-success">
+      Apply Credit Card
+    </button>
+  </router-link>
 </template>
 
 <script>
+/**
+ * Credit_Cards Component
+ * 
+ * Displays a list of credit cards for the logged-in user, 
+ * fetched from the backend API. Includes features to show
+ * card details and manage user interaction.
+ */
 export default {
   name: "Credit_Cards",
+  
+  // Component Data
   data() {
     return {
-      all_cards: [],
+      all_cards: [], // Array to store fetched cards
     };
   },
+
+  // Lifecycle hook - Fetch data when component is mounted
   mounted() {
     this.fetchData();
   },
+
+  // Methods for the component
   methods: {
+    /**
+     * Fetch user credit cards from the API.
+     * Uses the access token stored in local storage for authentication.
+     */
     async fetchData() {
       try {
         const response = await fetch(
@@ -77,6 +121,8 @@ export default {
 </script>
 
 <style scoped>
+/* Styling for the Credit_Cards Component */
+
 .users_cards {
   display: flex;
   flex-wrap: wrap;
@@ -84,20 +130,13 @@ export default {
   padding: 20px;
 }
 
-.card_head {
-  display: flex;
-  justify-content: space-around;
-  margin: 0;
-  padding: 0;
-  width:auto;
-}
 .card_container {
   margin-bottom: 20px;
   margin-right: 25px;
   border: 2px solid transparent;
   border-radius: 8px;
   transition: box-shadow 0.3s ease, border-color 0.3s ease;
-  widht: auto;
+  width: auto;
 }
 
 .card_container:hover {
@@ -117,10 +156,8 @@ export default {
   justify-content: space-between;
   padding: 20px;
   position: relative;
-  margin-right: 40px;
-  margin-top: 20px;
+  margin: 20px 10px 0 10px;
   transition: transform 1s ease, box-shadow 1s ease;
-  margin-left: 10px;
 }
 
 .card:hover {
@@ -138,6 +175,13 @@ export default {
   left: 20px;
 }
 
+.card_head {
+  display: flex;
+  justify-content: space-around;
+  margin: 0;
+  padding: 0;
+}
+
 .card-number {
   font-size: 1.4em;
   letter-spacing: 2px;
@@ -150,9 +194,7 @@ export default {
   align-items: center;
   margin-top: auto;
 }
-.card_general_details, .other_general_details{
-  margin-left: 20px;
-}
+
 .card-details .name {
   font-size: 1em;
   text-transform: uppercase;
@@ -166,27 +208,13 @@ export default {
   font-size: 1.2em;
 }
 
-.card_general_details {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: start;
+.card_general_details,
+.other_general_details {
+  margin-left: 20px;
 }
 
 .card_dates {
   margin-right: 50px;
-}
-
-.card_buttons {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: start;
-  margin-left: 20px;
-  margin-bottom: 20px;
-}
-
-.btn {
-  margin-bottom: 10px;
-  margin-right: 20px;
 }
 
 p {

@@ -1,19 +1,36 @@
 <template>
+  <!-- Prepaid Cards Section -->
   <h style="color: aqua; margin: 0px 10px;" class="heading">Prepaid Cards</h>
-  <div style="margin: 10px;"><h v-if="all_cards.length === 0" style="color: white">Sorry! No card available</h></div>
+  
+  <!-- Message when no cards are available -->
+  <div style="margin: 10px;">
+    <h v-if="all_cards.length === 0" style="color: white">Sorry! No card available</h>
+  </div>
+
+  <!-- Display user cards -->
   <div class="users_cards">
-    <div v-for="card in all_cards" :key="card" class="card_container">
+    <div v-for="card in all_cards" :key="card.card_no" class="card_container">
+      <!-- Card Container -->
       <div class="card">
+        <!-- Card Header -->
         <div class="card_head">
           <div class="chip"></div>
           <div style="margin-left: 200px;" class="card_type">Prepaid Card</div>
         </div>
+        
+        <!-- Card Number -->
         <div class="card-number">{{ card.card_no }}</div>
+        
+        <!-- Card Details -->
         <div class="card-details">
           <div class="name">{{ card.full_name }}</div>
         </div>
+        
+        <!-- Card Logo -->
         <div class="logo">VISA</div>
       </div>
+
+      <!-- Card Additional Details -->
       <div class="card_details">
         <div class="card_general_details">
           <div class="card_dates">
@@ -26,31 +43,58 @@
           </div>
         </div>
       </div>
+
+      <!-- Uncomment buttons section if needed in the future -->
+      <!--
       <div class="card_buttons">
         <button type="button" class="btn btn-success">Block</button>
         <button type="button" class="btn btn-success">Reset PIN</button>
         <button type="button" class="btn btn-success">Replace</button>
         <button type="button" class="btn btn-success">Top Up</button>
       </div>
+      -->
     </div>
   </div>
-  <router-link to="/prepaid_card_application"><button style="margin-left: 30px; margin-bottom: 20px;" type="button" class="btn btn-success">Apply Prepaid</button></router-link>
+
+  <!-- Link to apply for a prepaid card -->
+  <router-link to="/prepaid_card_application">
+    <button style="margin-left: 30px; margin-bottom: 20px;" type="button" class="btn btn-success">
+      Apply Prepaid
+    </button>
+  </router-link>
 </template>
 
 <script>
+/**
+ * Prepaid_Cards Component
+ * 
+ * Displays a list of prepaid cards for the logged-in user, 
+ * fetched from the backend API. Includes features to show card
+ * details and manage user interaction.
+ */
 const url2 = "http://127.0.0.1:8000/post/get_user_prepaid_cards";
 
 export default {
   name: "Prepaid_Cards",
+  
+  // Component Data
   data() {
     return {
-      all_cards: [],
+      all_cards: [], // Stores fetched cards
     };
   },
+
+  // Lifecycle hook - Fetch data when component is mounted
   mounted() {
     this.fetchData();
   },
+
+  // Methods for the component
   methods: {
+    /**
+     * Fetch user prepaid cards from API.
+     * Uses stored access token for authentication.
+     */
     async fetchData() {
       try {
         const response = await fetch(url2, {
@@ -59,6 +103,7 @@ export default {
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
         });
+
         const data = await response.json();
         this.all_cards.push(...data);
       } catch (error) {
@@ -70,6 +115,8 @@ export default {
 </script>
 
 <style scoped>
+/* Styling for the Prepaid_Cards Component */
+
 .users_cards {
   display: flex;
   flex-wrap: wrap;
@@ -154,25 +201,6 @@ export default {
   right: 20px;
   font-weight: bold;
   font-size: 1.2em;
-}
-
-.card_buttons {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: start;
-  margin-left: 20px;
-  margin-bottom: 20px;
-}
-
-.btn {
-  margin-right: 30px;
-}
-
-p {
-  color: white;
-  font-size: small;
-  font-style: italic;
-  margin-top: 5px;
 }
 
 .card_general_details {

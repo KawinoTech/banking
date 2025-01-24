@@ -1,23 +1,40 @@
 <template>
-  <h style="color: aqua; margin: 0px 10px 0px 10px;" class="heading">Debit Cards</h>
-  <div style="margin: 10px;"><h v-if="all_cards.length === 0" style="color: white">Sorry! No card available</h></div>
+  <!-- Debit Cards Section -->
+  <h style="color: aqua; margin: 0 10px;" class="heading">Debit Cards</h>
+  
+  <!-- Message when no cards are available -->
+  <div style="margin: 10px;">
+    <h v-if="all_cards.length === 0" style="color: white">Sorry! No card available</h>
+  </div>
+
+  <!-- Display user debit cards -->
   <div class="users_cards">
-    <div v-for="card in all_cards" :key="card" class="card_container">
+    <div v-for="card in all_cards" :key="card.card_no" class="card_container">
+      <!-- Card Container -->
       <div class="card">
+        <!-- Card Header -->
         <div class="card_head">
           <div class="chip"></div>
           <div class="card_type">{{ card.card_classification }}</div>
         </div>
+
+        <!-- Card Number -->
         <div class="card-number">{{ card.card_no }}</div>
+
+        <!-- Card Details -->
         <div class="card-details">
           <div class="name">{{ card.full_name }}</div>
         </div>
+
+        <!-- Card Logo -->
         <div class="logo">VISA</div>
       </div>
+
+      <!-- Additional Details for Card -->
       <div class="card_details">
         <div class="card_general_details">
           <div class="card_dates">
-            <p>Date issued: <span>{{ card.date_issued }}</span></p>
+            <p>Date Issued: <span>{{ card.date_issued }}</span></p>
             <p>Expiry Date: <span>{{ card.expiry_date }}</span></p>
           </div>
           <div class="card_status">
@@ -26,33 +43,54 @@
           </div>
         </div>
       </div>
+
+      <!-- Uncomment this section if needed for button actions -->
+      <!--
       <div class="card_buttons">
         <button type="button" class="btn btn-success">Block</button>
         <button type="button" class="btn btn-success">Reset PIN</button>
         <button type="button" class="btn btn-success">Replace</button>
       </div>
+      -->
     </div>
   </div>
-  <router-link to="/debit_card_application"><button style="margin-left: 30px; margin-bottom: 20px;" type="button" class="btn btn-success">Apply Debit Card</button></router-link>
+
+  <!-- Link to apply for a debit card -->
+  <router-link to="/debit_card_application">
+    <button style="margin: 30px 10px 20px;" type="button" class="btn btn-success">Apply Debit Card</button>
+  </router-link>
 </template>
 
 <script>
-const url2 = "http://127.0.0.1:8000/post/get_user_debit_cards";
-
+/**
+ * Debit_Cards Component
+ *
+ * This component displays a list of debit cards for the logged-in user,
+ * fetched from a backend API. It includes details such as card number,
+ * classification, and account status.
+ */
 export default {
   name: "Debit_Cards",
+
   data() {
     return {
-      all_cards: [],
+      all_cards: [], // Array to store fetched debit cards
     };
   },
+
+  // Fetch card data after the component is mounted
   mounted() {
     this.fetchData();
   },
+
   methods: {
+    /**
+     * Fetch Debit Card Data
+     * Retrieves the user's debit card information using an API call with the access token.
+     */
     async fetchData() {
       try {
-        const response = await fetch(url2, {
+        const response = await fetch("http://127.0.0.1:8000/post/get_user_debit_cards", {
           method: "GET",
           headers: {
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -69,6 +107,7 @@ export default {
 </script>
 
 <style scoped>
+/* Layout for the entire card collection */
 .users_cards {
   display: flex;
   flex-wrap: wrap;
@@ -76,19 +115,20 @@ export default {
   padding: 15px;
 }
 
+/* Individual card container with hover effects */
 .card_container {
-  margin-bottom: 20px;
-  margin-right: 25px;
+  margin: 20px 5px 0;
   border: 2px solid transparent;
   border-radius: 8px;
   transition: box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
 .card_container:hover {
-  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   border-color: aqua;
 }
 
+/* Card Styling */
 .card {
   width: 350px;
   height: 200px;
@@ -101,10 +141,8 @@ export default {
   justify-content: space-between;
   padding: 20px;
   position: relative;
-  margin-right: 50px;
-  margin-top: 20px;
-  margin-left: 10px;
-  transition: transform 1s ease, box-shadow 1s ease;
+  margin: 0px 0px 0;
+  transition: transform 0.5s ease, box-shadow 0.5s ease;
 }
 
 .card:hover {
@@ -112,6 +150,7 @@ export default {
   box-shadow: 0 8px 16px rgb(118, 216, 255);
 }
 
+/* Chip design */
 .card .chip {
   width: 50px;
   height: 35px;
@@ -119,6 +158,7 @@ export default {
   background: #e0e0e0;
 }
 
+/* Card Head */
 .card_head {
   display: flex;
   justify-content: space-around;
@@ -126,12 +166,14 @@ export default {
   padding: 0;
 }
 
+/* Card Number */
 .card-number {
   font-size: 1.4em;
   letter-spacing: 2px;
   margin-top: 30px;
 }
 
+/* Card Details */
 .card-details {
   display: flex;
   justify-content: space-between;
@@ -139,11 +181,13 @@ export default {
   margin-top: auto;
 }
 
+/* Name section */
 .card-details .name {
   font-size: 1em;
   text-transform: uppercase;
 }
 
+/* Logo Position */
 .logo {
   position: absolute;
   bottom: 20px;
@@ -152,6 +196,7 @@ export default {
   font-size: 1.2em;
 }
 
+/* Card Details Section */
 .card_details {
   margin-top: 10px;
 }
@@ -160,44 +205,21 @@ export default {
   display: flex;
   flex-wrap: wrap;
   justify-content: start;
-  margin-bottom: 10px;
-  margin-left: 10px;
+  margin: 10px;
 }
 
 .card_dates {
   margin-right: 50px;
 }
 
-.card_buttons {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: start;
-  margin-bottom: 20px;
-}
-
-.btn {
-  margin-right: 30px;
-}
-
-.card_head {
-  display: flex;
-  justify-content: space-around;
-  margin: 0;
-  padding: 0;
-}
-
 p {
   color: gold;
   font-size: small;
   font-style: italic;
-  margin-top: 5px;
+  margin: 5px 0;
 }
 
 span {
   color: aqua;
-}
-
-.btn {
-  margin-right: 30px;
 }
 </style>
