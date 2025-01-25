@@ -131,18 +131,19 @@
         </div>
       </div>
     </div>
+    <Footer></Footer>
 </template>
 
 <script>
-const url2 = "http://127.0.0.1:8000/post/get_user_transactive_accounts";
-const url3 = 'http://127.0.0.1:8000/post/get_user_transactive_loans';
+import apiEndpoints from '@/api/apiEndpoints';
 import utils from "../../utils/utils";
 import Nav_Bar from "../../components/navbar.vue";
+import Footer from '@/components/others/footer.vue';
 
 export default {
   name: "Pay_Bill",
   components: {
-    Nav_Bar,
+    Nav_Bar, Footer
   },
   data() {
     /**
@@ -251,7 +252,7 @@ export default {
         });
 
         // Send POST request to the API
-        const response = await fetch("http://127.0.0.1:8000/post/paybill", {
+        const response = await fetch(apiEndpoints.transactions.payBill, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -281,7 +282,7 @@ export default {
        * Fetches the user's transaction accounts from the backend API.
        */
       try {
-        const response = await fetch(url2, {
+        const response = await fetch(apiEndpoints.accounts.getTransactiveaccounts, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -294,7 +295,7 @@ export default {
         console.error("Error fetching data:", error);
       }
       try {
-        const response = await fetch(url3, {
+        const response = await fetch(apiEndpoints.loans.getTransactiveloans, {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${localStorage.getItem('accessToken')}`,

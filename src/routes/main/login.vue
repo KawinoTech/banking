@@ -40,7 +40,8 @@
 </div>
 </template>
 <script>
-const url = 'http://127.0.0.1:8000/post/login'
+import apiEndpoints from "../../api/apiEndpoints"
+
 export default ({
     name: "Login_Page",
     data() {
@@ -49,7 +50,6 @@ export default ({
             customer_no: '',
             password_hash: ''
         },
-        correct_login : true
         }
         
     },
@@ -58,7 +58,7 @@ methods: {
 
     async login() {
       try {
-        const response = await fetch(url, {
+        const response = await fetch(apiEndpoints.auth.login, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -69,9 +69,10 @@ methods: {
                   throw new Error('Failed to Login in');
         }
         const data = await response.json();
-        const accessToken = data.access_token;
+        const { access_token, expires_in } = data
         // Storing the access token in localStorage
-        localStorage.setItem('accessToken', accessToken);
+        localStorage.setItem("accessToken", access_token);
+        localStorage.setItem("expiresAt", new Date(expires_in).getTime());
         // Redirect to another page after successful login
         this.$router.push('/home');
       } catch (error) {
@@ -87,18 +88,6 @@ methods: {
 
 </script>
 <style scoped>
-body {
-    background-image: linear-gradient(-225deg, #E3FDF5 0%, #FFE6FA 100%);
-background-image: linear-gradient(to top, #177b76 0%, #1b5d67 100%);
-background-attachment: fixed;
-  background-repeat: no-repeat;
-
-    font-family: 'Vibur', cursive;
-/*   the main font */
-    font-family: 'Abel', sans-serif;
-opacity: .95;
-/* background-image: linear-gradient(to top, #d9afd9 0%, #97d9e1 100%); */
-}
 
 
 form {

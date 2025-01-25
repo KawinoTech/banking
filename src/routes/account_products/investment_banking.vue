@@ -28,8 +28,10 @@
 </p>
       <router-link to="/new_account"><button>Invest</button></router-link>
     </div>
+    <Footer></Footer>
   </template>
   <script>
+  import Footer from '@/components/others/footer.vue';
   import Nav_Bar from '../../components/navbar.vue'
   import Currencies_Trend from '../../components/others/exchange_r.vue'
       export default {
@@ -42,7 +44,7 @@
           },
           components: {
             Nav_Bar,
-            Currencies_Trend
+            Currencies_Trend, Footer
   }
       }
   </script>

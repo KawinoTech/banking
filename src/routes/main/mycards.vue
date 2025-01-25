@@ -5,9 +5,7 @@
 <div><Debit_Cards></Debit_Cards></div>
 <div><Credit_Cards></Credit_Cards></div>
 <div><Prepaid_Cards></Prepaid_Cards></div>
-
-
-
+<Footer></Footer>
 </template>
 
 <script>
@@ -16,6 +14,7 @@ import Exchange_Rate from '../../components/others/exchange_r.vue'
 import Debit_Cards from '../../components/cards/debit_cards.vue'
 import Credit_Cards from '../../components/cards/credit_cards.vue'
 import Prepaid_Cards from '../../components/cards/prepaid_cards.vue'
+import Footer from '@/components/others/footer.vue'
 export default {
     name: "My_Cards",
     components: {
@@ -23,7 +22,8 @@ export default {
         Exchange_Rate,
         Credit_Cards,
         Debit_Cards,
-        Prepaid_Cards
+        Prepaid_Cards,
+        Footer
     }
 }
 </script>

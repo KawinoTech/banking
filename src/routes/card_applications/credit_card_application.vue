@@ -79,15 +79,18 @@
         </div>
       </div>
     </div>
+    <Footer></Footer>
 </template>
 
 <script>
 import Nav_Bar from '../../components/navbar.vue'
 import utils from '../../utils/utils'
+import apiEndpoints from '@/api/apiEndpoints';
+import Footer from '@/components/others/footer.vue';
     export default {
         name: "Credit_App",
         components: {
-          Nav_Bar
+          Nav_Bar, Footer
         },
         data() {
     return {
@@ -118,7 +121,7 @@ import utils from '../../utils/utils'
                           "email_address": this.formData.email,
                           "full_name": this.formData.full_name,
                         "card_classification": this.formData.card_classification})
-      const response = await fetch('http://127.0.0.1:8000/post/credit_card_application', {
+      const response = await fetch(apiEndpoints.cardService.applyCreditCard, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',

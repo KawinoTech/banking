@@ -313,7 +313,7 @@ import utils from '../../utils/utils';
 import Terms_Conditions from '../../components/account_opening/terms_and_conditions.vue';
 
 // The URL endpoint for creating a personal account
-const url = 'http://127.0.0.1:8000/post/open_personal_account';
+import apiEndpoints from '@/api/apiEndpoints';
 
 export default {
   name: 'Personal_Account',
@@ -396,7 +396,7 @@ export default {
         formData.append('payload', JSON.stringify(requestBody['payload']));
 
         // Submit form data to the server
-        const response = await fetch(url, {
+        const response = await fetch(apiEndpoints.accounts.openPersonalAccount, {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${localStorage.getItem('accessToken')}`,

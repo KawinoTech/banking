@@ -1,22 +1,33 @@
 <template>
-  <router-view style="width: 100%;"></router-view>
-      <footer>
-        <p style="font-size: 10px;">Copyright &copy; All rights reserved</p>
-        <p v-bind:class="status" style="font-size: 10px;">Application built by Okoth Kawino</p>
-    </footer>
+    <div id="app">
+        <SessionExpiredNotification
+            v-if="eventBus.showSessionNotification"
+            @close="eventBus.showSessionNotification = false"
+        />
+        <router-view />
+    </div>
 </template>
 
 <script>
+import { eventBus } from './utils/eventBus';
+import SessionExpiredNotification from './components/others/SessionExpiredNotification.vue';
+
 export default {
-  name: 'App',
-  data(){
-    return {
-      status: 'danger',
-      movie: '',
-      showpop: false
-    }
+  name: "App",
+  components: {
+    SessionExpiredNotification,
   },
-}
+  data() {
+    return {
+      showSessionNotification: false,
+    };
+  },
+  computed: {
+        eventBus() {
+            return eventBus;
+        }
+      },
+};
 </script>
 <style scoped>
 

@@ -78,7 +78,7 @@
   <script>
   import utils from '../../utils/utils';
   /*import Terms_Conditions from '../../components/account_opening/terms_and_conditions.vue';*/
-  const url = 'http://127.0.0.1:8000/post/apply_personal_loan';
+import apiEndpoints from '@/api/apiEndpoints';
   
   export default {
     name: 'Personal_Loan',
@@ -112,7 +112,7 @@
             payback_period: this.formData.repayment_period,
           });
           console.log(requestBody)
-          const response = await fetch(url, {
+          const response = await fetch(apiEndpoints.loans.applyPersonalLoan, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

@@ -69,6 +69,7 @@
  * fetched from a backend API. It includes details such as card number,
  * classification, and account status.
  */
+import apiEndpoints from '@/api/apiEndpoints';
 export default {
   name: "Debit_Cards",
 
@@ -90,7 +91,7 @@ export default {
      */
     async fetchData() {
       try {
-        const response = await fetch("http://127.0.0.1:8000/post/get_user_debit_cards", {
+        const response = await fetch(apiEndpoints.cardService.getUserDC, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,

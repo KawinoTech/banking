@@ -28,6 +28,7 @@
     <div style="background-color: aqua; height: 2px; width: 85%; margin-top: 80px; margin-left: 40px;">.</div>
     <h1 style="color: gold; margin-top: 30px;padding-left: 40px;">Wallets</h1>
     <ThirdP_Wallets></ThirdP_Wallets>
+    <Footer></Footer>
 </template>
 
 <script>
@@ -42,17 +43,15 @@ import Term_Deposits from '../../components/assets&_liabilities/term_deposit.vue
 import Current_Accounts from '../../components/assets&_liabilities/current_acs.vue'
 import Customer_Liability from '../../components/assets&_liabilities/customer_liability.vue'
 import ThirdP_Wallets from '../../components/services/thirdp_wallets.vue'
+import Footer from '../../components/others/footer.vue'
+
 export default {
   name: 'Home_Page',
 
-     data(){
-        return {
-            loading: true,
-        };
-     },
      components: {
       Exchange_Rate,
       Nav_Bar,
+      Footer,
       Accounts_Options,
       Financial_Services,
       Enter_tainment,
@@ -63,22 +62,6 @@ export default {
       Customer_Liability,
       ThirdP_Wallets
      },
-
-  methods: {
-    async fetchData() {
-        try {
-            const response = await fetch('');
-            const data = await response.json();
-            for (let i = 0; i < data.currencies.length; i++)
-            {
-                this.currencies.push(data.currencies[i]);
-            }
-            this.loading = false;
-        } catch (error) {
-            console.error('Error fetching data:', error);
-        }
-    }
-  }
 }
 </script>
 

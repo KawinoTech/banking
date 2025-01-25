@@ -90,11 +90,13 @@
           </div>
         </div>
       </div>
+      <Footer></Footer>
   </template>
   
   <script>
+  import Footer from '@/components/others/footer.vue';
   // URL for fetching user account data
-  const url2 = "http://127.0.0.1:8000/post/get_user_transactive_accounts";
+import apiEndpoints from '@/api/apiEndpoints';
   
   // Import necessary utility functions and components
   import utils from "../../utils/utils";
@@ -103,7 +105,8 @@
   export default {
     name: "Term_Deposit", // Component name
     components: {
-      Nav_Bar // Navigation bar component
+      Nav_Bar, // Navigation bar component
+      Footer
     },
 
     // Computed property to calculate potential interest for a term deposit
@@ -192,7 +195,7 @@
           });
 
           // Make the API request to book the term deposit
-          const response = await fetch("http://127.0.0.1:8000/post/book_td", {
+          const response = await fetch(apiEndpoints.termDeposits.bookTD, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -222,7 +225,7 @@
       // Method to fetch the user's account data
       async fetchData() {
         try {
-          const response = await fetch(url2, {
+          const response = await fetch(apiEndpoints.accounts.getTransactiveaccounts, {
             method: "GET",
             headers: {
               Authorization: `Bearer ${localStorage.getItem("accessToken")}`, // Pass access token in headers

@@ -16,15 +16,13 @@
 <div class="button_area" style="margin: 30px;">
 <router-link to="/home"><button type="button" class="btn btn-success">Return Home</button></router-link>
 </div>
+<Footer></Footer>
 </template>
 <script>
+import Footer from '@/components/others/footer.vue';
 export default {
     name: "Error_Pg",
-    data() {
-        return {
-            
-        }
-    }
+    components: {Footer}
 }
 </script>
 

@@ -70,20 +70,20 @@
         </div>
     </div>
     <div class="modal-overlay" v-if="isConfirmationVisible">
-            <div class="modal-card">
-                <h2 class="modal-title">Confirm Details</h2>
-                <p class="modal-content">
+            <div class="modal-card-">
+                <h2 class="modal-title-">Confirm Details</h2>
+                <p class="modal-content-">
                 Account Number: <span>{{ formData.account }}</span>
                 </p>
-                <p class="modal-content">
+                <p class="modal-content-">
                 Beneficiary: <span>{{ formData.beneficiary }}</span>
                 </p>
-                <p class="modal-content">
+                <p class="modal-content-">
                 Amount: <span>{{ formData.amount }}</span>
                 </p>
-                <div v-if="!isProcessing" class="modal-buttons">
-                <button class="modal-btn confirm" @click="confirmTransfer">Yes</button>
-                <button class="modal-btn cancel" @click="cancelTransfer">Cancel</button>
+                <div v-if="!isProcessing" class="modal-buttons-">
+                <button class="modal-btn- confirm" @click="confirmTransfer">Yes</button>
+                <button class="modal-btn- cancel" @click="cancelTransfer">Cancel</button>
                 </div>
                 <div v-if="isProcessing">
                 <p class="wait">
@@ -92,17 +92,19 @@
                 </div>
             </div>
         </div>
+        <Footer></Footer>
   </template>
   
   <script>
-  const url2 = "http://127.0.0.1:8000/post/get_user_transactive_accounts";
-  import utils from "../../utils/utils";
-  import Nav_Bar from "../../components/navbar.vue";
+import apiEndpoints from '@/api/apiEndpoints';
+import utils from "../../utils/utils";
+import Nav_Bar from "../../components/navbar.vue";
+import Footer from '@/components/others/footer.vue';
   
   export default {
     name: "Apple_Pay",
     components: {
-      Nav_Bar,
+      Nav_Bar, Footer
     },
     data() {
       return {
@@ -168,7 +170,7 @@
             account: this.findAndReturnSubsequent(this.formData.account, ":"),
 
           });
-          const response = await fetch("http://127.0.0.1:8000/post/topup_wallet", {
+          const response = await fetch(apiEndpoints.transactions.topUpWallet, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -191,7 +193,7 @@
       },
       async fetchData() {
         try {
-          const response = await fetch(url2, {
+          const response = await fetch(apiEndpoints.accounts.getTransactiveaccounts, {
             method: "GET",
             headers: {
               Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -232,7 +234,7 @@
   form {
     margin-left: 10px;
   }
-  i {
+  .fa-brands {
     color: aqua;
     font-size: 500px;
     margin: 0;
@@ -271,7 +273,7 @@
     margin-bottom: 20px; /* Add some spacing between them */
   }
 
- i {
+  .fa-brands {
     font-size: 300px; /* Reduce icon size for smaller screens */
   }
 }

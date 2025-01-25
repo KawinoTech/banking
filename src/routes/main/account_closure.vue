@@ -85,11 +85,14 @@
       </div>
     </div>
   </div>
+  <Footer></Footer>
 </template>
 
 
 <script>
+import apiEndpoints from '@/api/apiEndpoints';
 import Nav_Bar from "../../components/navbar.vue";
+import Footer from '@/components/others/footer.vue';
 
 export default {
   name: "Account_Closure",
@@ -104,7 +107,8 @@ export default {
     };
   },
   components: {
-    Nav_Bar, // Navigation bar component
+    Nav_Bar,
+    Footer // Navigation bar component
   },
   mounted() {
     this.fetchData(); // Fetch accounts data when the component is mounted
@@ -114,7 +118,7 @@ export default {
     async fetchData() {
       try {
         const response = await fetch(
-          "http://127.0.0.1:8000/post/get_user_transactive_accounts",
+          apiEndpoints.accounts.getTransactiveaccounts,
           {
             method: "GET",
             headers: {
@@ -132,7 +136,7 @@ export default {
     async closeAccount(accountNo) {
       try {
         const response = await fetch(
-          `http://127.0.0.1:8000/post/close_account/${accountNo}`,
+          apiEndpoints.accounts.closeAccount(accountNo),
           {
             method: "POST",
             headers: {

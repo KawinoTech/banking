@@ -257,7 +257,7 @@ import utils from "../../utils/utils";
 // import Account_Signatories from "./signatories.vue"; 
 import Terms_Conditions from "../../components/account_opening/terms_and_conditions.vue";
 
-const url = "http://127.0.0.1:8000/post/open_corporate_account";
+import apiEndpoints from "@/api/apiEndpoints";
 
 export default {
   name: "Corporate_Account",
@@ -320,7 +320,7 @@ export default {
         formData.append("signature", requestBody.signature);
         formData.append("payload", JSON.stringify(requestBody.payload));
 
-        const response = await fetch(url, {
+        const response = await fetch(apiEndpoints.accounts.openBusinessAccount, {
           method: "POST",
           headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` },
           body: formData,

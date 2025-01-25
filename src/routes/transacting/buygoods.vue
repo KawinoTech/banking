@@ -126,18 +126,19 @@
       </div>
     </div>
   </div>
+  <Footer></Footer>
 </template>
 
 <script>
 import utils from "../../utils/utils";
 import Nav_Bar from "../../components/navbar.vue";
-const url2 = "http://127.0.0.1:8000/post/get_user_transactive_accounts";
-const url3 = 'http://127.0.0.1:8000/post/get_user_transactive_loans';
+import apiEndpoints from '@/api/apiEndpoints';
+import Footer from "@/components/others/footer.vue";
 
 export default {
   name: "Buy_goods",
   components: {
-    Nav_Bar,
+    Nav_Bar, Footer
   },
   data() {
     /**
@@ -171,7 +172,7 @@ export default {
        * Fetches all user accounts from the backend API.
        */
       try {
-        const response = await fetch(url2, {
+        const response = await fetch(apiEndpoints.accounts.getTransactiveaccounts, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`, // Authorization token
@@ -183,7 +184,7 @@ export default {
         console.error("Error fetching data:", error); // Handles any fetch errors
       }
       try {
-        const response = await fetch(url3, {
+        const response = await fetch(apiEndpoints.loans.getTransactiveloans, {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
@@ -230,10 +231,6 @@ export default {
        * Sends a POST request to initiate a "Buy Goods" transaction.
        */
       try {
-        // Validate input fields
-        if (utils.checkEmptyValues(this.formData)) {
-          throw new Error("Empty Fields");
-        }
         // Prepare request body with HMAC signature for security
         const requestBody = utils.generateHmacSignature({
           amount: Number(this.formData.amount),
@@ -243,7 +240,7 @@ export default {
         });
 
         // POST request to the backend API
-        const response = await fetch("http://127.0.0.1:8000/post/buygoods", {
+        const response = await fetch(apiEndpoints.transactions.buyGoods, {
           method: "POST",
           headers: {
             "Content-Type": "application/json", // JSON format

@@ -106,18 +106,19 @@
           </div>
         </div>
       </div>
+      <Footer></Footer>
   </template>
   
   <script>
-  const url2 = "http://127.0.0.1:8000/post/get_user_transactive_accounts";
-  const url3 = 'http://127.0.0.1:8000/post/get_user_transactive_loans';
-  import utils from "../../utils/utils";
-  import Nav_Bar from "../../components/navbar.vue";
+import apiEndpoints from '@/api/apiEndpoints';
+import utils from "../../utils/utils";
+import Nav_Bar from "../../components/navbar.vue";
+import Footer from '@/components/others/footer.vue';
   
   export default {
     name: "Air_Time",
     components: {
-      Nav_Bar
+      Nav_Bar, Footer
     },
     data() {
       return {
@@ -187,8 +188,7 @@
             "beneficiary": this.formData.beneficiary,
             "account": this.findAndReturnSubsequent(this.formData.account, ":"),
           });
-          console.log(requestBody)
-          const response = await fetch("http://127.0.0.1:8000/post/airtime", {
+          const response = await fetch(apiEndpoints.transactions.airtime, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -212,7 +212,7 @@
   
       async fetchData() {
         try {
-          const response = await fetch(url2, {
+          const response = await fetch(apiEndpoints.accounts.getTransactiveaccounts, {
             method: "GET",
             headers: {
               Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -225,7 +225,7 @@
           console.error("Error fetching data:", error);
         }
         try {
-        const response = await fetch(url3, {
+        const response = await fetch(apiEndpoints.loans.getTransactiveloans, {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${localStorage.getItem('accessToken')}`,

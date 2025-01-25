@@ -26,6 +26,7 @@
   <Personal_Loan v-if="modePersonalloan"></Personal_Loan>
   <Business_Loan v-if="modeBusinessloan"></Business_Loan>
   <Mortgage_Facility v-if="modeMortgage"></Mortgage_Facility>
+  <Footer></Footer>
 </template>
 
 
@@ -34,11 +35,11 @@ import Nav_Bar from '../../components/navbar.vue';
 import Personal_Loan from '../../components/loans/personal_loan.vue';
 import Business_Loan from '../../components/loans/business_loan.vue';
 import Mortgage_Facility from '../../components/loans/mortgage.vue';
-
+import Footer from '@/components/others/footer.vue';
 
 export default {
   name: 'New_Loan',
-  components: { Nav_Bar,  Personal_Loan, Business_Loan, Mortgage_Facility},
+  components: { Nav_Bar,  Personal_Loan, Business_Loan, Mortgage_Facility, Footer},
 
   data() {
     return {

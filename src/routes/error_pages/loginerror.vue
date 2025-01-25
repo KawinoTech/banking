@@ -16,15 +16,13 @@
 <div class="button_area" style="margin: 30px;">
 <router-link to="/"><button type="button" class="btn btn-success">Try Again</button></router-link>
 </div>
+<Footer></Footer>
 </template>
 <script>
+import Footer from '@/components/others/footer.vue';
 export default {
     name: "Login_Error_Pg",
-    data() {
-        return {
-            
-        }
-    }
+    components: {Footer}
 }
 </script>
 

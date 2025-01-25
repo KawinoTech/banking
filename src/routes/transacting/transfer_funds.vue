@@ -133,6 +133,7 @@
       </div>
     </div>
   </div>
+  <Footer></Footer>
 </template>
 
 <script>
@@ -142,15 +143,15 @@
  * confirmation modals, and user account fetching.
  */
 
-const url2 = 'http://127.0.0.1:8000/post/get_user_transactive_accounts';
-const url3 = 'http://127.0.0.1:8000/post/get_user_transactive_loans';
+import apiEndpoints from '@/api/apiEndpoints';
 import Nav_Bar from '../../components/navbar.vue';
 import utils from '../../utils/utils';
+import Footer from '@/components/others/footer.vue';
 
 export default {
   name: "Transfer_Funds",
   components: {
-    Nav_Bar,
+    Nav_Bar, Footer
   },
   data() {
     return {
@@ -235,7 +236,7 @@ export default {
           beneficiary: this.formData.beneficiary,
         });
 
-        const response = await fetch('http://127.0.0.1:8000/post/transfer', {
+        const response = await fetch(apiEndpoints.transactions.c2bTransfer, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -269,7 +270,7 @@ export default {
      */
     async fetchData() {
       try {
-        const response = await fetch(url2, {
+        const response = await fetch(apiEndpoints.accounts.getTransactiveaccounts, {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
@@ -282,7 +283,7 @@ export default {
         console.error('Error fetching data:', error);
       }
       try {
-        const response = await fetch(url3, {
+        const response = await fetch(apiEndpoints.loans.getTransactiveloans, {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${localStorage.getItem('accessToken')}`,

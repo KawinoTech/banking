@@ -63,15 +63,18 @@
       Next
     </button>
   </div>
+  <Footer></Footer>
 </template>
 
 <script>
+import apiEndpoints from '@/api/apiEndpoints';
 import Nav_Bar from "../../components/navbar.vue";
 import jsPDF from "jspdf"; // Import jsPDF library
+import Footer from '@/components/others/footer.vue';
 
 export default {
   name: "Transaction_History",
-  components: { Nav_Bar },
+  components: { Nav_Bar, Footer },
 
   data() {
     return {
@@ -93,7 +96,7 @@ export default {
     async fetchData() {
       try {
         const response = await fetch(
-          "http://127.0.0.1:8000/post/all_user_transactions",
+          apiEndpoints.transactions.allCurrentUserTransactions,
           {
             method: "GET",
             headers: {

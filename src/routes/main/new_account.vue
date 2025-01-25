@@ -26,6 +26,7 @@
   <Personal_Account v-if="modePersonalAcc"></Personal_Account>
   <Corporate_Account v-if="modeCorporateAcc"></Corporate_Account>
   <Foreign_Currency_Account v-if="modeFCAcc"></Foreign_Currency_Account>
+  <Footer></Footer>
 </template>
 
 
@@ -34,11 +35,12 @@ import Nav_Bar from '../../components/navbar.vue';
 import Personal_Account from '../../components/account_opening/personal_acc.vue';
 import Corporate_Account from '../../components/account_opening/corporate_acc.vue';
 import Foreign_Currency_Account from '../../components/account_opening/foreign_currency.vue';
+import Footer from '@/components/others/footer.vue';
 
 
 export default {
   name: 'New_Account',
-  components: { Nav_Bar,  Personal_Account, Corporate_Account, Foreign_Currency_Account},
+  components: { Nav_Bar,  Personal_Account, Corporate_Account, Foreign_Currency_Account, Footer},
 
   data() {
     return {

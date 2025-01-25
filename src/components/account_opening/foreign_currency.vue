@@ -302,7 +302,7 @@
 import utils from '../../utils/utils';
 import Terms_Conditions from '../../components/account_opening/terms_and_conditions.vue';
 
-const url = 'http://127.0.0.1:8000/post/open_foreign_currency_account';
+import apiEndpoints from '@/api/apiEndpoints';
 
 export default {
   name: 'Foreign_Currency_Account',
@@ -381,7 +381,7 @@ export default {
         formData.append('signature', requestBody['signature']);
         formData.append('payload', JSON.stringify(requestBody['payload']));
 
-        const response = await fetch(url, {
+        const response = await fetch(apiEndpoints.accounts.openForeignCurrency, {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${localStorage.getItem('accessToken')}`,

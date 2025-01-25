@@ -5,15 +5,13 @@
         <div id="icon"><i class="fa-solid fa-circle-exclamation fa-beat-fade"></i></div>
         <a href="/">Go Back Home</a>
     </div>
+    <Footer></Footer>
 </template>
 <script>
+import Footer from '@/components/others/footer.vue';
 export default {
     name: "Not_Found",
-    data() {
-        return {
-            
-        }
-    }
+    components: {Footer}
 }
 </script>
 

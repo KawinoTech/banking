@@ -35,10 +35,14 @@
         </div>
       </div>
     </div>
+    <Footer></Footer>
 </template>
 <script>
 import Nav_Bar from '../../components/navbar.vue'
 import utils from '../../utils/utils'
+import apiEndpoints from '@/api/apiEndpoints';
+import Footer from '@/components/others/footer.vue';
+
 export default {
   name: 'Report_Problem',
 
@@ -53,13 +57,13 @@ export default {
         };
      },
      components: {
-        Nav_Bar
+        Nav_Bar, Footer
      },
      methods: {
      async reportProblem() {
      this.submitted = true;
      try{
-          const response = await fetch('http://127.0.0.1:8000/post/report_problem',
+          const response = await fetch(apiEndpoints.helpDesk.report,
           {
             method: 'POST',
             headers: {

@@ -79,15 +79,17 @@
         </div>
       </div>
     </div>
+    <Footer></Footer>
 </template>
 <script>
 import Nav_Bar from '../../components/navbar.vue'
 import utils from '../../utils/utils'
-const url2 = "http://127.0.0.1:8000/post/get_user_transactive_accounts";
+import apiEndpoints from '@/api/apiEndpoints';
+import Footer from '@/components/others/footer.vue';
     export default {
         name: "Prepaid_App",
         components: {
-          Nav_Bar
+          Nav_Bar, Footer
         },
         data() {
     return {
@@ -111,7 +113,7 @@ const url2 = "http://127.0.0.1:8000/post/get_user_transactive_accounts";
   methods: {
     async fetchData() {
       try {
-        const response = await fetch(url2, {
+        const response = await fetch(apiEndpoints.accounts.getTransactiveaccounts, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -138,7 +140,7 @@ const url2 = "http://127.0.0.1:8000/post/get_user_transactive_accounts";
                           "full_name": this.formData.full_name,
                         "intended_usage": this.formData.intended_usage,
                       "balance": Number(this.formData.preloaded_amount)})
-      const response = await fetch('http://127.0.0.1:8000/post/prepaid_card_application', {
+      const response = await fetch(apiEndpoints.cardService.applyPrepaidCard, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',

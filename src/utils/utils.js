@@ -72,4 +72,8 @@ export default {
       }
     }
   },
+  isTokenExpired() {
+    const expiresAt = localStorage.getItem("expiresAt");
+    return !expiresAt || Date.now() > parseInt(expiresAt, 10);
+  }
 };

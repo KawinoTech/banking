@@ -117,7 +117,7 @@
   /*import Account_Signatories from "./signatories.vue"; will work on this feature later*/
   /*import Terms_Conditions from "../../components/account_opening/terms_and_conditions.vue";*/
   
-  const url = "http://127.0.0.1:8000/post/apply_business_loan";
+import apiEndpoints from "@/api/apiEndpoints";
   
   export default {
     name: "Business_Loan",
@@ -174,7 +174,7 @@
           formData.append('signature', requestBody['signature']);
           formData.append('payload', JSON.stringify(requestBody['payload']));
   
-          const response = await fetch(url, {
+          const response = await fetch(apiEndpoints.loans.applyBusinessLoan, {
             method: "POST",
             headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` },
             body: formData,

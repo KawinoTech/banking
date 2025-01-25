@@ -133,7 +133,7 @@
   import utils from '../../utils/utils';
   /*import Terms_Conditions from '../../components/account_opening/terms_and_conditions.vue';*/
   
-  const url = 'http://127.0.0.1:8000/post/apply_mortgage';
+import apiEndpoints from '@/api/apiEndpoints';
   
   export default {
     name: 'Mortgage_Facility',
@@ -191,7 +191,7 @@
           for (let [key, value] of formData.entries()) {
             console.log(key, value)
           }
-          const response = await fetch(url, {
+          const response = await fetch(apiEndpoints.loans.applyMortgage, {
             method: 'POST',
             headers: {
               Authorization: `Bearer ${localStorage.getItem('accessToken')}`,

@@ -30,8 +30,10 @@
     </p>
     <router-link to="/new_account"><button>Open Account</button></router-link>
   </div>
+  <Footer></Footer>
 </template>
 <script>
+import Footer from '@/components/others/footer.vue';
 import Nav_Bar from '../../components/navbar.vue'
     export default {
         name: 'Savings_Account',
@@ -42,7 +44,7 @@ import Nav_Bar from '../../components/navbar.vue'
             }
         },
         components: {
-          Nav_Bar
+          Nav_Bar, Footer
 }
     }
 </script>

@@ -72,7 +72,7 @@
  * fetched from the backend API. Includes features to show card
  * details and manage user interaction.
  */
-const url2 = "http://127.0.0.1:8000/post/get_user_prepaid_cards";
+import apiEndpoints from '@/api/apiEndpoints';
 
 export default {
   name: "Prepaid_Cards",
@@ -97,7 +97,7 @@ export default {
      */
     async fetchData() {
       try {
-        const response = await fetch(url2, {
+        const response = await fetch(apiEndpoints.cardService.getUserPC, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,

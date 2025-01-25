@@ -77,6 +77,7 @@
  * fetched from the backend API. Includes features to show
  * card details and manage user interaction.
  */
+import apiEndpoints from '@/api/apiEndpoints';
 export default {
   name: "Credit_Cards",
   
@@ -101,7 +102,7 @@ export default {
     async fetchData() {
       try {
         const response = await fetch(
-          "http://127.0.0.1:8000/post/get_user_credit_cards",
+          apiEndpoints.cardService.getUserCC,
           {
             method: "GET",
             headers: {
