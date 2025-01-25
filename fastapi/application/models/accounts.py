@@ -2,7 +2,7 @@ from sqlalchemy import Column, String, Integer, ForeignKey, Boolean, Float, Text
 from .base_model import BaseModel
 from .cards import DebitCards
 from .files import Signatory, CorporateDocs, PersonalDocs, F_C_A_Docs
-from ..database import Base
+from . import Base
 from babel.numbers import format_currency
 from sqlalchemy.orm import relationship
 from datetime import datetime

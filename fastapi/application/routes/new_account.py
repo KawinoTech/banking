@@ -8,7 +8,6 @@ from ..schema import accounts
 from .. import oauth
 from ..database import get_db
 from ..models.accounts import PersonalAccounts, ForeignCurrency, CorporateAccounts
-from ..models.loans import PersonalLoans, BusinessLoans
 from typing import List
 from ..models.files import CorporateDocs, PersonalDocs, F_C_A_Docs
 import json

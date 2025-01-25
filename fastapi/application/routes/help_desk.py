@@ -4,7 +4,7 @@ from datetime import datetime
 from uuid import uuid4
 from ..schema import help_desk
 
-from .. import schemas, oauth
+from .. import oauth
 from ..models.customer_service import ClientHelpRequest, ClientReports
 from ..database import get_db
 

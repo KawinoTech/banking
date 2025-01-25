@@ -10,7 +10,7 @@ from ..models.transactions import Transfer, BuyGoods, PayBill, Airtime, TopUpWal
 from ..models.accounts import PersonalAccounts, CorporateAccounts
 from ..models.loans import PersonalLoans, BusinessLoans
 from ..models.users import Customer
-from .. import schemas, oauth
+from .. import oauth
 from ..schema import transactions
 from ..database import get_db
 
@@ -609,7 +609,7 @@ def all_user_transactions(
         topups = user.get_topups(db)
 
         # Consolidate all transactions
-        all_transactions = c2b_transactions + bills + goods_and_services + airtime
+        all_transactions = c2b_transactions + bills + goods_and_services + airtime + topups
 
         # Format transaction details
         for transaction in all_transactions:

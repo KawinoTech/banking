@@ -19,7 +19,7 @@ Attributes and Relationships:
     Each subclass of `Loan` has unique attributes and relationships tailored to its specific use case.
 """
 
-from ..database import Base
+from . import Base
 from sqlalchemy import Column, String, Integer, ForeignKey, Float, Text, DateTime
 from .base_model import BaseModel
 from sqlalchemy.orm import relationship

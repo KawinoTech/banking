@@ -1,5 +1,32 @@
+"""
+Customer Service Module.
+
+This module defines models related to customer service interactions, specifically help requests and customer reports. 
+The models facilitate tracking and managing customer inquiries and feedback within the system. Each model inherits 
+from `BaseModel` for common fields and functionality and integrates with SQLAlchemy ORM for database interactions.
+
+Models:
+    - ClientHelpRequest: Represents a help request created by a customer. Tracks the customer's unique identifier, 
+      the help message, and its resolution status.
+    - ClientReports: Represents a report filed by a customer, such as complaints or feedback. Tracks the customer's 
+      unique identifier, report content, and resolution status.
+
+Usage:
+    These models can be used to manage customer support tickets and ensure follow-ups on reports or inquiries.
+    They provide utility methods to instantiate and represent the objects meaningfully for debugging and logging.
+
+Table Names:
+    - client_help: Database table for storing help requests.
+    - client_reports: Database table for storing reports filed by customers.
+
+Attributes:
+    - owner_customer_no (Foreign Key): Links to the unique identifier of a customer in the customers table.
+    - text (Text): Stores the description or message related to the help request or report.
+    - status_resolved (Boolean): Tracks if the item has been addressed; defaults to unresolved (False).
+"""
+
 from .base_model import BaseModel
-from ..database import Base
+from . import Base
 from sqlalchemy import Column, Text, Integer, ForeignKey, Boolean
 
 class ClientHelpRequest(BaseModel, Base):

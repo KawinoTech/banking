@@ -1,5 +1,25 @@
+"""
+Module: term_deposit.py
+
+This module defines the TermDeposit class, which models a term deposit system in a financial application.
+
+Key Features:
+- Integration with SQLAlchemy ORM for database operations.
+- Representation of term deposits with attributes such as account number, owner, maturity details, and rates.
+- Utility methods for formatting and calculating data (e.g., UUID truncation, currency formatting, date operations).
+
+Classes:
+- TermDeposit: Represents a term deposit, including details such as the maturity period, interest rate, and deposit amount.
+
+Dependencies:
+- SQLAlchemy: For database interactions and table definitions.
+- Babel: To format currency representations.
+- datetime: For managing date and time operations.
+
+"""
+
 from .base_model import BaseModel
-from ..database import Base
+from . import Base
 from sqlalchemy import Column, String, Integer, ForeignKey, Float, DateTime
 from babel.numbers import format_currency
 from datetime import datetime

@@ -1,6 +1,47 @@
+"""
+Module: transactions.py
+
+This module provides the implementation of transaction-related models used in a financial application.
+
+Key Features:
+- Models for different transaction types, including transfers, bill payments, airtime purchases, goods purchases, and wallet top-ups.
+- Common functionality for handling transactions such as UUID truncation, currency formatting, and reference number generation.
+- Seamless database integration with SQLAlchemy.
+
+Classes:
+1. **Transaction**:
+    - Base model for financial transactions, containing common attributes such as reference number, account, amount, remarks, beneficiary, and date of the transaction.
+    - Provides utility methods for data truncation and formatting.
+    
+2. **Transfer**:
+    - Represents a transfer transaction.
+    - Contains additional attributes such as the owner customer number and transaction type (defaults to "c2b_transfer").
+
+3. **PayBill**:
+    - Represents a bill payment transaction.
+    - Adds attributes for customer ownership and transaction type (defaults to "paybill").
+
+4. **BuyGoods**:
+    - Represents a transaction for purchasing goods and services.
+    - Includes attributes for customer ownership and transaction type (defaults to "buy_goods_and_services").
+
+5. **Airtime**:
+    - Represents an airtime purchase transaction.
+    - Handles details specific to airtime purchases with transaction type set to "airtime".
+
+6. **TopUpWallet**:
+    - Represents a wallet top-up transaction.
+    - Adds attributes for customer ownership, transaction type (defaults to "wallet_topup"), and service provider.
+
+Dependencies:
+- SQLAlchemy: ORM for database interactions.
+- Babel: Formatting currency representations.
+- random, string: Utility modules for generating unique reference numbers.
+"""
+
 from sqlalchemy import Column, String, Integer, ForeignKey, Float, DateTime
 from .base_model import BaseModel
-from ..database import Base
+from . import Base
 from babel.numbers import format_currency
 import random
 import string

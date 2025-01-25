@@ -15,7 +15,10 @@ from uuid import uuid4
 CLASSES = [PersonalAccounts, CorporateAccounts]
 
 # Initialize the router for the "/post" prefix
-router = APIRouter(prefix="/post")
+router = APIRouter(
+    prefix="/post",
+    tags=["Investments"],  # Assign this router to a specific documentation category
+)
 
 # POST endpoint to book a term deposit
 @router.post("/book_td", status_code=status.HTTP_201_CREATED, response_model=term_deposits.TDSummary)

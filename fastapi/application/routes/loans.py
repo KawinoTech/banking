@@ -29,7 +29,6 @@ Modules Imported:
 """
 
 from fastapi import Depends, status, APIRouter, HTTPException, File, Form, UploadFile
-from sqlalchemy.exc import IntegrityError
 from .. import oauth
 from typing import List
 from dateutil.relativedelta import relativedelta

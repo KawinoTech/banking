@@ -1,6 +1,24 @@
+"""
+Card Models Module.
+
+This module defines various models representing different types of cards, such as prepaid, credit, and debit cards.
+All card models inherit common fields and methods from the `BaseCards` class, which itself extends the `BaseModel` class.
+The models are designed for integration with a database using SQLAlchemy, facilitating ORM functionality.
+
+Models:
+    - BaseCards: The base model for all card types, containing common fields and utility methods.
+    - PrepaidCards: Represents a prepaid card with specific attributes and functionality.
+    - CreditCards: Represents a credit card, including attributes such as balance, interest rate, and credit limit.
+    - DebitCards: Represents a debit card, including attributes like the attached account number and classification.
+
+Usage:
+    These models can be used in a SQLAlchemy-based application to interact with database records.
+    They provide pre-defined fields and methods for operations such as generating card numbers, formatting them, and truncating sensitive information.
+"""
+
 from sqlalchemy import Column, String, Integer, ForeignKey, Float, Text, DateTime
 from .base_model import BaseModel
-from ..database import Base
+from . import Base
 import random
 import string
 
