@@ -55,58 +55,58 @@ This project is a **comprehensive financial management API**, built using **Fast
    cd fastapi
 
 2. **Clone the Repository**
-    python -m venv venv
-    source venv/bin/activate  # On macOS/Linux
-    venv\Scripts\activate     # On Windows
+- python -m venv venv
+- source venv/bin/activate  # On macOS/Linux
+- venv\Scripts\activate     # On Windows
 
 3. **Install Dependencies**
-    pip install -r requirements.txt
+- pip install -r requirements.txt
 
 
 4. **Setup Environment Variables**
-SECRET_KEY=your_secret_key
-DATABASE_USERNAME=your_db_username
-DATABASE_PASSWORD=your_db_password
-DATABASE_HOST=localhost
-DATABASE_NAME=your_db_name
-ACCESS_TOKEN_EXPIRATION=30  # Token expiry in minutes
+- SECRET_KEY=your_secret_key
+- DATABASE_USERNAME=your_db_username
+- DATABASE_PASSWORD=your_db_password
+- DATABASE_HOST=localhost
+- DATABASE_NAME=your_db_name
+- ACCESS_TOKEN_EXPIRATION=30  # Token expiry in minutes
 
 5. **Start the Server**
-uvicorn main:app --reload
+- uvicorn main:app --reload
 
 ## Usage
 ### Endpoints
 
-FastAPI automatically generates interactive API documentation, accessible at:
-Swagger UI: /docs
+- FastAPI automatically generates interactive API documentation, accessible at:
+- Swagger UI: /docs
 
 1. **User Management**
-POST /post/create: Create a new user.
-POST /post/login: Authenticate a user and retrieve an access token.
-GET /post/get_customers: Retrieve all customers.
+- POST /post/create: Create a new user.
+- POST /post/login: Authenticate a user and retrieve an access token.
+- GET /post/get_customers: Retrieve all customers.
 
 2. **Transaction Management**
-POST /post/transfer: Create a transfer transaction.
-POST /post/paybill: Make a bill payment transaction.
-POST /post/buygoods: Create a goods purchase transaction.
+- POST /post/transfer: Create a transfer transaction.
+- POST /post/paybill: Make a bill payment transaction.
+- POST /post/buygoods: Create a goods purchase transaction.
 
 3. **Card Services**
-POST /post/debit_card_application: Apply for a debit card.
-POST /post/credit_card_application: Apply for a credit card.
-POST /post/prepaid_card_application: Apply for a prepaid card.
+- POST /post/debit_card_application: Apply for a debit card.
+- POST /post/credit_card_application: Apply for a credit card.
+- POST /post/prepaid_card_application: Apply for a prepaid card.
 
 ## Configuration
 This application supports environment-specific configurations using .env files. Key variables include:
-SECRET_KEY: Used for cryptographic operations.
-DATABASE_USERNAME, DATABASE_PASSWORD, DATABASE_HOST, DATABASE_NAME: Database connection credentials.
-ACCESS_TOKEN_EXPIRATION: The expiration time (in minutes) for JWT tokens.
+- SECRET_KEY: Used for cryptographic operations.
+- DATABASE_USERNAME, DATABASE_PASSWORD, DATABASE_HOST, DATABASE_NAME: Database connection credentials.
+- ACCESS_TOKEN_EXPIRATION: The expiration time (in minutes) for JWT tokens.
 
 ## Technical Highlights
 1. **SQLAlchemy ORM**
 
 Models include users, transactions, loans, and term deposits.
 Support for foreign keys and relationships, enabling efficient data querying.
-Connection Pooling:
+2. **Connection Pooling**
 
 Efficient use of MySQL connections via create_engine with configurable parameters like pool_size and pool_recycle.
 2. **Session Management**
